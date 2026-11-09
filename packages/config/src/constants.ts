@@ -1,0 +1,33 @@
+export const SYSTEM_CONSTANTS = {
+  APP_NAME: 'Rental Marketplace Peshawar',
+  VERSION: '1.0.0',
+  DEFAULT_LOCALE: 'en-PK',
+  DEFAULT_CURRENCY: 'PKR',
+  DEFAULT_TIMEZONE: 'Asia/Karachi',
+
+  PAGINATION: {
+    DEFAULT_LIMIT: 20,
+    MAX_LIMIT: 50,
+  },
+
+  SECURITY: {
+    PASSWORD_SALT_ROUNDS: 12,
+    OTP_LENGTH: 6,
+    OTP_EXPIRY_MINUTES: 10,
+    MAX_LOGIN_ATTEMPTS: 5,
+    LOCKOUT_DURATION_MINUTES: 15,
+  },
+
+  MEDIA: {
+    MAX_IMAGE_SIZE_MB: 10,
+    MAX_IMAGES_PER_PROPERTY: 15,
+    ALLOWED_IMAGE_MIME_TYPES: ['image/jpeg', 'image/png', 'image/webp'],
+  },
+
+  RATE_LIMITS: {
+    GLOBAL_TTL_SECONDS: 60,
+    GLOBAL_MAX_REQUESTS: 120,
+    AUTH_MAX_REQUESTS: 10,
+    SEARCH_MAX_REQUESTS: 60,
+  },
+} as const;

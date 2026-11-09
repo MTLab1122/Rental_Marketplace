@@ -1,0 +1,152 @@
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [postgis, uuidOssp(map: "uuid-ossp")]
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+enum UserRole {
+  TENANT
+  LANDLORD
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum TenantType {
+  STUDENT
+  FAMILY
+}
+
+enum PropertyEligibility {
+  STUDENTS_ONLY
+  FAMILIES_ONLY
+}
+
+enum PropertyStatus {
+  DRAFT
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+  SUSPENDED
+  RENTED
+  UNAVAILABLE
+  DELETED
+}
+
+model User {
+  id           String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email        String      @unique @db.VarChar(255)
+  passwordHash String      @db.VarChar(255)
+  fullName     String      @db.VarChar(150)
+  phoneNumber  String      @db.VarChar(20)
+  role         UserRole    @default(TENANT)
+  tenantType   TenantType?
+  isVerified   Boolean     @default(false)
+  createdAt    DateTime    @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime    @updatedAt @db.Timestamptz(6)
+  deletedAt    DateTime?   @db.Timestamptz(6)
+
+  // Relations
+  properties      Property[]     @relation("LandlordProperties")
+  approvedByProps Property[]     @relation("AdminApprovedProperties")
+  refreshTokens   RefreshToken[]
+  auditLogs       AuditLog[]
+
+  @@index([email])
+  @@index([role])
+  @@index([tenantType])
+  @@map("users")
+}
+
+model RefreshToken {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId     String   @db.Uuid
+  tokenHash  String   @unique @db.VarChar(255)
+  familyId   String   @db.Uuid
+  isRevoked  Boolean  @default(false)
+  expiresAt  DateTime @db.Timestamptz(6)
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+model Locality {
+  id               String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name             String   @unique @db.VarChar(100)
+  slug             String   @unique @db.VarChar(100)
+  postalCode       String   @db.VarChar(10)
+  latitude         Decimal  @db.Decimal(10, 7)
+  longitude        Decimal  @db.Decimal(10, 7)
+  boundaryGeoJson  Json?
+  isActive         Boolean  @default(true)
+  createdAt        DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime @updatedAt @db.Timestamptz(6)
+
+  properties Property[]
+
+  @@index([slug])
+  @@index([isActive])
+  @@map("localities")
+}
+
+model Property {
+  id                 String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  landlordId         String              @db.Uuid
+  localityId         String              @db.Uuid
+  title              String              @db.VarChar(255)
+  description        String              @db.Text
+  eligibility        PropertyEligibility
+  status             PropertyStatus      @default(DRAFT)
+  monthlyRentPkr     Decimal             @db.Decimal(12, 2)
+  securityDepositPkr Decimal             @db.Decimal(12, 2)
+  bedrooms           Int                 @db.SmallInt
+  bathrooms          Int                 @db.SmallInt
+  latitude           Decimal             @db.Decimal(10, 7)
+  longitude          Decimal             @db.Decimal(10, 7)
+  address            String              @db.VarChar(255)
+  isAvailable        Boolean             @default(true)
+  verifiedAt         DateTime?           @db.Timestamptz(6)
+  approvedById       String?             @db.Uuid
+  createdAt          DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime            @updatedAt @db.Timestamptz(6)
+  deletedAt          DateTime?           @db.Timestamptz(6)
+
+  landlord   User     @relation("LandlordProperties", fields: [landlordId], references: [id])
+  locality   Locality @relation(fields: [localityId], references: [id])
+  approvedBy User?    @relation("AdminApprovedProperties", fields: [approvedById], references: [id])
+
+  // Composite indexes for performance and strict separation
+  @@index([localityId])
+  @@index([eligibility, status, isAvailable])
+  @@index([status, deletedAt])
+  @@index([landlordId])
+  @@map("properties")
+}
+
+model AuditLog {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId     String?  @db.Uuid
+  action     String   @db.VarChar(100)
+  entity     String   @db.VarChar(50)
+  entityId   String?  @db.VarChar(50)
+  metadata   Json?
+  ipAddress  String?  @db.VarChar(45)
+  userAgent  String?  @db.VarChar(255)
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entity, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+

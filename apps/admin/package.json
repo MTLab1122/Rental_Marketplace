@@ -1,0 +1,29 @@
+{
+  "name": "@rental-peshawar/admin",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev -p 3001",
+    "build": "next build",
+    "start": "next start -p 3001",
+    "lint": "eslint \"{app,components,lib}/**/*.{ts,tsx}\"",
+    "lint:fix": "eslint \"{app,components,lib}/**/*.{ts,tsx}\" --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "node --test tests/**/*.test.js"
+  },
+  "dependencies": {
+    "@rental-peshawar/config": "workspace:*",
+    "@rental-peshawar/shared-types": "workspace:*",
+    "@rental-peshawar/ui": "workspace:*",
+    "next": "^15.1.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "typescript": "^5.7.3"
+  }
+}

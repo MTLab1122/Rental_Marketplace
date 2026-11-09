@@ -1,0 +1,12 @@
+node_modules/
+dist/
+build/
+.next/
+coverage/
+.dart_tool/
+apps/mobile/
+package-lock.json
+pnpm-lock.yaml
+*.min.js
+*.min.css
+
