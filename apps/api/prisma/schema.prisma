@@ -9,7 +9,11 @@ generator client {
   previewFeatures = ["postgresqlExtensions"]
 }
 
-enum UserRole {
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum UserRoleName {
   TENANT
   LANDLORD
   ADMIN
@@ -26,6 +30,16 @@ enum PropertyEligibility {
   FAMILIES_ONLY
 }
 
+enum PropertyType {
+  SINGLE_ROOM
+  SHARED_ROOM
+  HOSTEL
+  PORTION
+  APARTMENT
+  HOUSE
+  RESIDENTIAL_UNIT
+}
+
 enum PropertyStatus {
   DRAFT
   PENDING_REVIEW
@@ -37,58 +51,235 @@ enum PropertyStatus {
   DELETED
 }
 
-model User {
-  id           String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  email        String      @unique @db.VarChar(255)
-  passwordHash String      @db.VarChar(255)
-  fullName     String      @db.VarChar(150)
-  phoneNumber  String      @db.VarChar(20)
-  role         UserRole    @default(TENANT)
-  tenantType   TenantType?
-  isVerified   Boolean     @default(false)
-  createdAt    DateTime    @default(now()) @db.Timestamptz(6)
-  updatedAt    DateTime    @updatedAt @db.Timestamptz(6)
-  deletedAt    DateTime?   @db.Timestamptz(6)
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+  EXPIRED
+}
 
-  // Relations
-  properties      Property[]     @relation("LandlordProperties")
-  approvedByProps Property[]     @relation("AdminApprovedProperties")
-  refreshTokens   RefreshToken[]
-  auditLogs       AuditLog[]
+enum InquiryStatus {
+  SUBMITTED
+  SEEN
+  REPLIED
+  ACCEPTED
+  DECLINED
+  CLOSED
+}
+
+enum ReportStatus {
+  OPEN
+  IN_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+enum NotificationType {
+  INQUIRY_RECEIVED
+  INQUIRY_REPLIED
+  LISTING_APPROVED
+  LISTING_REJECTED
+  LISTING_SUSPENDED
+  MESSAGE_RECEIVED
+  SYSTEM
+}
+
+// ==========================================
+// AUTHENTICATION & ACCESS CONTROL MODELS
+// ==========================================
+
+model User {
+  id                  String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email               String       @unique @db.VarChar(255)
+  phoneNumber         String       @unique @db.VarChar(20)
+  passwordHash        String       @db.VarChar(255)
+  fullName            String       @db.VarChar(150)
+  isVerified          Boolean      @default(false)
+  isSuspended         Boolean      @default(false)
+  suspendedReason     String?      @db.VarChar(255)
+  failedLoginAttempts Int          @default(0)
+  lockedUntil         DateTime?    @db.Timestamptz(6)
+  passwordResetToken  String?      @db.VarChar(255)
+  passwordResetExpires DateTime?   @db.Timestamptz(6)
+  createdAt           DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime     @updatedAt @db.Timestamptz(6)
+  deletedAt           DateTime?    @db.Timestamptz(6)
+
+  // Profiles
+  tenantProfile   TenantProfile?
+  landlordProfile LandlordProfile?
+  adminProfile    AdminProfile?
+
+  // RBAC Relations
+  roles          UserRole[]
+  refreshTokens  RefreshToken[]
+  auditLogs      AuditLog[]             @relation("ActorAuditLogs")
+  deviceTokens   DeviceToken[]
+  notifications  Notification[]
+
+  // Domain Relations
+  properties          Property[]        @relation("LandlordProperties")
+  approvedProperties  Property[]        @relation("AdminApprovedProperties")
+  favorites           Favorite[]
+  inquiriesSent       Inquiry[]         @relation("TenantInquiries")
+  inquiriesReceived   Inquiry[]         @relation("LandlordInquiries")
+  conversationParts   ConversationParticipant[]
+  sentMessages        Message[]         @relation("SentMessages")
+  reportsFiled        Report[]          @relation("ReportsFiled")
+  reportsResolved     Report[]          @relation("ReportsResolved")
+  verificationRecords VerificationRecord[]
+  verifiedRecords     VerificationRecord[] @relation("AdminVerifiedRecords")
 
   @@index([email])
-  @@index([role])
-  @@index([tenantType])
+  @@index([phoneNumber])
+  @@index([isVerified])
+  @@index([isSuspended])
   @@map("users")
 }
 
+model Role {
+  id          String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        UserRoleName     @unique
+  description String?          @db.VarChar(255)
+  isSystem    Boolean          @default(true)
+  createdAt   DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime         @updatedAt @db.Timestamptz(6)
+
+  users       UserRole[]
+  permissions RolePermission[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  id         String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId     String       @db.Uuid
+  roleId     String       @db.Uuid
+  assignedAt DateTime     @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([userId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+model Permission {
+  id          String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  code        String           @unique @db.VarChar(100)
+  module      String           @db.VarChar(50)
+  description String?          @db.VarChar(255)
+  createdAt   DateTime         @default(now()) @db.Timestamptz(6)
+
+  roles RolePermission[]
+
+  @@index([module])
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  roleId       String     @db.Uuid
+  permissionId String     @db.Uuid
+  createdAt    DateTime   @default(now()) @db.Timestamptz(6)
+
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, permissionId])
+  @@index([roleId])
+  @@index([permissionId])
+  @@map("role_permissions")
+}
+
 model RefreshToken {
-  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId     String   @db.Uuid
-  tokenHash  String   @unique @db.VarChar(255)
-  familyId   String   @db.Uuid
-  isRevoked  Boolean  @default(false)
-  expiresAt  DateTime @db.Timestamptz(6)
-  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  id         String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId     String    @db.Uuid
+  tokenHash  String    @unique @db.VarChar(255)
+  familyId   String    @db.Uuid
+  deviceId   String?   @db.VarChar(100)
+  userAgent  String?   @db.VarChar(255)
+  isRevoked  Boolean   @default(false)
+  expiresAt  DateTime  @db.Timestamptz(6)
+  createdAt  DateTime  @default(now()) @db.Timestamptz(6)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([familyId])
+  @@index([tokenHash])
   @@map("refresh_tokens")
 }
 
+// ==========================================
+// USER PROFILES
+// ==========================================
+
+model TenantProfile {
+  id                 String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId             String     @unique @db.Uuid
+  tenantType         TenantType
+  institutionName    String?    @db.VarChar(150)
+  studentIdCardUrl   String?    @db.VarChar(500)
+  familyMembersCount Int?       @db.SmallInt
+  preferredLocalities Json?
+  createdAt          DateTime   @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime   @updatedAt @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tenantType])
+  @@map("tenant_profiles")
+}
+
+model LandlordProfile {
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId         String   @unique @db.Uuid
+  cnicNumber     String?  @unique @db.VarChar(20)
+  isCnicVerified Boolean  @default(false)
+  businessName   String?  @db.VarChar(150)
+  officeAddress  String?  @db.VarChar(255)
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime @updatedAt @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("landlord_profiles")
+}
+
+model AdminProfile {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId      String   @unique @db.Uuid
+  department  String?  @db.VarChar(100)
+  designation String?  @db.VarChar(100)
+  canModerate Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admin_profiles")
+}
+
+// ==========================================
+// LOCALITIES & PROPERTIES
+// ==========================================
+
 model Locality {
-  id               String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  name             String   @unique @db.VarChar(100)
-  slug             String   @unique @db.VarChar(100)
-  postalCode       String   @db.VarChar(10)
-  latitude         Decimal  @db.Decimal(10, 7)
-  longitude        Decimal  @db.Decimal(10, 7)
-  boundaryGeoJson  Json?
-  isActive         Boolean  @default(true)
-  createdAt        DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt        DateTime @updatedAt @db.Timestamptz(6)
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name            String    @unique @db.VarChar(100)
+  slug            String    @unique @db.VarChar(100)
+  postalCode      String    @db.VarChar(10)
+  latitude        Decimal   @db.Decimal(10, 7)
+  longitude       Decimal   @db.Decimal(10, 7)
+  boundaryGeoJson Json?
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt       DateTime? @db.Timestamptz(6)
 
   properties Property[]
 
@@ -102,51 +293,273 @@ model Property {
   landlordId         String              @db.Uuid
   localityId         String              @db.Uuid
   title              String              @db.VarChar(255)
+  slug               String              @unique @db.VarChar(255)
   description        String              @db.Text
   eligibility        PropertyEligibility
+  propertyType       PropertyType
   status             PropertyStatus      @default(DRAFT)
   monthlyRentPkr     Decimal             @db.Decimal(12, 2)
   securityDepositPkr Decimal             @db.Decimal(12, 2)
   bedrooms           Int                 @db.SmallInt
   bathrooms          Int                 @db.SmallInt
+  areaSqFt           Decimal?            @db.Decimal(10, 2)
   latitude           Decimal             @db.Decimal(10, 7)
   longitude          Decimal             @db.Decimal(10, 7)
   address            String              @db.VarChar(255)
   isAvailable        Boolean             @default(true)
   verifiedAt         DateTime?           @db.Timestamptz(6)
   approvedById       String?             @db.Uuid
+  rejectionReason    String?             @db.VarChar(255)
   createdAt          DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt          DateTime            @updatedAt @db.Timestamptz(6)
   deletedAt          DateTime?           @db.Timestamptz(6)
 
-  landlord   User     @relation("LandlordProperties", fields: [landlordId], references: [id])
-  locality   Locality @relation(fields: [localityId], references: [id])
-  approvedBy User?    @relation("AdminApprovedProperties", fields: [approvedById], references: [id])
+  landlord   User      @relation("LandlordProperties", fields: [landlordId], references: [id], onDelete: Restrict)
+  locality   Locality  @relation(fields: [localityId], references: [id], onDelete: Restrict)
+  approvedBy User?     @relation("AdminApprovedProperties", fields: [approvedById], references: [id], onDelete: SetNull)
 
-  // Composite indexes for performance and strict separation
-  @@index([localityId])
+  images     PropertyImage[]
+  amenities  PropertyAmenity[]
+  favorites  Favorite[]
+  inquiries  Inquiry[]
+
+  // High performance composite indexes
   @@index([eligibility, status, isAvailable])
-  @@index([status, deletedAt])
+  @@index([localityId, status])
+  @@index([propertyType, eligibility])
   @@index([landlordId])
+  @@index([status, deletedAt])
   @@map("properties")
 }
 
+model PropertyImage {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propertyId String   @db.Uuid
+  url        String   @db.VarChar(500)
+  publicId   String?  @db.VarChar(255)
+  caption    String?  @db.VarChar(150)
+  isPrimary  Boolean  @default(false)
+  sortOrder  Int      @default(0) @db.SmallInt
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId])
+  @@map("property_images")
+}
+
+model Amenity {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name      String   @unique @db.VarChar(100)
+  code      String   @unique @db.VarChar(50)
+  category  String   @db.VarChar(50)
+  icon      String?  @db.VarChar(50)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  properties PropertyAmenity[]
+
+  @@map("amenities")
+}
+
+model PropertyAmenity {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propertyId String   @db.Uuid
+  amenityId  String   @db.Uuid
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  amenity  Amenity  @relation(fields: [amenityId], references: [id], onDelete: Restrict)
+
+  @@unique([propertyId, amenityId])
+  @@index([propertyId])
+  @@index([amenityId])
+  @@map("property_amenities")
+}
+
+// ==========================================
+// ENGAGEMENT: FAVORITES, INQUIRIES, CHAT
+// ==========================================
+
+model Favorite {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId     String   @db.Uuid
+  propertyId String   @db.Uuid
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, propertyId])
+  @@index([userId])
+  @@index([propertyId])
+  @@map("favorites")
+}
+
+model Inquiry {
+  id                 String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propertyId         String        @db.Uuid
+  tenantId           String        @db.Uuid
+  landlordId         String        @db.Uuid
+  status             InquiryStatus @default(SUBMITTED)
+  message            String        @db.Text
+  proposedMoveInDate DateTime?     @db.Date
+  createdAt          DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime      @updatedAt @db.Timestamptz(6)
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant   User     @relation("TenantInquiries", fields: [tenantId], references: [id], onDelete: Restrict)
+  landlord User     @relation("LandlordInquiries", fields: [landlordId], references: [id], onDelete: Restrict)
+
+  @@index([tenantId])
+  @@index([landlordId])
+  @@index([propertyId])
+  @@index([status])
+  @@map("inquiries")
+}
+
+model Conversation {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propertyId    String?   @db.Uuid
+  lastMessageAt DateTime? @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @db.Timestamptz(6)
+
+  participants ConversationParticipant[]
+  messages     Message[]
+
+  @@map("conversations")
+}
+
+model ConversationParticipant {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  conversationId String    @db.Uuid
+  userId         String    @db.Uuid
+  lastReadAt     DateTime? @db.Timestamptz(6)
+  joinedAt       DateTime  @default(now()) @db.Timestamptz(6)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([conversationId])
+  @@index([userId])
+  @@map("conversation_participants")
+}
+
+model Message {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  conversationId String    @db.Uuid
+  senderId       String    @db.Uuid
+  content        String    @db.Text
+  isRead         Boolean   @default(false)
+  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
+  deletedAt      DateTime? @db.Timestamptz(6)
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("SentMessages", fields: [senderId], references: [id], onDelete: Restrict)
+
+  @@index([conversationId])
+  @@index([senderId])
+  @@map("messages")
+}
+
+// ==========================================
+// NOTIFICATIONS, DEVICES & VERIFICATIONS
+// ==========================================
+
+model Notification {
+  id        String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String           @db.Uuid
+  type      NotificationType
+  title     String           @db.VarChar(150)
+  body      String           @db.Text
+  data      Json?
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@map("notifications")
+}
+
+model DeviceToken {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId       String   @db.Uuid
+  fcmToken     String   @unique @db.VarChar(255)
+  platform     String   @db.VarChar(20)
+  lastActiveAt DateTime @default(now()) @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("device_tokens")
+}
+
+model Report {
+  id              String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  reporterId      String       @db.Uuid
+  targetType      String       @db.VarChar(50)
+  targetId        String       @db.VarChar(50)
+  reason          String       @db.VarChar(150)
+  details         String?      @db.Text
+  status          ReportStatus @default(OPEN)
+  resolvedById    String?      @db.Uuid
+  resolutionNotes String?      @db.Text
+  createdAt       DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(6)
+
+  reporter   User  @relation("ReportsFiled", fields: [reporterId], references: [id], onDelete: Restrict)
+  resolvedBy User? @relation("ReportsResolved", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([reporterId])
+  @@index([targetType, targetId])
+  @@index([status])
+  @@map("reports")
+}
+
+model VerificationRecord {
+  id              String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId          String             @db.Uuid
+  documentType    String             @db.VarChar(50)
+  documentUrl     String             @db.VarChar(500)
+  status          VerificationStatus @default(PENDING)
+  verifiedById    String?            @db.Uuid
+  verifiedAt      DateTime?          @db.Timestamptz(6)
+  rejectionReason String?            @db.VarChar(255)
+  createdAt       DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime           @updatedAt @db.Timestamptz(6)
+
+  user       User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verifiedBy User? @relation("AdminVerifiedRecords", fields: [verifiedById], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@map("verification_records")
+}
+
+// ==========================================
+// AUDIT LOG
+// ==========================================
+
 model AuditLog {
   id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId     String?  @db.Uuid
+  actorId    String?  @db.Uuid
   action     String   @db.VarChar(100)
-  entity     String   @db.VarChar(50)
-  entityId   String?  @db.VarChar(50)
-  metadata   Json?
+  targetType String   @db.VarChar(50)
+  targetId   String?  @db.VarChar(50)
+  before     Json?
+  after      Json?
   ipAddress  String?  @db.VarChar(45)
   userAgent  String?  @db.VarChar(255)
   createdAt  DateTime @default(now()) @db.Timestamptz(6)
 
-  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  actor User? @relation("ActorAuditLogs", fields: [actorId], references: [id], onDelete: SetNull)
 
-  @@index([userId])
-  @@index([entity, entityId])
+  @@index([actorId])
+  @@index([targetType, targetId])
+  @@index([action])
   @@index([createdAt])
   @@map("audit_logs")
 }
-

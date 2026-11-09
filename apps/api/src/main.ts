@@ -2,6 +2,9 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
+import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
+import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseTransformInterceptor } from './common/interceptors/response-transform.interceptor';
@@ -12,15 +15,35 @@ async function bootstrap(): Promise<void> {
   const pinoLogger = app.get(Logger);
   app.useLogger(pinoLogger);
 
+  // Helmet Security Headers
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      contentSecurityPolicy: process.env['NODE_ENV'] === 'production' ? undefined : false,
+    }),
+  );
+
+  // Cookie Parser for HTTP-only cookies
+  app.use(cookieParser());
+
+  // Request Body Size Limits
+  app.use(json({ limit: '10mb' }));
+  app.use(urlencoded({ extended: true, limit: '10mb' }));
+
   // Set global API prefix while keeping health and ready endpoints accessible at root
   app.setGlobalPrefix('api/v1', {
     exclude: ['health', 'ready', 'docs', 'docs-json'],
   });
 
-  // Enable CORS
+  // Strict CORS
   app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    origin: [
+      process.env['WEB_URL'] || 'http://localhost:3000',
+      process.env['ADMIN_URL'] || 'http://localhost:3001',
+      'http://localhost:3000',
+      'http://localhost:3001',
+    ],
+    methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
 

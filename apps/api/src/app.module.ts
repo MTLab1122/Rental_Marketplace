@@ -3,6 +3,7 @@ import { LoggerModule } from 'nestjs-pino';
 import { AppConfigModule } from './config/app-config.module';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
 
 @Module({
@@ -29,6 +30,7 @@ import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/requ
     }),
     DatabaseModule,
     HealthModule,
+    AuthModule,
   ],
 })
 export class AppModule implements NestModule {

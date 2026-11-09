@@ -26,6 +26,37 @@ export enum PropertyEligibility {
 }
 
 /**
+ * Property Types
+ * Categorized strictly by eligibility constraints.
+ */
+export enum PropertyType {
+  // Common & Student-compatible
+  SINGLE_ROOM = 'SINGLE_ROOM',
+  SHARED_ROOM = 'SHARED_ROOM',
+  HOSTEL = 'HOSTEL',
+  PORTION = 'PORTION',
+  APARTMENT = 'APARTMENT',
+  // Family-compatible
+  HOUSE = 'HOUSE',
+  RESIDENTIAL_UNIT = 'RESIDENTIAL_UNIT',
+}
+
+export const STUDENT_PROPERTY_TYPES = [
+  PropertyType.SINGLE_ROOM,
+  PropertyType.SHARED_ROOM,
+  PropertyType.HOSTEL,
+  PropertyType.PORTION,
+  PropertyType.APARTMENT,
+] as const;
+
+export const FAMILY_PROPERTY_TYPES = [
+  PropertyType.HOUSE,
+  PropertyType.PORTION,
+  PropertyType.APARTMENT,
+  PropertyType.RESIDENTIAL_UNIT,
+] as const;
+
+/**
  * Property Lifecycle Statuses
  */
 export enum PropertyStatus {
@@ -37,6 +68,52 @@ export enum PropertyStatus {
   RENTED = 'RENTED',
   UNAVAILABLE = 'UNAVAILABLE',
   DELETED = 'DELETED',
+}
+
+/**
+ * Identity & Document Verification Statuses
+ */
+export enum VerificationStatus {
+  UNVERIFIED = 'UNVERIFIED',
+  PENDING = 'PENDING',
+  VERIFIED = 'VERIFIED',
+  REJECTED = 'REJECTED',
+  EXPIRED = 'EXPIRED',
+}
+
+/**
+ * Tenant Inquiry Lifecycle Statuses
+ */
+export enum InquiryStatus {
+  SUBMITTED = 'SUBMITTED',
+  SEEN = 'SEEN',
+  REPLIED = 'REPLIED',
+  ACCEPTED = 'ACCEPTED',
+  DECLINED = 'DECLINED',
+  CLOSED = 'CLOSED',
+}
+
+/**
+ * Platform Report Statuses
+ */
+export enum ReportStatus {
+  OPEN = 'OPEN',
+  IN_REVIEW = 'IN_REVIEW',
+  RESOLVED = 'RESOLVED',
+  DISMISSED = 'DISMISSED',
+}
+
+/**
+ * Notification Types
+ */
+export enum NotificationType {
+  INQUIRY_RECEIVED = 'INQUIRY_RECEIVED',
+  INQUIRY_REPLIED = 'INQUIRY_REPLIED',
+  LISTING_APPROVED = 'LISTING_APPROVED',
+  LISTING_REJECTED = 'LISTING_REJECTED',
+  LISTING_SUSPENDED = 'LISTING_SUSPENDED',
+  MESSAGE_RECEIVED = 'MESSAGE_RECEIVED',
+  SYSTEM = 'SYSTEM',
 }
 
 /**
