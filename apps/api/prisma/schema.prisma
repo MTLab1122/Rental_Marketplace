@@ -75,6 +75,23 @@ enum ReportStatus {
   DISMISSED
 }
 
+enum ReportReason {
+  FAKE_LISTING
+  WRONG_LOCATION
+  MISLEADING_INFORMATION
+  DISCRIMINATION
+  HARASSMENT
+  DUPLICATE_LISTING
+  UNSAFE_PROPERTY
+  OTHER
+}
+
+enum ImageModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
 enum NotificationType {
   INQUIRY_RECEIVED
   INQUIRY_REPLIED
@@ -343,18 +360,30 @@ model Property {
 }
 
 model PropertyImage {
-  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  propertyId String   @db.Uuid
-  url        String   @db.VarChar(500)
-  publicId   String?  @db.VarChar(255)
-  caption    String?  @db.VarChar(150)
-  isPrimary  Boolean  @default(false)
-  sortOrder  Int      @default(0) @db.SmallInt
-  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  id               String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propertyId       String                @db.Uuid
+  url              String                @db.VarChar(500)
+  thumbnailUrl     String?               @db.VarChar(500)
+  publicId         String?               @db.VarChar(255)
+  storageKey       String?               @db.VarChar(255)
+  caption          String?               @db.VarChar(150)
+  isPrimary        Boolean               @default(false)
+  sortOrder        Int                   @default(0) @db.SmallInt
+  moderationStatus ImageModerationStatus @default(PENDING)
+  rejectionReason  String?               @db.VarChar(255)
+  moderatedById    String?               @db.Uuid
+  moderatedAt      DateTime?             @db.Timestamptz(6)
+  mimeType         String?               @db.VarChar(50)
+  fileSizeBytes    Int?
+  width            Int?
+  height           Int?
+  checksum         String?               @db.VarChar(64)
+  createdAt        DateTime              @default(now()) @db.Timestamptz(6)
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
   @@index([propertyId])
+  @@index([propertyId, moderationStatus])
   @@map("property_images")
 }
 
@@ -512,7 +541,7 @@ model Report {
   reporterId      String       @db.Uuid
   targetType      String       @db.VarChar(50)
   targetId        String       @db.VarChar(50)
-  reason          String       @db.VarChar(150)
+  reason          ReportReason
   details         String?      @db.Text
   status          ReportStatus @default(OPEN)
   resolvedById    String?      @db.Uuid
@@ -526,26 +555,38 @@ model Report {
   @@index([reporterId])
   @@index([targetType, targetId])
   @@index([status])
+  @@index([reporterId, targetType, targetId])
   @@map("reports")
 }
 
 model VerificationRecord {
-  id              String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId          String             @db.Uuid
-  documentType    String             @db.VarChar(50)
-  documentUrl     String             @db.VarChar(500)
-  status          VerificationStatus @default(PENDING)
-  verifiedById    String?            @db.Uuid
-  verifiedAt      DateTime?          @db.Timestamptz(6)
-  rejectionReason String?            @db.VarChar(255)
-  createdAt       DateTime           @default(now()) @db.Timestamptz(6)
-  updatedAt       DateTime           @updatedAt @db.Timestamptz(6)
+  id                  String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId              String             @db.Uuid
+  fullName            String?            @db.VarChar(150)
+  phoneNumber         String?            @db.VarChar(20)
+  cnicNumberHash      String?            @db.VarChar(64)
+  cnicNumberEncrypted String?            @db.VarChar(255)
+  cnicNumberMasked    String?            @db.VarChar(20)
+  cnicFrontUrl        String?            @db.VarChar(500)
+  cnicBackUrl         String?            @db.VarChar(500)
+  selfieUrl           String?            @db.VarChar(500)
+  address             String?            @db.VarChar(255)
+  documentType        String             @default("CNIC") @db.VarChar(50)
+  documentUrl         String             @default("") @db.VarChar(500)
+  status              VerificationStatus @default(PENDING)
+  reviewNotes         String?            @db.Text
+  verifiedById        String?            @db.Uuid
+  verifiedAt          DateTime?          @db.Timestamptz(6)
+  rejectionReason     String?            @db.VarChar(255)
+  createdAt           DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime           @updatedAt @db.Timestamptz(6)
 
   user       User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   verifiedBy User? @relation("AdminVerifiedRecords", fields: [verifiedById], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([status])
+  @@index([cnicNumberHash])
   @@map("verification_records")
 }
 

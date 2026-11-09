@@ -6,6 +6,10 @@ import { HealthModule } from './health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { LocalityModule } from './modules/locality/locality.module';
 import { PropertyModule } from './modules/property/property.module';
+import { NotificationModule } from './modules/notification/notification.module';
+import { MediaModule } from './modules/media/media.module';
+import { VerificationModule } from './modules/verification/verification.module';
+import { ReportModule } from './modules/report/report.module';
 import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
 
 @Module({
@@ -35,6 +39,10 @@ import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/requ
     AuthModule,
     LocalityModule,
     PropertyModule,
+    NotificationModule,
+    MediaModule,
+    VerificationModule,
+    ReportModule,
   ],
 })
 export class AppModule implements NestModule {

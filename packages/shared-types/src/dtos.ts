@@ -300,6 +300,103 @@ export interface AuditLogDto {
   createdAt: string;
 }
 
+export interface GetUploadUrlDto {
+  purpose: 'property_image' | 'cnic_document' | 'selfie';
+  propertyId?: string;
+  mimeType: string;
+  fileSizeBytes: number;
+}
+
+export interface UploadUrlResponseDto {
+  uploadUrl: string;
+  method: string;
+  storageKey: string;
+  expiresInSeconds: number;
+  headers?: Record<string, string>;
+  publicUrl?: string;
+}
+
+export interface CompleteUploadDto {
+  storageKey: string;
+  propertyId?: string;
+  caption?: string;
+  isPrimary?: boolean;
+  sortOrder?: number;
+  width?: number;
+  height?: number;
+  fileSizeBytes: number;
+  mimeType: string;
+  checksum?: string;
+}
+
+export interface ModerateImageDto {
+  status: 'APPROVED' | 'REJECTED';
+  rejectionReason?: string;
+}
+
+export interface SubmitVerificationDto {
+  fullName: string;
+  phoneNumber: string;
+  cnicNumber: string;
+  cnicFrontStorageKey: string;
+  cnicBackStorageKey: string;
+  selfieStorageKey: string;
+  address: string;
+}
+
+export interface ReviewVerificationDto {
+  status: 'VERIFIED' | 'REJECTED' | 'EXPIRED';
+  reviewNotes?: string;
+}
+
+export interface VerificationResponseDto {
+  id: string;
+  userId: string;
+  fullName: string;
+  phoneNumber: string;
+  cnicNumberMasked: string;
+  status: 'UNVERIFIED' | 'PENDING' | 'VERIFIED' | 'REJECTED' | 'EXPIRED';
+  address?: string | null;
+  reviewNotes?: string | null;
+  verifiedAt?: string | null;
+  createdAt: string;
+}
+
+export interface CreateReportDto {
+  targetType: 'PROPERTY' | 'USER';
+  targetId: string;
+  reason: string;
+  details?: string;
+}
+
+export interface ReviewReportDto {
+  status: 'IN_REVIEW' | 'RESOLVED' | 'DISMISSED';
+  resolutionNotes?: string;
+}
+
+export interface ReportResponseDto {
+  id: string;
+  reporterId: string;
+  targetType: string;
+  targetId: string;
+  reason: string;
+  details?: string | null;
+  status: string;
+  resolutionNotes?: string | null;
+  createdAt: string;
+}
+
+export interface NotificationDto {
+  id: string;
+  userId: string;
+  type: string;
+  title: string;
+  body: string;
+  data?: Record<string, unknown> | null;
+  isRead: boolean;
+  createdAt: string;
+}
+
 export enum PermissionCode {
   // Properties
   PROPERTY_CREATE = 'property:create',

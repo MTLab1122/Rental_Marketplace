@@ -309,3 +309,33 @@ export class SearchPropertyQueryDto {
   @Type(() => Number)
   limit?: number;
 }
+
+export class AdminReasonDto {
+  @IsString()
+  @IsNotEmpty({ message: 'A reason is required for this moderation action' })
+  reason!: string;
+}
+
+export class AdminPropertyQueryDto {
+  @IsEnum(PropertyStatus)
+  @IsOptional()
+  status?: PropertyStatus;
+
+  @IsString()
+  @IsOptional()
+  localityId?: string;
+
+  @IsString()
+  @IsOptional()
+  search?: string;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  page?: number;
+
+  @IsNumber()
+  @IsOptional()
+  @Type(() => Number)
+  limit?: number;
+}

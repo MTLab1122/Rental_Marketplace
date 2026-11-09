@@ -104,6 +104,29 @@ export enum ReportStatus {
 }
 
 /**
+ * Report Reasons
+ */
+export enum ReportReason {
+  FAKE_LISTING = 'FAKE_LISTING',
+  WRONG_LOCATION = 'WRONG_LOCATION',
+  MISLEADING_INFORMATION = 'MISLEADING_INFORMATION',
+  DISCRIMINATION = 'DISCRIMINATION',
+  HARASSMENT = 'HARASSMENT',
+  DUPLICATE_LISTING = 'DUPLICATE_LISTING',
+  UNSAFE_PROPERTY = 'UNSAFE_PROPERTY',
+  OTHER = 'OTHER',
+}
+
+/**
+ * Image Moderation Statuses
+ */
+export enum ImageModerationStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}
+
+/**
  * Notification Types
  */
 export enum NotificationType {

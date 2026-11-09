@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PropertyService } from './property.service';
 import { PrismaService } from '../../database/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
+import { NotificationService } from '../notification/notification.service';
 import {
   PropertyEligibility,
   PropertyType,
@@ -75,10 +76,17 @@ describe('PropertyService', () => {
     propertyImage: {
       count: jest.fn(),
     },
+    user: {
+      findUnique: jest.fn(),
+    },
   };
 
   const mockAuditService = {
     log: jest.fn().mockResolvedValue({ id: 'audit-1' }),
+  };
+
+  const mockNotificationService = {
+    notify: jest.fn().mockResolvedValue({ id: 'notif-1' }),
   };
 
   beforeEach(async () => {
@@ -88,6 +96,7 @@ describe('PropertyService', () => {
         PropertyService,
         { provide: PrismaService, useValue: mockPrismaService },
         { provide: AuditService, useValue: mockAuditService },
+        { provide: NotificationService, useValue: mockNotificationService },
       ],
     }).compile();
 
@@ -254,8 +263,32 @@ describe('PropertyService', () => {
   });
 
   describe('updateStatusByLandlord workflow', () => {
+    it('submitting for review fails when landlord is not identity verified', async () => {
+      mockPrismaService.property.findFirst.mockResolvedValue(mockProperty);
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: landlordId,
+        isVerified: false,
+        landlordProfile: { isCnicVerified: false },
+      });
+
+      await expect(
+        service.updateStatusByLandlord(propertyId, landlordId, PropertyStatus.PENDING_REVIEW),
+      ).rejects.toThrow(
+        expect.objectContaining({
+          response: expect.objectContaining({
+            code: ErrorCode.LANDLORD_NOT_VERIFIED,
+          }),
+        }),
+      );
+    });
+
     it('submitting for review fails when listing has 0 images', async () => {
       mockPrismaService.property.findFirst.mockResolvedValue(mockProperty);
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: landlordId,
+        isVerified: true,
+        landlordProfile: { isCnicVerified: true },
+      });
       mockPrismaService.propertyImage.count.mockResolvedValue(0);
 
       await expect(
@@ -269,8 +302,13 @@ describe('PropertyService', () => {
       );
     });
 
-    it('submitting for review succeeds when listing has at least 1 image', async () => {
+    it('submitting for review succeeds when listing has at least 1 image and landlord is verified', async () => {
       mockPrismaService.property.findFirst.mockResolvedValue(mockProperty);
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: landlordId,
+        isVerified: true,
+        landlordProfile: { isCnicVerified: true },
+      });
       mockPrismaService.propertyImage.count.mockResolvedValue(2);
       mockPrismaService.property.update.mockResolvedValue({
         ...mockProperty,
@@ -393,6 +431,67 @@ describe('PropertyService', () => {
       });
 
       expect(res.status).toBe(PropertyStatus.SUSPENDED);
+    });
+  });
+
+  describe('dedicated admin moderation actions', () => {
+    it('approveByAdmin approves listing, notifies landlord, and writes audit log', async () => {
+      mockPrismaService.property.findFirst.mockResolvedValue({
+        ...mockProperty,
+        locality: { ...mockLocality, isActive: true },
+        images: [{ id: 'img-1', moderationStatus: 'APPROVED' }],
+      });
+      mockPrismaService.property.update.mockResolvedValue({
+        ...mockProperty,
+        status: PropertyStatus.APPROVED,
+        isAvailable: true,
+      });
+
+      const res = await service.approveByAdmin(propertyId, 'admin-1');
+      expect(res.status).toBe(PropertyStatus.APPROVED);
+      expect(mockNotificationService.notify).toHaveBeenCalledWith(
+        landlordId,
+        'LISTING_APPROVED',
+        expect.any(String),
+        expect.any(String),
+        expect.objectContaining({ propertyId }),
+      );
+    });
+
+    it('rejectByAdmin rejects listing and notifies landlord', async () => {
+      mockPrismaService.property.findFirst.mockResolvedValue(mockProperty);
+      mockPrismaService.property.update.mockResolvedValue({
+        ...mockProperty,
+        status: PropertyStatus.REJECTED,
+      });
+
+      const res = await service.rejectByAdmin(propertyId, 'admin-1', 'Violation of terms');
+      expect(res.status).toBe(PropertyStatus.REJECTED);
+      expect(mockNotificationService.notify).toHaveBeenCalledWith(
+        landlordId,
+        'LISTING_REJECTED',
+        expect.any(String),
+        expect.stringContaining('Violation of terms'),
+        expect.objectContaining({ propertyId }),
+      );
+    });
+
+    it('suspendByAdmin suspends listing and notifies landlord', async () => {
+      mockPrismaService.property.findFirst.mockResolvedValue(mockProperty);
+      mockPrismaService.property.update.mockResolvedValue({
+        ...mockProperty,
+        status: PropertyStatus.SUSPENDED,
+      });
+
+      const res = await service.suspendByAdmin(propertyId, 'admin-1', 'Fraud investigation');
+      expect(res.status).toBe(PropertyStatus.SUSPENDED);
+      expect(mockNotificationService.notify).toHaveBeenCalledWith(
+        landlordId,
+        'LISTING_SUSPENDED',
+        expect.any(String),
+        expect.stringContaining('Fraud investigation'),
+        expect.objectContaining({ propertyId }),
+      );
     });
   });
 

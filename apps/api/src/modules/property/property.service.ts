@@ -12,6 +12,7 @@ import {
   UpdatePropertyRequestDto,
   SearchPropertyQueryDto,
   UpdatePropertyStatusRequestDto,
+  AdminPropertyQueryDto,
 } from './dto/property.dto';
 import {
   validateEligibilityAndPropertyType,
@@ -25,7 +26,10 @@ import {
   PropertyStatus,
   TenantType,
   ErrorCode,
+  ImageModerationStatus,
+  NotificationType,
 } from '@rental-peshawar/shared-types';
+import { NotificationService } from '../notification/notification.service';
 import { Prisma } from '@prisma/client';
 
 @Injectable()
@@ -35,6 +39,7 @@ export class PropertyService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly auditService: AuditService,
+    private readonly notificationService: NotificationService,
   ) {}
 
   private slugify(text: string): string {
@@ -335,7 +340,24 @@ export class PropertyService {
     const property = await this.findByIdForLandlord(propertyId, landlordId);
 
     if (targetStatus === PropertyStatus.PENDING_REVIEW) {
-      // Must have at least 1 image before submission
+      // 1. Enforce landlord identity verification
+      const landlord = await this.prisma.user.findUnique({
+        where: { id: landlordId },
+        include: { landlordProfile: true },
+      });
+
+      const isVerified =
+        landlord?.isVerified === true || landlord?.landlordProfile?.isCnicVerified === true;
+
+      if (!isVerified) {
+        throw new UnprocessableEntityException({
+          code: ErrorCode.LANDLORD_NOT_VERIFIED,
+          message:
+            'Landlord identity verification is required before submitting listing for review.',
+        });
+      }
+
+      // 2. Must have at least 1 image before submission
       const imageCount = await this.prisma.propertyImage.count({
         where: { propertyId },
       });
@@ -502,6 +524,319 @@ export class PropertyService {
   }
 
   /**
+   * Admin: List properties for moderation with filtering and pagination
+   */
+  async findAllAdmin(query: AdminPropertyQueryDto) {
+    const page = query.page && query.page > 0 ? query.page : 1;
+    const limit = query.limit && query.limit > 0 ? Math.min(query.limit, 100) : 20;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.PropertyWhereInput = {
+      deletedAt: null,
+      ...(query.status && { status: query.status }),
+      ...(query.localityId && { localityId: query.localityId }),
+      ...(query.search && {
+        OR: [
+          { title: { contains: query.search, mode: 'insensitive' } },
+          { slug: { contains: query.search, mode: 'insensitive' } },
+          { address: { contains: query.search, mode: 'insensitive' } },
+        ],
+      }),
+    };
+
+    const [items, total] = await Promise.all([
+      this.prisma.property.findMany({
+        where,
+        include: {
+          locality: true,
+          landlord: {
+            select: { id: true, email: true, fullName: true, phoneNumber: true, isVerified: true },
+          },
+          images: { orderBy: { sortOrder: 'asc' } },
+          _count: {
+            select: { inquiries: true, favorites: true },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip,
+        take: limit,
+      }),
+      this.prisma.property.count({ where }),
+    ]);
+
+    return {
+      items,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
+  /**
+   * Admin: Inspect full property details
+   */
+  async findByIdForAdmin(propertyId: string) {
+    const property = await this.prisma.property.findFirst({
+      where: { id: propertyId },
+      include: {
+        locality: true,
+        landlord: {
+          select: {
+            id: true,
+            email: true,
+            fullName: true,
+            phoneNumber: true,
+            isVerified: true,
+            landlordProfile: true,
+          },
+        },
+        images: { orderBy: { sortOrder: 'asc' } },
+        amenities: { include: { amenity: true } },
+      },
+    });
+
+    if (!property) {
+      throw new NotFoundException(`Property with ID '${propertyId}' not found.`);
+    }
+
+    return property;
+  }
+
+  /**
+   * Admin: Approve listing
+   */
+  async approveByAdmin(propertyId: string, adminId: string) {
+    const property = await this.prisma.property.findFirst({
+      where: { id: propertyId, deletedAt: null },
+      include: { locality: true, landlord: { include: { landlordProfile: true } }, images: true },
+    });
+
+    if (!property) {
+      throw new NotFoundException(`Property with ID '${propertyId}' not found.`);
+    }
+
+    if (!property.locality.isActive) {
+      throw new UnprocessableEntityException({
+        code: ErrorCode.LOCALITY_INACTIVE,
+        message: 'Cannot approve property: Selected locality is deactivated.',
+      });
+    }
+
+    validatePeshawarCoordinates(Number(property.latitude), Number(property.longitude));
+
+    // Ensure at least 1 image is approved; auto-approve pending images if needed
+    const approvedImages = property.images.filter(
+      (img) => img.moderationStatus === ImageModerationStatus.APPROVED,
+    );
+    if (approvedImages.length === 0 && property.images.length > 0) {
+      await this.prisma.propertyImage.update({
+        where: { id: property.images[0]!.id },
+        data: {
+          moderationStatus: ImageModerationStatus.APPROVED,
+          moderatedById: adminId,
+          moderatedAt: new Date(),
+        },
+      });
+    }
+
+    const updated = await this.prisma.property.update({
+      where: { id: propertyId },
+      data: {
+        status: PropertyStatus.APPROVED,
+        isAvailable: true,
+        approvedBy: { connect: { id: adminId } },
+        verifiedAt: new Date(),
+        rejectionReason: null,
+        suspensionReason: null,
+      },
+      include: { locality: true, images: true },
+    });
+
+    await this.notificationService.notify(
+      property.landlordId,
+      NotificationType.LISTING_APPROVED,
+      'Listing Approved',
+      `Your property "${property.title}" has been approved and is now live on the Peshawar marketplace.`,
+      { propertyId: property.id },
+    );
+
+    await this.auditService.log({
+      actorId: adminId,
+      action: 'property:admin_approve',
+      targetType: 'property',
+      targetId: propertyId,
+      before: { status: property.status },
+      after: { status: PropertyStatus.APPROVED, isAvailable: true },
+    });
+
+    return updated;
+  }
+
+  /**
+   * Admin: Reject listing
+   */
+  async rejectByAdmin(propertyId: string, adminId: string, reason: string) {
+    if (!reason || reason.trim().length === 0) {
+      throw new UnprocessableEntityException({
+        code: ErrorCode.VALIDATION_ERROR,
+        message: 'Rejection reason is required.',
+      });
+    }
+
+    const property = await this.prisma.property.findFirst({
+      where: { id: propertyId, deletedAt: null },
+    });
+
+    if (!property) {
+      throw new NotFoundException(`Property with ID '${propertyId}' not found.`);
+    }
+
+    const updated = await this.prisma.property.update({
+      where: { id: propertyId },
+      data: {
+        status: PropertyStatus.REJECTED,
+        isAvailable: false,
+        rejectionReason: reason,
+      },
+    });
+
+    await this.notificationService.notify(
+      property.landlordId,
+      NotificationType.LISTING_REJECTED,
+      'Listing Rejected',
+      `Your property "${property.title}" was rejected: ${reason}`,
+      { propertyId: property.id, reason },
+    );
+
+    await this.auditService.log({
+      actorId: adminId,
+      action: 'property:admin_reject',
+      targetType: 'property',
+      targetId: propertyId,
+      before: { status: property.status },
+      after: { status: PropertyStatus.REJECTED, isAvailable: false, rejectionReason: reason },
+    });
+
+    return updated;
+  }
+
+  /**
+   * Admin: Suspend listing
+   */
+  async suspendByAdmin(propertyId: string, adminId: string, reason: string) {
+    if (!reason || reason.trim().length === 0) {
+      throw new UnprocessableEntityException({
+        code: ErrorCode.VALIDATION_ERROR,
+        message: 'Suspension reason is required.',
+      });
+    }
+
+    const property = await this.prisma.property.findFirst({
+      where: { id: propertyId, deletedAt: null },
+    });
+
+    if (!property) {
+      throw new NotFoundException(`Property with ID '${propertyId}' not found.`);
+    }
+
+    const updated = await this.prisma.property.update({
+      where: { id: propertyId },
+      data: {
+        status: PropertyStatus.SUSPENDED,
+        isAvailable: false,
+        suspensionReason: reason,
+      },
+    });
+
+    await this.notificationService.notify(
+      property.landlordId,
+      NotificationType.LISTING_SUSPENDED,
+      'Listing Suspended',
+      `Your property "${property.title}" has been suspended: ${reason}`,
+      { propertyId: property.id, reason },
+    );
+
+    await this.auditService.log({
+      actorId: adminId,
+      action: 'property:admin_suspend',
+      targetType: 'property',
+      targetId: propertyId,
+      before: { status: property.status },
+      after: { status: PropertyStatus.SUSPENDED, isAvailable: false, suspensionReason: reason },
+    });
+
+    return updated;
+  }
+
+  /**
+   * Admin: Restore listing
+   */
+  async restoreByAdmin(propertyId: string, adminId: string) {
+    const property = await this.prisma.property.findFirst({
+      where: { id: propertyId, deletedAt: null },
+    });
+
+    if (!property) {
+      throw new NotFoundException(`Property with ID '${propertyId}' not found.`);
+    }
+
+    const updated = await this.prisma.property.update({
+      where: { id: propertyId },
+      data: {
+        status: PropertyStatus.APPROVED,
+        isAvailable: true,
+        suspensionReason: null,
+        rejectionReason: null,
+      },
+    });
+
+    await this.auditService.log({
+      actorId: adminId,
+      action: 'property:admin_restore',
+      targetType: 'property',
+      targetId: propertyId,
+      before: { status: property.status },
+      after: { status: PropertyStatus.APPROVED, isAvailable: true },
+    });
+
+    return updated;
+  }
+
+  /**
+   * Admin: Soft delete listing
+   */
+  async deleteByAdmin(propertyId: string, adminId: string) {
+    const property = await this.prisma.property.findFirst({
+      where: { id: propertyId, deletedAt: null },
+    });
+
+    if (!property) {
+      throw new NotFoundException(`Property with ID '${propertyId}' not found.`);
+    }
+
+    await this.prisma.property.update({
+      where: { id: propertyId },
+      data: {
+        deletedAt: new Date(),
+        status: PropertyStatus.DELETED,
+        isAvailable: false,
+      },
+    });
+
+    await this.auditService.log({
+      actorId: adminId,
+      action: 'property:admin_delete',
+      targetType: 'property',
+      targetId: propertyId,
+      before: { status: property.status },
+      after: { status: PropertyStatus.DELETED, isAvailable: false },
+    });
+
+    return { success: true, message: `Property '${property.title}' deleted successfully.` };
+  }
+
+  /**
    * Public Search: Filter, sorting, cursor pagination, and strict tenant segregation
    */
   async searchPublic(
@@ -603,6 +938,7 @@ export class PropertyService {
         },
         images: {
           select: { id: true, url: true, caption: true, isPrimary: true, sortOrder: true },
+          where: { moderationStatus: ImageModerationStatus.APPROVED },
           orderBy: { sortOrder: 'asc' },
         },
         amenities: {
@@ -797,7 +1133,12 @@ export class PropertyService {
       viewCount: property.viewCount + 1,
       inquiryCount: property.inquiryCount,
       favoriteCount: property.favoriteCount,
-      images: property.images,
+      images:
+        isOwner || isAdmin
+          ? property.images
+          : property.images.filter(
+              (img) => img.moderationStatus === ImageModerationStatus.APPROVED,
+            ),
       amenities: property.amenities.map((a) => a.amenity),
       createdAt: property.createdAt,
     };
