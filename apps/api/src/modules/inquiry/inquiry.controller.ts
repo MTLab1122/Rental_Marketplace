@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Patch,
+  Delete,
   Param,
   Body,
   UseGuards,
@@ -26,12 +27,20 @@ export class InquiryController {
     @Body() dto: CreateInquiryRequestDto,
     @CurrentUser() user: { sub: string; tenantType?: TenantType },
   ) {
-    return this.inquiryService.createInquiry(user.sub, dto, user);
+    const inquiry = await this.inquiryService.createInquiry(user.sub, dto, user);
+    return { success: true, data: inquiry };
+  }
+
+  @Get('my')
+  async getMyInquiriesExplicit(@CurrentUser('sub') userId: string) {
+    const list = await this.inquiryService.getMyInquiries(userId);
+    return { success: true, data: list };
   }
 
   @Get()
-  async getMyInquiries(@CurrentUser() user: { sub: string; roles?: string[] }) {
-    return this.inquiryService.getMyInquiries(user.sub, user.roles || []);
+  async getMyInquiries(@CurrentUser('sub') userId: string) {
+    const list = await this.inquiryService.getMyInquiries(userId);
+    return { success: true, data: list };
   }
 
   @Get(':id')
@@ -39,15 +48,51 @@ export class InquiryController {
     @Param('id') id: string,
     @CurrentUser() user: { sub: string; roles?: string[] },
   ) {
-    return this.inquiryService.getInquiryById(id, user.sub, user.roles || []);
+    const inquiry = await this.inquiryService.getInquiryById(id, user.sub, user.roles || []);
+    return { success: true, data: inquiry };
   }
 
   @Patch(':id/status')
+  @HttpCode(HttpStatus.OK)
   async updateStatus(
     @Param('id') id: string,
     @Body() dto: UpdateInquiryStatusRequestDto,
+    @CurrentUser('sub') landlordId: string,
+  ) {
+    const updated = await this.inquiryService.updateStatusByLandlord(id, landlordId, dto);
+    return { success: true, data: updated };
+  }
+
+  @Delete(':id')
+  @HttpCode(HttpStatus.OK)
+  async deleteInquiry(
+    @Param('id') id: string,
     @CurrentUser() user: { sub: string; roles?: string[] },
   ) {
-    return this.inquiryService.updateStatus(id, user.sub, dto, user.roles || []);
+    const result = await this.inquiryService.deleteInquiry(id, user.sub, user.roles || []);
+    return result;
+  }
+}
+
+@Controller('landlord/inquiries')
+@UseGuards(JwtAuthGuard)
+export class LandlordInquiryController {
+  constructor(private readonly inquiryService: InquiryService) {}
+
+  @Get()
+  async getLandlordInquiries(@CurrentUser('sub') landlordId: string) {
+    const list = await this.inquiryService.getLandlordInquiries(landlordId);
+    return { success: true, data: list };
+  }
+
+  @Patch(':id/status')
+  @HttpCode(HttpStatus.OK)
+  async updateStatus(
+    @Param('id') id: string,
+    @Body() dto: UpdateInquiryStatusRequestDto,
+    @CurrentUser('sub') landlordId: string,
+  ) {
+    const updated = await this.inquiryService.updateStatusByLandlord(id, landlordId, dto);
+    return { success: true, data: updated };
   }
 }

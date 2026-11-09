@@ -4,6 +4,8 @@ import {
   PropertyEligibility,
   PropertyStatus,
   PropertyType,
+  ReportReason,
+  NotificationType,
 } from './enums.js';
 
 export interface HealthStatusDto {
@@ -397,7 +399,7 @@ export interface ReportResponseDto {
 export interface NotificationDto {
   id: string;
   userId: string;
-  type: string;
+  type: string | NotificationType;
   title: string;
   body: string;
   data?: Record<string, unknown> | null;
@@ -408,12 +410,14 @@ export interface NotificationDto {
 export interface CreateInquiryDto {
   propertyId: string;
   message: string;
+  proposedRentPkr?: number;
   proposedMoveInDate?: string;
   preferredContactMethod?: 'PHONE' | 'WHATSAPP' | 'IN_APP';
 }
 
 export interface UpdateInquiryStatusDto {
   status: 'SUBMITTED' | 'SEEN' | 'REPLIED' | 'ACCEPTED' | 'DECLINED' | 'CLOSED';
+  note?: string;
 }
 
 export interface InquiryResponseDto {
@@ -423,7 +427,12 @@ export interface InquiryResponseDto {
   landlordId: string;
   status: string;
   message: string;
+  proposedRentPkr?: number | null;
   proposedMoveInDate?: string | null;
+  preferredContactMethod?: string | null;
+  conversationId?: string | null;
+  whatsappUrl?: string | null;
+  canContactWhatsapp?: boolean;
   createdAt: string;
   updatedAt: string;
   property?: PropertySummaryDto;
@@ -438,7 +447,78 @@ export interface InquiryResponseDto {
     fullName: string;
     email: string;
     phoneNumber?: string | null;
+    whatsappNumber?: string | null;
   };
+}
+
+export interface ConversationParticipantDto {
+  id: string;
+  userId: string;
+  fullName: string;
+  role?: string;
+  lastReadAt?: string | null;
+  joinedAt?: string;
+}
+
+export interface MessageDto {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  content: string;
+  isRead: boolean;
+  readAt?: string | null;
+  createdAt: string;
+  sender?: {
+    id: string;
+    fullName: string;
+    email?: string;
+  };
+}
+
+export interface ConversationSummaryDto {
+  id: string;
+  inquiryId?: string | null;
+  propertyId?: string | null;
+  property?: PropertySummaryDto | null;
+  isBlocked: boolean;
+  blockedById?: string | null;
+  blockedAt?: string | null;
+  lastMessageAt?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  participants: ConversationParticipantDto[];
+  lastMessage?: MessageDto | null;
+  unreadCount?: number;
+  inquiryStatus?: string | null;
+  whatsappUrl?: string | null;
+  canContactWhatsapp?: boolean;
+}
+
+export interface SendMessageDto {
+  content: string;
+}
+
+export interface BlockConversationDto {
+  reason?: string;
+}
+
+export interface ReportConversationDto {
+  reason: ReportReason;
+  details: string;
+}
+
+export interface RegisterDeviceDto {
+  fcmToken: string;
+  platform: 'ANDROID' | 'IOS' | 'WEB';
+}
+
+export interface DeviceTokenDto {
+  id: string;
+  userId: string;
+  fcmToken: string;
+  platform: string;
+  lastActiveAt: string;
+  createdAt: string;
 }
 
 export interface FavoriteResponseDto {

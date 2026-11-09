@@ -2,25 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../../core/models/conversation_model.dart';
 import '../../../../core/models/inquiry_model.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/ui_feedback_widgets.dart';
 import '../../../auth/application/providers/auth_provider.dart';
 import '../../application/providers/inquiries_provider.dart';
+import '../../../messages/presentation/screens/chat_screen.dart';
 
 class InquiriesScreen extends ConsumerWidget {
   const InquiriesScreen({super.key});
 
   Color _getStatusColor(InquiryStatus status) {
     switch (status) {
-      case InquiryStatus.pending:
+      case InquiryStatus.submitted:
         return Colors.orange;
+      case InquiryStatus.seen:
+        return Colors.purple;
+      case InquiryStatus.replied:
+        return Colors.blue;
       case InquiryStatus.accepted:
         return AppTheme.primaryEmerald;
-      case InquiryStatus.rejected:
+      case InquiryStatus.declined:
         return Colors.redAccent;
-      case InquiryStatus.expired:
-      case InquiryStatus.cancelled:
+      case InquiryStatus.closed:
         return Colors.grey;
     }
   }
@@ -141,6 +147,82 @@ class InquiriesScreen extends ConsumerWidget {
                                   ),
                               ],
                             ),
+
+                            // WhatsApp contact reveal section
+                            if (inquiry.canContactWhatsapp && inquiry.whatsappUrl != null) ...[
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade50,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.green.shade200),
+                                ),
+                                child: Row(
+                                  children: [
+                                    const Icon(Icons.verified, color: Colors.green, size: 18),
+                                    const SizedBox(width: 8),
+                                    const Expanded(
+                                      child: Text(
+                                        'Inquiry accepted! WhatsApp contact is unlocked.',
+                                        style: TextStyle(fontSize: 11, color: Colors.green, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                    ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green.shade600,
+                                        foregroundColor: Colors.white,
+                                        visualDensity: VisualDensity.compact,
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      ),
+                                      icon: const Icon(Icons.chat, size: 14),
+                                      label: const Text('WhatsApp', style: TextStyle(fontSize: 11)),
+                                      onPressed: () async {
+                                        final uri = Uri.parse(inquiry.whatsappUrl!);
+                                        if (await canLaunchUrl(uri)) {
+                                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+
+                            // In-App Chat button
+                            if (inquiry.conversationId != null) ...[
+                              const SizedBox(height: 8),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton.icon(
+                                  icon: const Icon(Icons.chat_bubble_outline, size: 15, color: AppTheme.primaryEmerald),
+                                  label: const Text(
+                                    'Open In-App Chat',
+                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primaryEmerald),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ChatScreen(
+                                          conversation: ConversationModel(
+                                            id: inquiry.conversationId!,
+                                            inquiryId: inquiry.id,
+                                            propertyId: inquiry.propertyId,
+                                            propertyTitle: inquiry.propertyTitle,
+                                            propertyLocality: inquiry.propertyLocality,
+                                            canContactWhatsapp: inquiry.canContactWhatsapp,
+                                            whatsappUrl: inquiry.whatsappUrl,
+                                            participants: [],
+                                            createdAt: inquiry.createdAt,
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                       ),

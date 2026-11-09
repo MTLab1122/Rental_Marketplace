@@ -105,6 +105,16 @@ describe('Favorites and Inquiries E2E Tests', () => {
         status: dto.status,
       });
     }),
+    updateStatusByLandlord: jest.fn().mockImplementation((inqId, _uId, dto) => {
+      return Promise.resolve({
+        id: inqId,
+        status: dto.status,
+      });
+    }),
+    deleteInquiry: jest.fn().mockResolvedValue({
+      success: true,
+      message: 'Inquiry closed successfully.',
+    }),
   };
 
   beforeAll(async () => {

@@ -6,6 +6,8 @@ import {
   MinLength,
   MaxLength,
   IsDateString,
+  IsInt,
+  Min,
 } from 'class-validator';
 import { InquiryStatus } from '@rental-peshawar/shared-types';
 
@@ -20,6 +22,11 @@ export class CreateInquiryRequestDto {
   message!: string;
 
   @IsOptional()
+  @IsInt()
+  @Min(1000, { message: 'Proposed monthly rent must be at least PKR 1,000.' })
+  proposedRentPkr?: number;
+
+  @IsOptional()
   @IsDateString()
   proposedMoveInDate?: string;
 
@@ -31,4 +38,9 @@ export class CreateInquiryRequestDto {
 export class UpdateInquiryStatusRequestDto {
   @IsEnum(InquiryStatus)
   status!: InquiryStatus;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  note?: string;
 }

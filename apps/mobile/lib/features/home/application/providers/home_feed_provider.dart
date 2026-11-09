@@ -177,3 +177,4 @@ final homeFeedProvider =
   final auth = ref.watch(authProvider);
   return HomeFeedNotifier(client, auth.currentTenantType);
 });
+

@@ -76,6 +76,18 @@ export default function Navbar() {
             >
               Inquiries
             </Link>
+            <Link
+              href="/messages"
+              className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
+            >
+              Messages
+            </Link>
+            <Link
+              href="/notifications"
+              className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
+            >
+              Alerts
+            </Link>
 
             {isAuthenticated ? (
               <div className="flex items-center gap-3">
@@ -192,6 +204,20 @@ export default function Navbar() {
             className="block text-navy-800 font-semibold py-2"
           >
             My Inquiries
+          </Link>
+          <Link
+            href="/messages"
+            onClick={() => setMenuOpen(false)}
+            className="block text-navy-800 font-semibold py-2"
+          >
+            Direct Messages
+          </Link>
+          <Link
+            href="/notifications"
+            onClick={() => setMenuOpen(false)}
+            className="block text-navy-800 font-semibold py-2"
+          >
+            Alerts & Notifications
           </Link>
           {isAuthenticated ? (
             <div className="pt-2 border-t border-navy-100 flex items-center justify-between">

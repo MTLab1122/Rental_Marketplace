@@ -200,3 +200,4 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   final storage = ref.watch(secureStorageProvider);
   return AuthNotifier(client, storage);
 });
+

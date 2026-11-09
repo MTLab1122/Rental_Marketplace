@@ -161,3 +161,4 @@ final searchProvider =
   final auth = ref.watch(authProvider);
   return SearchNotifier(client, auth.currentTenantType);
 });
+

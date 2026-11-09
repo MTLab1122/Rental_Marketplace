@@ -116,3 +116,4 @@ final inquiriesProvider =
   final auth = ref.watch(authProvider);
   return InquiriesNotifier(client, auth.isAuthenticated);
 });
+

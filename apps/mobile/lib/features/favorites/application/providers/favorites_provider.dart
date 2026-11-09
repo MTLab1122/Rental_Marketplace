@@ -118,3 +118,4 @@ final favoritesProvider =
   final auth = ref.watch(authProvider);
   return FavoritesNotifier(client, auth.isAuthenticated);
 });
+

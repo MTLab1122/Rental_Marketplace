@@ -4,8 +4,10 @@ import { LandlordVerificationController } from './landlord-verification.controll
 import { AdminVerificationController } from './admin-verification.controller';
 import { AuditService } from '../../common/audit/audit.service';
 import { TokenService } from '../auth/token.service';
+import { NotificationModule } from '../notification/notification.module';
 
 @Module({
+  imports: [NotificationModule],
   controllers: [LandlordVerificationController, AdminVerificationController],
   providers: [VerificationService, AuditService, TokenService],
   exports: [VerificationService],

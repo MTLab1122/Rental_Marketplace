@@ -12,6 +12,7 @@ import { VerificationModule } from './modules/verification/verification.module';
 import { ReportModule } from './modules/report/report.module';
 import { FavoriteModule } from './modules/favorite/favorite.module';
 import { InquiryModule } from './modules/inquiry/inquiry.module';
+import { ConversationModule } from './modules/conversation/conversation.module';
 import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
 
 @Module({
@@ -47,6 +48,7 @@ import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/requ
     ReportModule,
     FavoriteModule,
     InquiryModule,
+    ConversationModule,
   ],
 })
 export class AppModule implements NestModule {

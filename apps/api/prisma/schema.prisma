@@ -143,6 +143,7 @@ model User {
   inquiriesReceived   Inquiry[]         @relation("LandlordInquiries")
   conversationParts   ConversationParticipant[]
   sentMessages        Message[]         @relation("SentMessages")
+  conversationsBlocked Conversation[]   @relation("BlockedConversations")
   reportsFiled        Report[]          @relation("ReportsFiled")
   reportsResolved     Report[]          @relation("ReportsResolved")
   verificationRecords VerificationRecord[]
@@ -259,6 +260,8 @@ model LandlordProfile {
   isCnicVerified Boolean  @default(false)
   businessName   String?  @db.VarChar(150)
   officeAddress  String?  @db.VarChar(255)
+  whatsappNumber String?  @db.VarChar(20)
+  whatsappEnabled Boolean @default(false)
   createdAt      DateTime @default(now()) @db.Timestamptz(6)
   updatedAt      DateTime @updatedAt @db.Timestamptz(6)
 
@@ -332,6 +335,8 @@ model Property {
   viewCount          Int                 @default(0)
   inquiryCount       Int                 @default(0)
   favoriteCount      Int                 @default(0)
+  whatsappNumber     String?             @db.VarChar(20)
+  showWhatsapp       Boolean             @default(false)
   verifiedAt         DateTime?           @db.Timestamptz(6)
   approvedById       String?             @db.Uuid
   rejectionReason    String?             @db.VarChar(255)
@@ -346,8 +351,9 @@ model Property {
 
   images     PropertyImage[]
   amenities  PropertyAmenity[]
-  favorites  Favorite[]
-  inquiries  Inquiry[]
+  favorites     Favorite[]
+  inquiries     Inquiry[]
+  conversations Conversation[]
 
   // High performance composite indexes
   @@index([status, eligibility, isAvailable, localityId])
@@ -435,19 +441,22 @@ model Favorite {
 }
 
 model Inquiry {
-  id                 String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  propertyId         String        @db.Uuid
-  tenantId           String        @db.Uuid
-  landlordId         String        @db.Uuid
-  status             InquiryStatus @default(SUBMITTED)
-  message            String        @db.Text
-  proposedMoveInDate DateTime?     @db.Date
-  createdAt          DateTime      @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime      @updatedAt @db.Timestamptz(6)
+  id                     String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propertyId             String        @db.Uuid
+  tenantId               String        @db.Uuid
+  landlordId             String        @db.Uuid
+  status                 InquiryStatus @default(SUBMITTED)
+  message                String        @db.Text
+  proposedMoveInDate     DateTime?     @db.Date
+  proposedRentPkr        Int?
+  preferredContactMethod String?       @default("IN_APP") @db.VarChar(20)
+  createdAt              DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime      @updatedAt @db.Timestamptz(6)
 
-  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
-  tenant   User     @relation("TenantInquiries", fields: [tenantId], references: [id], onDelete: Restrict)
-  landlord User     @relation("LandlordInquiries", fields: [landlordId], references: [id], onDelete: Restrict)
+  property     Property      @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant       User          @relation("TenantInquiries", fields: [tenantId], references: [id], onDelete: Restrict)
+  landlord     User          @relation("LandlordInquiries", fields: [landlordId], references: [id], onDelete: Restrict)
+  conversation Conversation?
 
   @@index([tenantId])
   @@index([landlordId])
@@ -458,13 +467,24 @@ model Inquiry {
 
 model Conversation {
   id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  inquiryId     String?   @unique @db.Uuid
   propertyId    String?   @db.Uuid
+  isBlocked     Boolean   @default(false)
+  blockedById   String?   @db.Uuid
+  blockedAt     DateTime? @db.Timestamptz(6)
   lastMessageAt DateTime? @db.Timestamptz(6)
   createdAt     DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime  @default(now()) @updatedAt @db.Timestamptz(6)
 
+  inquiry      Inquiry?                  @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  property     Property?                 @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  blockedBy    User?                     @relation("BlockedConversations", fields: [blockedById], references: [id], onDelete: SetNull)
   participants ConversationParticipant[]
   messages     Message[]
 
+  @@index([inquiryId])
+  @@index([propertyId])
+  @@index([isBlocked])
   @@map("conversations")
 }
 
@@ -490,6 +510,7 @@ model Message {
   senderId       String    @db.Uuid
   content        String    @db.Text
   isRead         Boolean   @default(false)
+  readAt         DateTime? @db.Timestamptz(6)
   createdAt      DateTime  @default(now()) @db.Timestamptz(6)
   deletedAt      DateTime? @db.Timestamptz(6)
 

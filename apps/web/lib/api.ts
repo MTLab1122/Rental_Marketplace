@@ -4,7 +4,10 @@ import {
   TenantType,
   PropertyType,
   InquiryResponseDto,
+  InquiryStatus,
   ReportReason,
+  ConversationSummaryDto,
+  MessageDto,
 } from '@rental-peshawar/shared-types';
 
 const API_BASE_URL = process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3000/api/v1';
@@ -128,6 +131,150 @@ export async function submitInquiry(
 
 export async function getMyInquiries(token: string): Promise<InquiryResponseDto[]> {
   return fetchWithAuth('/inquiries', { method: 'GET' }, token);
+}
+
+export async function getInquiryById(id: string, token: string): Promise<InquiryResponseDto> {
+  return fetchWithAuth(`/inquiries/${id}`, { method: 'GET' }, token);
+}
+
+export async function getLandlordInquiries(token: string): Promise<InquiryResponseDto[]> {
+  return fetchWithAuth('/landlord/inquiries', { method: 'GET' }, token);
+}
+
+export async function updateInquiryStatus(
+  id: string,
+  status: InquiryStatus,
+  token: string,
+  note?: string,
+): Promise<InquiryResponseDto> {
+  return fetchWithAuth(
+    `/landlord/inquiries/${id}/status`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ status, note }),
+    },
+    token,
+  );
+}
+
+export async function deleteInquiry(
+  id: string,
+  token: string,
+): Promise<{ success: boolean; message: string }> {
+  return fetchWithAuth(`/inquiries/${id}`, { method: 'DELETE' }, token);
+}
+
+// ==========================================
+// Conversations & Real-Time Messaging APIs
+// ==========================================
+
+export async function getConversations(token: string): Promise<ConversationSummaryDto[]> {
+  return fetchWithAuth('/conversations', { method: 'GET' }, token);
+}
+
+export async function getConversationMessages(id: string, token: string): Promise<MessageDto[]> {
+  return fetchWithAuth(`/conversations/${id}/messages`, { method: 'GET' }, token);
+}
+
+export async function sendConversationMessage(
+  id: string,
+  content: string,
+  token: string,
+): Promise<MessageDto> {
+  return fetchWithAuth(
+    `/conversations/${id}/messages`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    },
+    token,
+  );
+}
+
+export async function markConversationRead(
+  id: string,
+  token: string,
+): Promise<{ success: boolean; updatedCount: number; readAt: string }> {
+  return fetchWithAuth(`/conversations/${id}/read`, { method: 'PATCH' }, token);
+}
+
+export async function blockConversation(
+  id: string,
+  token: string,
+  reason?: string,
+): Promise<{ id: string; isBlocked: boolean; blockedById: string }> {
+  return fetchWithAuth(
+    `/conversations/${id}/block`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ reason }),
+    },
+    token,
+  );
+}
+
+export async function reportConversation(
+  id: string,
+  reason: ReportReason,
+  details: string,
+  token: string,
+) {
+  return fetchWithAuth(
+    `/conversations/${id}/report`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ reason, details }),
+    },
+    token,
+  );
+}
+
+// ==========================================
+// Notifications & Device Tokens APIs
+// ==========================================
+
+export interface AppNotification {
+  id: string;
+  userId: string;
+  type: string;
+  title: string;
+  body: string;
+  data?: Record<string, unknown> | null;
+  isRead: boolean;
+  createdAt: string;
+}
+
+export async function getNotifications(token: string): Promise<AppNotification[]> {
+  return fetchWithAuth('/notifications', { method: 'GET' }, token);
+}
+
+export async function markNotificationRead(id: string, token: string): Promise<AppNotification> {
+  return fetchWithAuth(`/notifications/${id}/read`, { method: 'PATCH' }, token);
+}
+
+export async function markAllNotificationsRead(
+  token: string,
+): Promise<{ success: boolean; updatedCount: number }> {
+  return fetchWithAuth('/notifications/read-all', { method: 'PATCH' }, token);
+}
+
+export async function registerDeviceToken(
+  fcmToken: string,
+  platform: 'ANDROID' | 'IOS' | 'WEB',
+  token: string,
+) {
+  return fetchWithAuth(
+    '/devices',
+    {
+      method: 'POST',
+      body: JSON.stringify({ fcmToken, platform }),
+    },
+    token,
+  );
+}
+
+export async function deleteDeviceToken(id: string, token: string) {
+  return fetchWithAuth(`/devices/${id}`, { method: 'DELETE' }, token);
 }
 
 export async function submitReport(

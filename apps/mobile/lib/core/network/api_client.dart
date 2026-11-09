@@ -110,3 +110,4 @@ class ApiClient {
     return await _dio.delete(path, data: data, queryParameters: queryParameters, options: options);
   }
 }
+

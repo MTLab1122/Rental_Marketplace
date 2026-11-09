@@ -1,9 +1,10 @@
 enum InquiryStatus {
-  pending,
+  submitted,
+  seen,
+  replied,
   accepted,
-  rejected,
-  expired,
-  cancelled,
+  declined,
+  closed,
 }
 
 class InquiryModel {
@@ -19,6 +20,9 @@ class InquiryModel {
   final int? proposedRentPkr;
   final DateTime? proposedMoveInDate;
   final String preferredContactMethod;
+  final String? conversationId;
+  final bool canContactWhatsapp;
+  final String? whatsappUrl;
   final DateTime createdAt;
 
   InquiryModel({
@@ -34,37 +38,47 @@ class InquiryModel {
     this.proposedRentPkr,
     this.proposedMoveInDate,
     required this.preferredContactMethod,
+    this.conversationId,
+    this.canContactWhatsapp = false,
+    this.whatsappUrl,
     required this.createdAt,
   });
 
   String get statusLabel {
     switch (status) {
-      case InquiryStatus.pending:
-        return 'Pending Review';
+      case InquiryStatus.submitted:
+        return 'Submitted';
+      case InquiryStatus.seen:
+        return 'Seen by Landlord';
+      case InquiryStatus.replied:
+        return 'Landlord Replied';
       case InquiryStatus.accepted:
         return 'Accepted';
-      case InquiryStatus.rejected:
+      case InquiryStatus.declined:
         return 'Declined';
-      case InquiryStatus.expired:
-        return 'Expired';
-      case InquiryStatus.cancelled:
-        return 'Cancelled';
+      case InquiryStatus.closed:
+        return 'Closed';
     }
   }
 
   factory InquiryModel.fromJson(Map<String, dynamic> json) {
     InquiryStatus parseStatus(String? s) {
       switch (s) {
+        case 'SEEN':
+          return InquiryStatus.seen;
+        case 'REPLIED':
+          return InquiryStatus.replied;
         case 'ACCEPTED':
           return InquiryStatus.accepted;
+        case 'DECLINED':
         case 'REJECTED':
-          return InquiryStatus.rejected;
-        case 'EXPIRED':
-          return InquiryStatus.expired;
+          return InquiryStatus.declined;
+        case 'CLOSED':
         case 'CANCELLED':
-          return InquiryStatus.cancelled;
+        case 'EXPIRED':
+          return InquiryStatus.closed;
         default:
-          return InquiryStatus.pending;
+          return InquiryStatus.submitted;
       }
     }
 
@@ -98,6 +112,12 @@ class InquiryModel {
           ? DateTime.tryParse(json['proposedMoveInDate'] as String)
           : null,
       preferredContactMethod: json['preferredContactMethod'] as String? ?? 'IN_APP',
+      conversationId: json['conversationId'] as String? ??
+          (json['conversation'] != null && json['conversation'] is Map
+              ? json['conversation']['id'] as String?
+              : null),
+      canContactWhatsapp: json['canContactWhatsapp'] as bool? ?? false,
+      whatsappUrl: json['whatsappUrl'] as String?,
       createdAt: json['createdAt'] != null
           ? DateTime.parse(json['createdAt'] as String)
           : DateTime.now(),
