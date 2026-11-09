@@ -272,11 +272,13 @@ model Locality {
   id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
   name            String    @unique @db.VarChar(100)
   slug            String    @unique @db.VarChar(100)
+  description     String?   @db.Text
   postalCode      String    @db.VarChar(10)
   latitude        Decimal   @db.Decimal(10, 7)
   longitude       Decimal   @db.Decimal(10, 7)
   boundaryGeoJson Json?
   isActive        Boolean   @default(true)
+  sortOrder       Int       @default(0) @db.SmallInt
   createdAt       DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt       DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt       DateTime? @db.Timestamptz(6)
@@ -303,13 +305,20 @@ model Property {
   bedrooms           Int                 @db.SmallInt
   bathrooms          Int                 @db.SmallInt
   areaSqFt           Decimal?            @db.Decimal(10, 2)
+  furnishing         String?             @db.VarChar(50)
+  address            String              @db.VarChar(255)
+  addressNote        String?             @db.VarChar(255)
   latitude           Decimal             @db.Decimal(10, 7)
   longitude          Decimal             @db.Decimal(10, 7)
-  address            String              @db.VarChar(255)
   isAvailable        Boolean             @default(true)
+  isFeatured         Boolean             @default(false)
+  viewCount          Int                 @default(0)
+  inquiryCount       Int                 @default(0)
+  favoriteCount      Int                 @default(0)
   verifiedAt         DateTime?           @db.Timestamptz(6)
   approvedById       String?             @db.Uuid
   rejectionReason    String?             @db.VarChar(255)
+  suspensionReason   String?             @db.VarChar(255)
   createdAt          DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt          DateTime            @updatedAt @db.Timestamptz(6)
   deletedAt          DateTime?           @db.Timestamptz(6)
@@ -324,9 +333,10 @@ model Property {
   inquiries  Inquiry[]
 
   // High performance composite indexes
-  @@index([eligibility, status, isAvailable])
-  @@index([localityId, status])
-  @@index([propertyType, eligibility])
+  @@index([status, eligibility, isAvailable, localityId])
+  @@index([monthlyRentPkr])
+  @@index([bedrooms, propertyType])
+  @@index([createdAt])
   @@index([landlordId])
   @@index([status, deletedAt])
   @@map("properties")

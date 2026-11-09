@@ -6,11 +6,28 @@ import { GlobalExceptionFilter } from '../src/common/filters/http-exception.filt
 import { ResponseTransformInterceptor } from '../src/common/interceptors/response-transform.interceptor';
 import { TokenService } from '../src/modules/auth/token.service';
 import { AuthService } from '../src/modules/auth/auth.service';
+import { PrismaService } from '../src/database/prisma.service';
+import { RedisService } from '../src/database/redis.service';
 import { UserRole, TenantType } from '@rental-peshawar/shared-types';
 
 describe('Auth & Health System E2E Tests', () => {
   let app: INestApplication;
   let tokenService: TokenService;
+  jest.setTimeout(30000);
+
+  const mockPrismaService = {
+    $connect: jest.fn().mockResolvedValue(undefined),
+    $disconnect: jest.fn().mockResolvedValue(undefined),
+    isHealthy: jest.fn().mockResolvedValue(true),
+  };
+
+  const mockRedisService = {
+    isHealthy: jest.fn().mockResolvedValue(true),
+    getClient: jest.fn().mockReturnValue(null),
+    get: jest.fn().mockResolvedValue(null),
+    set: jest.fn().mockResolvedValue('OK'),
+    del: jest.fn().mockResolvedValue(1),
+  };
 
   const mockAuthService = {
     register: jest.fn().mockImplementation((dto) => {
@@ -76,6 +93,10 @@ describe('Auth & Health System E2E Tests', () => {
     })
       .overrideProvider(AuthService)
       .useValue(mockAuthService)
+      .overrideProvider(PrismaService)
+      .useValue(mockPrismaService)
+      .overrideProvider(RedisService)
+      .useValue(mockRedisService)
       .compile();
 
     app = moduleFixture.createNestApplication();

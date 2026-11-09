@@ -290,11 +290,13 @@ async function main() {
   console.log(`✅ ${amenitiesData.length} amenities seeded.`);
 
   // 5. Initial 15 Verified Localities in Peshawar
-  for (const loc of PESHAWAR_LOCALITIES_CONFIG) {
+  for (let i = 0; i < PESHAWAR_LOCALITIES_CONFIG.length; i++) {
+    const loc = PESHAWAR_LOCALITIES_CONFIG[i]!;
     await prisma.locality.upsert({
       where: { slug: loc.slug },
       update: {
         name: loc.name,
+        description: loc.description,
         postalCode: loc.postalCode,
         latitude: loc.centerCoordinates.latitude,
         longitude: loc.centerCoordinates.longitude,
@@ -302,11 +304,13 @@ async function main() {
           type: 'Polygon',
           coordinates: [PESHAWAR_SERVICE_BOUNDARY_POLYGON],
         },
+        sortOrder: i + 1,
         isActive: true,
       },
       create: {
         name: loc.name,
         slug: loc.slug,
+        description: loc.description,
         postalCode: loc.postalCode,
         latitude: loc.centerCoordinates.latitude,
         longitude: loc.centerCoordinates.longitude,
@@ -314,6 +318,7 @@ async function main() {
           type: 'Polygon',
           coordinates: [PESHAWAR_SERVICE_BOUNDARY_POLYGON],
         },
+        sortOrder: i + 1,
         isActive: true,
       },
     });

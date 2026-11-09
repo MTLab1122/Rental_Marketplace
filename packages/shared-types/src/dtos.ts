@@ -32,10 +32,44 @@ export interface LocalityDto {
   id: string;
   name: string;
   slug: string;
+  description?: string | null;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  boundaryGeoJson?: Record<string, unknown> | null;
   isActive: boolean;
-  centerLatitude: number;
-  centerLongitude: number;
+  sortOrder: number;
   propertyCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateLocalityDto {
+  name: string;
+  slug?: string;
+  description?: string;
+  postalCode: string;
+  latitude: number;
+  longitude: number;
+  boundaryGeoJson?: Record<string, unknown>;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
+export interface UpdateLocalityDto {
+  name?: string;
+  slug?: string;
+  description?: string;
+  postalCode?: string;
+  latitude?: number;
+  longitude?: number;
+  boundaryGeoJson?: Record<string, unknown>;
+  isActive?: boolean;
+  sortOrder?: number;
+}
+
+export interface UpdateLocalityStatusDto {
+  isActive: boolean;
 }
 
 /**
@@ -127,6 +161,22 @@ export interface UpdateProfileDto {
   officeAddress?: string;
 }
 
+export interface PropertyImageDto {
+  id: string;
+  url: string;
+  caption?: string | null;
+  isPrimary: boolean;
+  sortOrder: number;
+}
+
+export interface AmenityDto {
+  id: string;
+  name: string;
+  code: string;
+  category: string;
+  icon?: string | null;
+}
+
 export interface PropertySummaryDto {
   id: string;
   title: string;
@@ -140,9 +190,101 @@ export interface PropertySummaryDto {
   securityDepositPkr: number;
   bedrooms: number;
   bathrooms: number;
+  areaSqFt?: number | null;
+  furnishing?: string | null;
   coordinates: CoordinatesDto;
+  addressNote?: string | null;
   isAvailable: boolean;
+  isFeatured: boolean;
+  viewCount: number;
+  inquiryCount: number;
+  favoriteCount: number;
+  images: PropertyImageDto[];
+  amenities: AmenityDto[];
   createdAt: string;
+}
+
+export interface CreatePropertyDto {
+  title: string;
+  description: string;
+  eligibility: PropertyEligibility;
+  propertyType: PropertyType;
+  monthlyRentPkr: number;
+  securityDepositPkr: number;
+  bedrooms: number;
+  bathrooms: number;
+  areaSqFt?: number;
+  furnishing?: string;
+  address: string;
+  addressNote?: string;
+  latitude: number;
+  longitude: number;
+  localityId: string;
+  amenityIds?: string[];
+  images?: {
+    url: string;
+    caption?: string;
+    isPrimary?: boolean;
+    sortOrder?: number;
+  }[];
+}
+
+export interface UpdatePropertyDto {
+  title?: string;
+  description?: string;
+  eligibility?: PropertyEligibility;
+  propertyType?: PropertyType;
+  monthlyRentPkr?: number;
+  securityDepositPkr?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  areaSqFt?: number;
+  furnishing?: string;
+  address?: string;
+  addressNote?: string;
+  latitude?: number;
+  longitude?: number;
+  localityId?: string;
+  amenityIds?: string[];
+  images?: {
+    url: string;
+    caption?: string;
+    isPrimary?: boolean;
+    sortOrder?: number;
+  }[];
+}
+
+export interface UpdatePropertyStatusDto {
+  status: PropertyStatus;
+  reason?: string;
+}
+
+export interface PropertySearchQueryDto {
+  eligibility?: PropertyEligibility;
+  tenantType?: TenantType;
+  localityId?: string;
+  propertyType?: PropertyType;
+  minRent?: number;
+  maxRent?: number;
+  minBedrooms?: number;
+  maxBedrooms?: number;
+  minBathrooms?: number;
+  furnished?: boolean | string;
+  amenityIds?: string[];
+  latitude?: number;
+  longitude?: number;
+  radiusKm?: number;
+  boundingBox?: string; // minLat,minLng,maxLat,maxLng
+  sort?: 'newest' | 'lowest_rent' | 'highest_rent' | 'nearest';
+  cursor?: string;
+  limit?: number;
+}
+
+export interface PaginatedResultDto<T> {
+  items: T[];
+  nextCursor: string | null;
+  hasMore: boolean;
+  total?: number;
 }
 
 export interface AuditLogDto {

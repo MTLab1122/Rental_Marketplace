@@ -49,35 +49,42 @@ export class GlobalExceptionFilter implements ExceptionFilter {
           });
         }
 
-        if (respObj['error'] && typeof respObj['error'] === 'string') {
+        if (respObj['code'] && typeof respObj['code'] === 'string') {
+          code = respObj['code'];
+        } else if (respObj['error'] && typeof respObj['error'] === 'string') {
           if (!code || code === ErrorCode.INTERNAL_SERVER_ERROR) {
             code = respObj['error'].toUpperCase().replace(/\s+/g, '_');
           }
         }
       }
 
-      switch (status) {
-        case HttpStatus.BAD_REQUEST:
-          code = code || ErrorCode.VALIDATION_ERROR;
-          break;
-        case HttpStatus.UNAUTHORIZED:
-          code = ErrorCode.UNAUTHORIZED;
-          break;
-        case HttpStatus.FORBIDDEN:
-          code = ErrorCode.FORBIDDEN;
-          break;
-        case HttpStatus.NOT_FOUND:
-          code = ErrorCode.NOT_FOUND;
-          break;
-        case HttpStatus.CONFLICT:
-          code = ErrorCode.CONFLICT;
-          break;
-        case HttpStatus.TOO_MANY_REQUESTS:
-          code = ErrorCode.RATE_LIMIT_EXCEEDED;
-          break;
-        case HttpStatus.SERVICE_UNAVAILABLE:
-          code = ErrorCode.SERVICE_UNAVAILABLE;
-          break;
+      if (code === ErrorCode.INTERNAL_SERVER_ERROR) {
+        switch (status) {
+          case HttpStatus.BAD_REQUEST:
+            code = ErrorCode.VALIDATION_ERROR;
+            break;
+          case HttpStatus.UNAUTHORIZED:
+            code = ErrorCode.UNAUTHORIZED;
+            break;
+          case HttpStatus.FORBIDDEN:
+            code = ErrorCode.FORBIDDEN;
+            break;
+          case HttpStatus.NOT_FOUND:
+            code = ErrorCode.NOT_FOUND;
+            break;
+          case HttpStatus.CONFLICT:
+            code = ErrorCode.CONFLICT;
+            break;
+          case HttpStatus.UNPROCESSABLE_ENTITY:
+            code = 'UNPROCESSABLE_ENTITY';
+            break;
+          case HttpStatus.TOO_MANY_REQUESTS:
+            code = ErrorCode.RATE_LIMIT_EXCEEDED;
+            break;
+          case HttpStatus.SERVICE_UNAVAILABLE:
+            code = ErrorCode.SERVICE_UNAVAILABLE;
+            break;
+        }
       }
     } else if (exception instanceof Error) {
       message = exception.message;
