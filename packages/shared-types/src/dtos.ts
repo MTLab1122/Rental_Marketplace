@@ -181,11 +181,18 @@ export interface PropertySummaryDto {
   id: string;
   title: string;
   slug: string;
-  localityId: string;
-  localityName: string;
+  description?: string | null;
+  localityId?: string;
+  localityName?: string;
+  locality?: {
+    id: string;
+    name: string;
+    slug?: string;
+    postalCode?: string;
+  };
   eligibility: PropertyEligibility;
   propertyType: PropertyType;
-  status: PropertyStatus;
+  status?: PropertyStatus;
   monthlyRentPkr: number;
   securityDepositPkr: number;
   bedrooms: number;
@@ -194,14 +201,15 @@ export interface PropertySummaryDto {
   furnishing?: string | null;
   coordinates: CoordinatesDto;
   addressNote?: string | null;
+  address?: string;
   isAvailable: boolean;
-  isFeatured: boolean;
-  viewCount: number;
-  inquiryCount: number;
-  favoriteCount: number;
+  isFeatured?: boolean;
+  viewCount?: number;
+  inquiryCount?: number;
+  favoriteCount?: number;
   images: PropertyImageDto[];
   amenities: AmenityDto[];
-  createdAt: string;
+  createdAt?: string;
 }
 
 export interface CreatePropertyDto {
@@ -395,6 +403,50 @@ export interface NotificationDto {
   data?: Record<string, unknown> | null;
   isRead: boolean;
   createdAt: string;
+}
+
+export interface CreateInquiryDto {
+  propertyId: string;
+  message: string;
+  proposedMoveInDate?: string;
+  preferredContactMethod?: 'PHONE' | 'WHATSAPP' | 'IN_APP';
+}
+
+export interface UpdateInquiryStatusDto {
+  status: 'SUBMITTED' | 'SEEN' | 'REPLIED' | 'ACCEPTED' | 'DECLINED' | 'CLOSED';
+}
+
+export interface InquiryResponseDto {
+  id: string;
+  propertyId: string;
+  tenantId: string;
+  landlordId: string;
+  status: string;
+  message: string;
+  proposedMoveInDate?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  property?: PropertySummaryDto;
+  tenant?: {
+    id: string;
+    fullName: string;
+    email: string;
+    phoneNumber?: string | null;
+  };
+  landlord?: {
+    id: string;
+    fullName: string;
+    email: string;
+    phoneNumber?: string | null;
+  };
+}
+
+export interface FavoriteResponseDto {
+  id: string;
+  userId: string;
+  propertyId: string;
+  createdAt: string;
+  property?: PropertySummaryDto;
 }
 
 export enum PermissionCode {

@@ -10,6 +10,8 @@ import { NotificationModule } from './modules/notification/notification.module';
 import { MediaModule } from './modules/media/media.module';
 import { VerificationModule } from './modules/verification/verification.module';
 import { ReportModule } from './modules/report/report.module';
+import { FavoriteModule } from './modules/favorite/favorite.module';
+import { InquiryModule } from './modules/inquiry/inquiry.module';
 import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
 
 @Module({
@@ -43,6 +45,8 @@ import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/requ
     MediaModule,
     VerificationModule,
     ReportModule,
+    FavoriteModule,
+    InquiryModule,
   ],
 })
 export class AppModule implements NestModule {

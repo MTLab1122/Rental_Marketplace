@@ -61,3 +61,4 @@ ALTER TABLE "reports" DROP COLUMN IF EXISTS "reason";
 ALTER TABLE "reports" ADD COLUMN IF NOT EXISTS "reason" "ReportReason" NOT NULL DEFAULT 'OTHER';
 
 CREATE INDEX IF NOT EXISTS "reports_reporter_id_target_type_target_id_idx" ON "reports"("reporter_id", "target_type", "target_id");
+
