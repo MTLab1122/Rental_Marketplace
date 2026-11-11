@@ -107,3 +107,4 @@ final notificationsProvider =
   final auth = ref.watch(authProvider);
   return NotificationsNotifier(client, auth.isAuthenticated);
 });
+

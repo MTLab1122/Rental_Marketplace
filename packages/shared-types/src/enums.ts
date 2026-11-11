@@ -6,6 +6,8 @@ export enum UserRole {
   LANDLORD = 'LANDLORD',
   ADMIN = 'ADMIN',
   SUPER_ADMIN = 'SUPER_ADMIN',
+  MODERATOR = 'MODERATOR',
+  SUPPORT = 'SUPPORT',
 }
 
 /**
@@ -124,6 +126,15 @@ export enum ImageModerationStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
+}
+
+/**
+ * Analytics View Event Sources
+ */
+export enum ViewSource {
+  MOBILE = 'MOBILE',
+  WEB = 'WEB',
+  ADMIN_REFERRAL = 'ADMIN_REFERRAL',
 }
 
 /**

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { PropertyService } from './property.service';
 import { LandlordPropertyController } from './landlord-property.controller';
+import { LandlordDashboardController } from './landlord-dashboard.controller';
 import { PublicPropertyController } from './public-property.controller';
 import { AdminPropertyController } from './admin-property.controller';
 import { LocalityModule } from '../locality/locality.module';
@@ -10,7 +11,12 @@ import { TokenService } from '../auth/token.service';
 
 @Module({
   imports: [LocalityModule, NotificationModule],
-  controllers: [PublicPropertyController, LandlordPropertyController, AdminPropertyController],
+  controllers: [
+    PublicPropertyController,
+    LandlordDashboardController,
+    LandlordPropertyController,
+    AdminPropertyController,
+  ],
   providers: [PropertyService, AuditService, TokenService],
   exports: [PropertyService],
 })

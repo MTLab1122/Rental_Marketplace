@@ -85,6 +85,15 @@ export class LandlordInquiryController {
     return { success: true, data: list };
   }
 
+  @Get(':id')
+  async getLandlordInquiryById(
+    @Param('id') id: string,
+    @CurrentUser() user: { sub: string; roles?: string[] },
+  ) {
+    const inquiry = await this.inquiryService.getInquiryById(id, user.sub, user.roles || []);
+    return { success: true, data: inquiry };
+  }
+
   @Patch(':id/status')
   @HttpCode(HttpStatus.OK)
   async updateStatus(

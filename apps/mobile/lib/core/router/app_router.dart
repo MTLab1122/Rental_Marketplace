@@ -12,6 +12,13 @@ import '../../features/profile/presentation/screens/profile_screen.dart';
 import '../../features/property/presentation/screens/property_detail_screen.dart';
 import '../../features/notifications/presentation/screens/notifications_screen.dart';
 import '../../features/messages/presentation/screens/messages_screen.dart';
+import '../../features/landlord/presentation/screens/landlord_dashboard_screen.dart';
+import '../../features/landlord/presentation/screens/my_listings_screen.dart';
+import '../../features/landlord/presentation/screens/create_listing_wizard_screen.dart';
+import '../../features/landlord/presentation/screens/edit_listing_screen.dart';
+import '../../features/landlord/presentation/screens/listing_analytics_screen.dart';
+import '../../features/landlord/presentation/screens/landlord_inquiries_screen.dart';
+import '../../features/landlord/presentation/screens/landlord_verification_screen.dart';
 import '../theme/app_theme.dart';
 
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -57,6 +64,40 @@ GoRouter createAppRouter(SecureStorageService storage) {
       GoRoute(
         path: '/messages',
         builder: (context, state) => const MessagesScreen(),
+      ),
+      GoRoute(
+        path: '/landlord',
+        builder: (context, state) => const LandlordDashboardScreen(),
+      ),
+      GoRoute(
+        path: '/landlord/properties',
+        builder: (context, state) => const MyListingsScreen(),
+      ),
+      GoRoute(
+        path: '/landlord/properties/new',
+        builder: (context, state) => const CreateListingWizardScreen(),
+      ),
+      GoRoute(
+        path: '/landlord/properties/:id/edit',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return EditListingScreen(propertyId: id);
+        },
+      ),
+      GoRoute(
+        path: '/landlord/properties/:id/analytics',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return ListingAnalyticsScreen(propertyId: id);
+        },
+      ),
+      GoRoute(
+        path: '/landlord/inquiries',
+        builder: (context, state) => const LandlordInquiriesScreen(),
+      ),
+      GoRoute(
+        path: '/landlord/verification',
+        builder: (context, state) => const LandlordVerificationScreen(),
       ),
 
       // Shell route for Bottom Navigation Bar

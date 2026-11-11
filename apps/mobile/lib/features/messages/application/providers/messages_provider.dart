@@ -93,3 +93,4 @@ final messagesProvider =
   final auth = ref.watch(authProvider);
   return MessagesNotifier(client, auth.isAuthenticated);
 });
+

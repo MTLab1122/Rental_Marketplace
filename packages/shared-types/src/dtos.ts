@@ -169,6 +169,7 @@ export interface PropertyImageDto {
   caption?: string | null;
   isPrimary: boolean;
   sortOrder: number;
+  moderationStatus?: string;
 }
 
 export interface AmenityDto {
@@ -209,6 +210,9 @@ export interface PropertySummaryDto {
   viewCount?: number;
   inquiryCount?: number;
   favoriteCount?: number;
+  availableFromDate?: string | null;
+  isDuplicateWarning?: boolean;
+  isDuplicateConfirmed?: boolean;
   images: PropertyImageDto[];
   amenities: AmenityDto[];
   createdAt?: string;
@@ -227,6 +231,8 @@ export interface CreatePropertyDto {
   furnishing?: string;
   address: string;
   addressNote?: string;
+  availableFromDate?: string;
+  allowDuplicateBypass?: boolean;
   latitude: number;
   longitude: number;
   localityId: string;
@@ -529,6 +535,65 @@ export interface FavoriteResponseDto {
   property?: PropertySummaryDto;
 }
 
+export interface LandlordDashboardSummaryDto {
+  totalProperties: number;
+  activeListings: number;
+  pendingReview: number;
+  rentedCount: number;
+  unavailableCount: number;
+  totalInquiries: number;
+  unreadInquiries: number;
+  unreadMessagesCount: number;
+  totalViews: number;
+  averageResponseTimeMinutes: number | null;
+  responseRatePercent: number | null;
+  recentInquiries: InquiryResponseDto[];
+  verification: {
+    isVerified: boolean;
+    status: string;
+    cnicMasked?: string | null;
+  };
+}
+
+export interface PropertyAnalyticsDto {
+  propertyId: string;
+  propertyTitle: string;
+  totalViews: number;
+  uniqueViews: number;
+  favoritesCount: number;
+  inquiriesCount: number;
+  responseRatePercent: number | null;
+  averageResponseTimeMinutes: number | null;
+  qualityScore: number;
+  viewsBySource: {
+    mobile: number;
+    web: number;
+    adminReferral: number;
+  };
+  viewsByLocality: Record<string, number>;
+}
+
+export interface DuplicateCheckRequestDto {
+  localityId: string;
+  propertyType: PropertyType;
+  monthlyRentPkr: number;
+  latitude: number;
+  longitude: number;
+  title: string;
+}
+
+export interface DuplicateCheckResponseDto {
+  isDuplicate: boolean;
+  matchedPropertyId?: string;
+  matchedPropertyTitle?: string;
+  warningMessage?: string;
+}
+
+export interface RecordViewEventDto {
+  source?: 'MOBILE' | 'WEB' | 'ADMIN_REFERRAL';
+  localityId?: string;
+}
+
 export enum PermissionCode {
   // Properties
   PROPERTY_CREATE = 'property:create',
@@ -555,4 +620,131 @@ export enum PermissionCode {
   USER_VERIFY = 'user:verify',
   ADMIN_MANAGE = 'admin:manage',
   AUDIT_READ = 'audit:read',
+
+  // Phase 8 Admin Console Permissions
+  MANAGE_USERS = 'manage:users',
+  MANAGE_LANDLORDS = 'manage:landlords',
+  MANAGE_PROPERTIES = 'manage:properties',
+  MODERATE_LISTINGS = 'moderate:listings',
+  REVIEW_REPORTS = 'review:reports',
+  MANAGE_LOCALITIES = 'manage:localities',
+  MANAGE_NOTIFICATIONS = 'manage:notifications',
+  VIEW_ANALYTICS = 'view:analytics',
+  MANAGE_SETTINGS = 'manage:settings',
+  MANAGE_ADMINS = 'manage:admins',
+  VIEW_AUDIT_LOGS = 'view:audit_logs',
+}
+
+// ==========================================
+// Phase 8 Admin Console DTOs
+// ==========================================
+
+export interface AdminUserListItemDto {
+  id: string;
+  email: string;
+  phoneNumber: string;
+  fullName: string;
+  isVerified: boolean;
+  isSuspended: boolean;
+  suspendedReason?: string | null;
+  roles: string[];
+  tenantType?: string | null;
+  propertiesCount?: number;
+  inquiriesCount?: number;
+  reportsCount?: number;
+  createdAt: string;
+  lastLoginAt?: string | null;
+}
+
+export interface AdminUserDetailDto extends AdminUserListItemDto {
+  failedLoginAttempts: number;
+  lockedUntil?: string | null;
+  isMfaEnabled: boolean;
+  verificationRecord?: {
+    id: string;
+    status: string;
+    cnicMasked?: string | null;
+    documentType?: string | null;
+    documentUrl?: string | null;
+    selfieUrl?: string | null;
+    submittedAt: string;
+    verifiedAt?: string | null;
+    reviewNotes?: string | null;
+  } | null;
+  auditHistory?: {
+    id: string;
+    action: string;
+    createdAt: string;
+    ipAddress?: string | null;
+  }[];
+}
+
+export interface AdminAnalyticsOverviewDto {
+  totalUsers: number;
+  activeUsers: number;
+  tenantsByType: {
+    student: number;
+    family: number;
+  };
+  landlordsTotal: number;
+  verifiedLandlords: number;
+  propertiesByStatus: {
+    approved: number;
+    pendingReview: number;
+    rejected: number;
+    suspended: number;
+    rented: number;
+    unavailable: number;
+    draft: number;
+  };
+  propertiesByEligibility: {
+    studentsOnly: number;
+    familiesOnly: number;
+  };
+  propertiesByLocality: Record<string, number>;
+  totalInquiries: number;
+  totalMessages: number;
+  totalReports: {
+    open: number;
+    resolved: number;
+    dismissed: number;
+  };
+  moderationSlaHours: number;
+  searchToInquiryConversionRate: number;
+  viewsTotal: number;
+}
+
+export interface AdminAnalyticsTrendsDto {
+  daily: { date: string; views: number; inquiries: number; newUsers: number }[];
+  weekly: { week: string; views: number; inquiries: number; listings: number }[];
+  monthly: { month: string; views: number; inquiries: number; listings: number }[];
+}
+
+export interface AdminAuditLogItemDto {
+  id: string;
+  actorId?: string | null;
+  actorName?: string | null;
+  actorEmail?: string | null;
+  action: string;
+  targetType: string;
+  targetId?: string | null;
+  before?: unknown;
+  after?: unknown;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  createdAt: string;
+}
+
+export interface SystemSettingDto {
+  key: string;
+  value: unknown;
+  description?: string | null;
+  updatedBy?: string | null;
+  updatedAt: string;
+}
+
+export interface MfaSetupResponseDto {
+  secret: string;
+  qrCodeUrl: string;
+  otpauthUrl: string;
 }

@@ -18,6 +18,8 @@ enum UserRoleName {
   LANDLORD
   ADMIN
   SUPER_ADMIN
+  MODERATOR
+  SUPPORT
 }
 
 enum TenantType {
@@ -92,6 +94,12 @@ enum ImageModerationStatus {
   REJECTED
 }
 
+enum ViewSource {
+  MOBILE
+  WEB
+  ADMIN_REFERRAL
+}
+
 enum NotificationType {
   INQUIRY_RECEIVED
   INQUIRY_REPLIED
@@ -119,6 +127,8 @@ model User {
   lockedUntil         DateTime?    @db.Timestamptz(6)
   passwordResetToken  String?      @db.VarChar(255)
   passwordResetExpires DateTime?   @db.Timestamptz(6)
+  mfaSecret           String?      @db.VarChar(255)
+  isMfaEnabled        Boolean      @default(false)
   createdAt           DateTime     @default(now()) @db.Timestamptz(6)
   updatedAt           DateTime     @updatedAt @db.Timestamptz(6)
   deletedAt           DateTime?    @db.Timestamptz(6)
@@ -341,6 +351,10 @@ model Property {
   approvedById       String?             @db.Uuid
   rejectionReason    String?             @db.VarChar(255)
   suspensionReason   String?             @db.VarChar(255)
+  availableFromDate  DateTime?           @db.Date
+  isDuplicateWarning Boolean             @default(false)
+  isDuplicateConfirmed Boolean           @default(false)
+  duplicateOfPropertyId String?          @db.Uuid
   createdAt          DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt          DateTime            @updatedAt @db.Timestamptz(6)
   deletedAt          DateTime?           @db.Timestamptz(6)
@@ -349,11 +363,12 @@ model Property {
   locality   Locality  @relation(fields: [localityId], references: [id], onDelete: Restrict)
   approvedBy User?     @relation("AdminApprovedProperties", fields: [approvedById], references: [id], onDelete: SetNull)
 
-  images     PropertyImage[]
-  amenities  PropertyAmenity[]
+  images        PropertyImage[]
+  amenities     PropertyAmenity[]
   favorites     Favorite[]
   inquiries     Inquiry[]
   conversations Conversation[]
+  viewEvents    PropertyViewEvent[]
 
   // High performance composite indexes
   @@index([status, eligibility, isAvailable, localityId])
@@ -419,6 +434,25 @@ model PropertyAmenity {
   @@index([propertyId])
   @@index([amenityId])
   @@map("property_amenities")
+}
+
+model PropertyViewEvent {
+  id         String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propertyId String     @db.Uuid
+  viewerId   String?    @db.Uuid
+  ipHash     String?    @db.VarChar(64)
+  source     ViewSource @default(WEB)
+  localityId String?    @db.Uuid
+  createdAt  DateTime   @default(now()) @db.Timestamptz(6)
+
+  property   Property   @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, createdAt])
+  @@index([propertyId, viewerId])
+  @@index([propertyId, ipHash])
+  @@index([propertyId, source])
+  @@index([localityId])
+  @@map("property_view_events")
 }
 
 // ==========================================
@@ -634,4 +668,18 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
   @@map("audit_logs")
+}
+
+// ==========================================
+// SYSTEM SETTINGS & FEATURE FLAGS
+// ==========================================
+
+model SystemSetting {
+  key         String   @id @db.VarChar(100)
+  value       Json
+  description String?  @db.VarChar(255)
+  updatedBy   String?  @db.Uuid
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("system_settings")
 }

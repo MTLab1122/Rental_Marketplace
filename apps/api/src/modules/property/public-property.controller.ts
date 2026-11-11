@@ -1,7 +1,17 @@
-import { Controller, Get, Param, Query, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Param,
+  Query,
+  Body,
+  Req,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { Request } from 'express';
 import { PropertyService } from './property.service';
-import { SearchPropertyQueryDto } from './dto/property.dto';
+import { SearchPropertyQueryDto, RecordPropertyViewRequestDto } from './dto/property.dto';
 import { TokenService } from '../auth/token.service';
 import { TenantType } from '@rental-peshawar/shared-types';
 
@@ -64,6 +74,18 @@ export class PublicPropertyController {
     const parsedLimit = limit ? parseInt(limit, 10) : 10;
     const effectiveTenantType = currentUser?.tenantType || tenantType;
     return this.propertyService.getRecent(parsedLimit, effectiveTenantType);
+  }
+
+  @Post(':id/view')
+  @HttpCode(HttpStatus.OK)
+  async recordView(
+    @Param('id') id: string,
+    @Body() dto: RecordPropertyViewRequestDto,
+    @Req() req: Request,
+  ) {
+    const currentUser = this.extractUserFromRequest(req);
+    const clientIp = req.ip || req.socket?.remoteAddress;
+    return this.propertyService.recordView(id, dto, currentUser?.sub, clientIp);
   }
 
   @Get(':id')

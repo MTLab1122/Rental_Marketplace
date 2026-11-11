@@ -9,6 +9,7 @@ import {
   PropertyStatus,
   TenantType,
   ErrorCode,
+  ViewSource,
 } from '@rental-peshawar/shared-types';
 import { NotFoundException, ForbiddenException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
@@ -71,14 +72,36 @@ describe('PropertyService', () => {
       create: jest.fn(),
       findMany: jest.fn(),
       findFirst: jest.fn(),
+      findUnique: jest.fn(),
       update: jest.fn(),
+      count: jest.fn(),
     },
     propertyImage: {
       count: jest.fn(),
+      update: jest.fn(),
+      findMany: jest.fn(),
+    },
+    propertyViewEvent: {
+      create: jest.fn(),
+      count: jest.fn(),
+      findMany: jest.fn(),
+      groupBy: jest.fn(),
+    },
+    favorite: {
+      count: jest.fn(),
+    },
+    inquiry: {
+      count: jest.fn(),
+      findMany: jest.fn(),
+    },
+    message: {
+      count: jest.fn(),
+      findFirst: jest.fn(),
     },
     user: {
       findUnique: jest.fn(),
     },
+    $transaction: jest.fn().mockImplementation((promises) => Promise.all(promises)),
   };
 
   const mockAuditService = {
@@ -91,6 +114,12 @@ describe('PropertyService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockPrismaService.user.findUnique.mockResolvedValue({
+      id: landlordId,
+      isVerified: true,
+      landlordProfile: { isCnicVerified: true },
+    });
+    mockPrismaService.property.findMany.mockResolvedValue([]);
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         PropertyService,
@@ -181,6 +210,124 @@ describe('PropertyService', () => {
         expect.objectContaining({
           response: expect.objectContaining({
             code: ErrorCode.INVALID_ELIGIBILITY_PROPERTY_TYPE,
+          }),
+        }),
+      );
+    });
+
+    it('rejects property creation when landlord is not identity verified with LANDLORD_NOT_VERIFIED', async () => {
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: landlordId,
+        isVerified: false,
+        landlordProfile: { isCnicVerified: false },
+      });
+
+      await expect(
+        service.create(landlordId, {
+          title: 'University Town Student Studio',
+          description: 'Clean studio room.',
+          eligibility: PropertyEligibility.STUDENTS_ONLY,
+          propertyType: PropertyType.SINGLE_ROOM,
+          monthlyRentPkr: 15000,
+          securityDepositPkr: 30000,
+          bedrooms: 1,
+          bathrooms: 1,
+          address: 'Street 4, Sector B',
+          latitude: 33.9982,
+          longitude: 71.4883,
+          localityId,
+        }),
+      ).rejects.toThrow(
+        expect.objectContaining({
+          response: expect.objectContaining({
+            code: ErrorCode.LANDLORD_NOT_VERIFIED,
+          }),
+        }),
+      );
+    });
+
+    it('rejects near-duplicate listing if allowDuplicateBypass is false with DUPLICATE_LISTING_EXISTS', async () => {
+      mockPrismaService.locality.findFirst.mockResolvedValue(mockLocality);
+      mockPrismaService.property.findMany.mockResolvedValue([
+        {
+          id: 'existing-dup-1',
+          landlordId,
+          localityId,
+          propertyType: PropertyType.SINGLE_ROOM,
+          title: 'University Town Student Studio',
+          monthlyRentPkr: new Prisma.Decimal(15000),
+          latitude: new Prisma.Decimal(33.9982),
+          longitude: new Prisma.Decimal(71.4883),
+        },
+      ]);
+
+      await expect(
+        service.create(landlordId, {
+          title: 'University Town Student Studio',
+          description: 'Near duplicate studio listing.',
+          eligibility: PropertyEligibility.STUDENTS_ONLY,
+          propertyType: PropertyType.SINGLE_ROOM,
+          monthlyRentPkr: 15000,
+          securityDepositPkr: 30000,
+          bedrooms: 1,
+          bathrooms: 1,
+          address: 'Street 4, Sector B',
+          latitude: 33.9982,
+          longitude: 71.4883,
+          localityId,
+          allowDuplicateBypass: false,
+        }),
+      ).rejects.toThrow(
+        expect.objectContaining({
+          response: expect.objectContaining({
+            code: ErrorCode.DUPLICATE_LISTING_EXISTS,
+          }),
+        }),
+      );
+    });
+
+    it('creates listing with warning if allowDuplicateBypass is true', async () => {
+      mockPrismaService.locality.findFirst.mockResolvedValue(mockLocality);
+      mockPrismaService.property.findMany.mockResolvedValue([
+        {
+          id: 'existing-dup-1',
+          landlordId,
+          localityId,
+          propertyType: PropertyType.SINGLE_ROOM,
+          title: 'University Town Student Studio',
+          monthlyRentPkr: new Prisma.Decimal(15000),
+          latitude: new Prisma.Decimal(33.9982),
+          longitude: new Prisma.Decimal(71.4883),
+        },
+      ]);
+      mockPrismaService.property.create.mockResolvedValue({
+        ...mockProperty,
+        isDuplicateWarning: true,
+        duplicateOfPropertyId: 'existing-dup-1',
+      });
+
+      const res = await service.create(landlordId, {
+        title: 'University Town Student Studio',
+        description: 'Bypassing duplicate warning with confirmed flag.',
+        eligibility: PropertyEligibility.STUDENTS_ONLY,
+        propertyType: PropertyType.SINGLE_ROOM,
+        monthlyRentPkr: 15000,
+        securityDepositPkr: 30000,
+        bedrooms: 1,
+        bathrooms: 1,
+        address: 'Street 4, Sector B',
+        latitude: 33.9982,
+        longitude: 71.4883,
+        localityId,
+        allowDuplicateBypass: true,
+      });
+
+      expect(res.isDuplicateWarning).toBe(true);
+      expect(mockPrismaService.property.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            isDuplicateWarning: true,
+            duplicateOfPropertyId: 'existing-dup-1',
           }),
         }),
       );
@@ -360,6 +507,65 @@ describe('PropertyService', () => {
             code: ErrorCode.INVALID_STATUS_TRANSITION,
           }),
         }),
+      );
+    });
+
+    it('prevents landlord from making REJECTED listing available with CANNOT_ACTIVATE_REJECTED_PROPERTY', async () => {
+      mockPrismaService.property.findFirst.mockResolvedValue({
+        ...mockProperty,
+        status: PropertyStatus.REJECTED,
+      });
+
+      await expect(
+        service.updateStatusByLandlord(propertyId, landlordId, PropertyStatus.APPROVED),
+      ).rejects.toThrow(
+        expect.objectContaining({
+          response: expect.objectContaining({
+            code: ErrorCode.CANNOT_ACTIVATE_REJECTED_PROPERTY,
+          }),
+        }),
+      );
+    });
+
+    it('prevents landlord from making SUSPENDED listing available with CANNOT_ACTIVATE_REJECTED_PROPERTY', async () => {
+      mockPrismaService.property.findFirst.mockResolvedValue({
+        ...mockProperty,
+        status: PropertyStatus.SUSPENDED,
+      });
+
+      await expect(
+        service.updateStatusByLandlord(propertyId, landlordId, PropertyStatus.APPROVED),
+      ).rejects.toThrow(
+        expect.objectContaining({
+          response: expect.objectContaining({
+            code: ErrorCode.CANNOT_ACTIVATE_REJECTED_PROPERTY,
+          }),
+        }),
+      );
+    });
+
+    it('landlord restores RENTED listing to available when previously approved', async () => {
+      mockPrismaService.property.findFirst.mockResolvedValue({
+        ...mockProperty,
+        status: PropertyStatus.RENTED,
+        isAvailable: false,
+      });
+      mockPrismaService.property.update.mockResolvedValue({
+        ...mockProperty,
+        status: PropertyStatus.APPROVED,
+        isAvailable: true,
+      });
+
+      const res = await service.updateStatusByLandlord(
+        propertyId,
+        landlordId,
+        PropertyStatus.APPROVED,
+      );
+
+      expect(res.status).toBe(PropertyStatus.APPROVED);
+      expect(res.isAvailable).toBe(true);
+      expect(mockAuditService.log).toHaveBeenCalledWith(
+        expect.objectContaining({ action: 'property:restore_available' }),
       );
     });
   });
@@ -619,6 +825,187 @@ describe('PropertyService', () => {
 
       expect(res.id).toBe(propertyId);
       expect(res.address).toBe(mockProperty.address); // exact address shown to owner
+    });
+  });
+
+  describe('recordView analytics tracking', () => {
+    it('records view event with hashed IP and increments property viewCount', async () => {
+      mockPrismaService.property.findUnique.mockResolvedValue({
+        id: propertyId,
+        localityId,
+        deletedAt: null,
+      });
+      mockPrismaService.propertyViewEvent.create.mockResolvedValue({ id: 'pve-1' });
+      mockPrismaService.property.update.mockResolvedValue(mockProperty);
+
+      const res = await service.recordView(
+        propertyId,
+        { source: ViewSource.WEB, localityId },
+        'viewer-1',
+        '192.168.1.1',
+      );
+
+      expect(res.success).toBe(true);
+      expect(mockPrismaService.propertyViewEvent.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            propertyId,
+            viewerId: 'viewer-1',
+            source: ViewSource.WEB,
+            localityId,
+          }),
+        }),
+      );
+      expect(mockPrismaService.property.update).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: { id: propertyId },
+          data: { viewCount: { increment: 1 } },
+        }),
+      );
+    });
+  });
+
+  describe('getPropertyAnalytics', () => {
+    it('calculates real listing analytics accurately from database events', async () => {
+      mockPrismaService.property.findFirst.mockResolvedValue({
+        ...mockProperty,
+        title: 'Spacious University Town Student Apartment with Study Desks',
+        description:
+          'Fully equipped student apartment with high speed internet, dedicated study desks, backup generator, and walking distance to University of Peshawar.',
+      });
+      mockPrismaService.propertyViewEvent.count.mockResolvedValue(45);
+      mockPrismaService.propertyViewEvent.findMany
+        .mockResolvedValueOnce([{ viewerId: 'user-1' }, { viewerId: 'user-2' }]) // distinct users
+        .mockResolvedValueOnce([{ ipHash: 'hash-1' }, { ipHash: 'hash-2' }, { ipHash: 'hash-3' }]); // distinct IPs
+      mockPrismaService.favorite.count.mockResolvedValue(12);
+
+      const inqCreatedAt = new Date('2026-02-15T10:00:00Z');
+      mockPrismaService.inquiry.findMany.mockResolvedValue([
+        { id: 'inq-1', status: 'REPLIED', createdAt: inqCreatedAt, conversation: { id: 'conv-1' } },
+        { id: 'inq-2', status: 'SUBMITTED', createdAt: inqCreatedAt, conversation: null },
+      ]);
+
+      mockPrismaService.message.findFirst.mockResolvedValue({
+        createdAt: new Date('2026-02-15T10:30:00Z'), // 30 minutes later
+      });
+
+      mockPrismaService.propertyViewEvent.groupBy
+        .mockResolvedValueOnce([
+          { source: ViewSource.WEB, _count: { id: 30 } },
+          { source: ViewSource.MOBILE, _count: { id: 15 } },
+        ])
+        .mockResolvedValueOnce([
+          { localityId: 'loc-1', _count: { id: 25 } },
+          { localityId: 'loc-2', _count: { id: 20 } },
+        ]);
+
+      const analytics = await service.getPropertyAnalytics(propertyId, landlordId);
+
+      expect(analytics.propertyId).toBe(propertyId);
+      expect(analytics.totalViews).toBe(45);
+      expect(analytics.uniqueViews).toBe(5); // 2 users + 3 ips
+      expect(analytics.favoritesCount).toBe(12);
+      expect(analytics.inquiriesCount).toBe(2);
+      expect(analytics.responseRatePercent).toBe(50); // 1 out of 2 responded
+      expect(analytics.averageResponseTimeMinutes).toBe(30); // 30 min diff
+      expect(analytics.qualityScore).toBeGreaterThanOrEqual(50);
+      expect(analytics.viewsBySource.web).toBe(30);
+      expect(analytics.viewsBySource.mobile).toBe(15);
+      expect(analytics.viewsByLocality['loc-1']).toBe(25);
+    });
+  });
+
+  describe('getLandlordDashboard', () => {
+    it('aggregates real metrics and recent inquiries for landlord dashboard', async () => {
+      mockPrismaService.property.count
+        .mockResolvedValueOnce(5) // totalProperties
+        .mockResolvedValueOnce(3) // activeListings
+        .mockResolvedValueOnce(1) // pendingReview
+        .mockResolvedValueOnce(1) // rentedCount
+        .mockResolvedValueOnce(0); // unavailableCount
+
+      mockPrismaService.property.findMany.mockResolvedValue([{ id: propertyId }]);
+      mockPrismaService.inquiry.count
+        .mockResolvedValueOnce(10) // totalInquiries
+        .mockResolvedValueOnce(2); // unreadInquiries
+
+      mockPrismaService.message.count.mockResolvedValue(4); // unreadMessagesCount
+      mockPrismaService.propertyViewEvent.count.mockResolvedValue(150); // totalViews
+
+      mockPrismaService.inquiry.findMany
+        .mockResolvedValueOnce([
+          {
+            id: 'inq-1',
+            status: 'REPLIED',
+            createdAt: new Date('2026-02-15T10:00:00Z'),
+            conversation: { id: 'c1' },
+          },
+          {
+            id: 'inq-2',
+            status: 'SUBMITTED',
+            createdAt: new Date('2026-02-15T11:00:00Z'),
+            conversation: null,
+          },
+        ])
+        .mockResolvedValueOnce([
+          {
+            id: 'inq-1',
+            propertyId,
+            tenantId: 'tenant-1',
+            landlordId,
+            status: 'REPLIED',
+            message: 'Is this studio available from March?',
+            proposedRentPkr: new Prisma.Decimal(15000),
+            proposedMoveInDate: new Date('2026-03-01'),
+            preferredContactMethod: 'IN_APP',
+            conversation: { id: 'c1' },
+            createdAt: new Date('2026-02-15T10:00:00Z'),
+            updatedAt: new Date('2026-02-15T10:30:00Z'),
+            property: {
+              id: propertyId,
+              title: 'University Town Student Studio',
+              slug: 'university-town-student-studio',
+              monthlyRentPkr: new Prisma.Decimal(15000),
+              locality: { id: localityId, name: 'University Town', slug: 'university-town' },
+              images: [{ url: 'https://cdn.example.com/p1.jpg' }],
+            },
+            tenant: {
+              id: 'tenant-1',
+              fullName: 'Ahmad Khan',
+              email: 'ahmad@example.com',
+              phoneNumber: '+923001234567',
+            },
+          },
+        ]);
+
+      mockPrismaService.message.findFirst.mockResolvedValue({
+        createdAt: new Date('2026-02-15T10:20:00Z'), // 20 min diff
+      });
+
+      mockPrismaService.user.findUnique.mockResolvedValue({
+        id: landlordId,
+        isVerified: true,
+        landlordProfile: {
+          cnicNumber: '1730112345671',
+          isCnicVerified: true,
+        },
+      });
+
+      const dashboard = await service.getLandlordDashboard(landlordId);
+
+      expect(dashboard.totalProperties).toBe(5);
+      expect(dashboard.activeListings).toBe(3);
+      expect(dashboard.pendingReview).toBe(1);
+      expect(dashboard.rentedCount).toBe(1);
+      expect(dashboard.totalInquiries).toBe(10);
+      expect(dashboard.unreadInquiries).toBe(2);
+      expect(dashboard.unreadMessagesCount).toBe(4);
+      expect(dashboard.totalViews).toBe(150);
+      expect(dashboard.averageResponseTimeMinutes).toBe(20);
+      expect(dashboard.responseRatePercent).toBe(50);
+      expect(dashboard.recentInquiries.length).toBe(1);
+      expect(dashboard.verification.isVerified).toBe(true);
+      expect(dashboard.verification.cnicMasked).toBe('17301-*******-1');
     });
   });
 });

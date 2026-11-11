@@ -5,6 +5,7 @@ import {
   UnprocessableEntityException,
   Logger,
 } from '@nestjs/common';
+import * as crypto from 'crypto';
 import { PrismaService } from '../../database/prisma.service';
 import { AuditService } from '../../common/audit/audit.service';
 import {
@@ -13,6 +14,8 @@ import {
   SearchPropertyQueryDto,
   UpdatePropertyStatusRequestDto,
   AdminPropertyQueryDto,
+  DuplicateCheckRequestDto,
+  RecordPropertyViewRequestDto,
 } from './dto/property.dto';
 import {
   validateEligibilityAndPropertyType,
@@ -20,6 +23,7 @@ import {
   isCoordinateWithinGeoJsonPolygon,
   calculateHaversineDistanceKm,
 } from './property.validator';
+import { isNearDuplicateListing, calculateListingQualityScore } from './property.util';
 import {
   PropertyEligibility,
   PropertyType,
@@ -28,6 +32,10 @@ import {
   ErrorCode,
   ImageModerationStatus,
   NotificationType,
+  ViewSource,
+  PropertyAnalyticsDto,
+  LandlordDashboardSummaryDto,
+  InquiryResponseDto,
 } from '@rental-peshawar/shared-types';
 import { NotificationService } from '../notification/notification.service';
 import { Prisma } from '@prisma/client';
@@ -54,9 +62,85 @@ export class PropertyService {
   }
 
   /**
+   * Check whether a listing is a near-duplicate of an existing listing for this landlord.
+   */
+  async checkDuplicate(landlordId: string, dto: DuplicateCheckRequestDto) {
+    const existingProperties = await this.prisma.property.findMany({
+      where: {
+        landlordId,
+        localityId: dto.localityId,
+        propertyType: dto.propertyType,
+        deletedAt: null,
+      },
+      select: {
+        id: true,
+        landlordId: true,
+        localityId: true,
+        propertyType: true,
+        title: true,
+        monthlyRentPkr: true,
+        latitude: true,
+        longitude: true,
+      },
+    });
+
+    const candidate = {
+      landlordId,
+      localityId: dto.localityId,
+      propertyType: dto.propertyType,
+      title: dto.title,
+      monthlyRentPkr: Number(dto.monthlyRentPkr),
+      latitude: Number(dto.latitude),
+      longitude: Number(dto.longitude),
+    };
+
+    for (const existing of existingProperties) {
+      const isDup = isNearDuplicateListing(candidate, {
+        id: existing.id,
+        landlordId: existing.landlordId,
+        localityId: existing.localityId,
+        propertyType: existing.propertyType as unknown as PropertyType,
+        title: existing.title,
+        monthlyRentPkr: Number(existing.monthlyRentPkr),
+        latitude: Number(existing.latitude),
+        longitude: Number(existing.longitude),
+      });
+
+      if (isDup) {
+        return {
+          isDuplicate: true,
+          matchedPropertyId: existing.id,
+          matchedPropertyTitle: existing.title,
+          warningMessage: `A near-duplicate listing '${existing.title}' already exists at this location with similar rent.`,
+        };
+      }
+    }
+
+    return {
+      isDuplicate: false,
+    };
+  }
+
+  /**
    * Landlord: Create a new property in DRAFT status
    */
   async create(landlordId: string, dto: CreatePropertyRequestDto) {
+    // 0. Enforce landlord identity verification
+    const landlord = await this.prisma.user.findUnique({
+      where: { id: landlordId },
+      include: { landlordProfile: true },
+    });
+
+    const isVerified =
+      landlord?.isVerified === true || landlord?.landlordProfile?.isCnicVerified === true;
+
+    if (!isVerified) {
+      throw new UnprocessableEntityException({
+        code: ErrorCode.LANDLORD_NOT_VERIFIED,
+        message: 'Landlord identity verification is required before creating a property listing.',
+      });
+    }
+
     // 1. Enforce property eligibility and type rules
     validateEligibilityAndPropertyType(dto.eligibility, dto.propertyType);
 
@@ -97,9 +181,36 @@ export class PropertyService {
       }
     }
 
+    // 5. Check for near-duplicate listing
+    const duplicateCheck = await this.checkDuplicate(landlordId, {
+      localityId: dto.localityId,
+      propertyType: dto.propertyType,
+      monthlyRentPkr: dto.monthlyRentPkr,
+      latitude: dto.latitude,
+      longitude: dto.longitude,
+      title: dto.title,
+    });
+
+    let isDuplicateWarning = false;
+    let duplicateOfPropertyId: string | null = null;
+
+    if (duplicateCheck.isDuplicate) {
+      if (!dto.allowDuplicateBypass) {
+        throw new UnprocessableEntityException({
+          code: ErrorCode.DUPLICATE_LISTING_EXISTS,
+          message:
+            duplicateCheck.warningMessage ||
+            'A near-duplicate listing already exists for this landlord.',
+          matchedPropertyId: duplicateCheck.matchedPropertyId,
+        });
+      }
+      isDuplicateWarning = true;
+      duplicateOfPropertyId = duplicateCheck.matchedPropertyId || null;
+    }
+
     const slug = this.slugify(dto.title);
 
-    // 5. Create property in Prisma
+    // 6. Create property in Prisma
     const property = await this.prisma.property.create({
       data: {
         landlordId,
@@ -120,6 +231,9 @@ export class PropertyService {
         addressNote: dto.addressNote || null,
         latitude: new Prisma.Decimal(dto.latitude),
         longitude: new Prisma.Decimal(dto.longitude),
+        availableFromDate: dto.availableFromDate ? new Date(dto.availableFromDate) : null,
+        isDuplicateWarning,
+        duplicateOfPropertyId,
         isAvailable: true,
         ...(dto.amenityIds && dto.amenityIds.length > 0
           ? {
@@ -424,12 +538,25 @@ export class PropertyService {
     if (targetStatus === PropertyStatus.APPROVED) {
       // Landlord attempting to restore to available
       if (
+        property.status === PropertyStatus.REJECTED ||
+        property.status === PropertyStatus.SUSPENDED
+      ) {
+        throw new UnprocessableEntityException({
+          code: ErrorCode.CANNOT_ACTIVATE_REJECTED_PROPERTY,
+          message:
+            'Landlord cannot make rejected or suspended property publicly available. Admin review required.',
+        });
+      }
+
+      if (
         property.status !== PropertyStatus.APPROVED &&
+        property.status !== PropertyStatus.RENTED &&
         property.status !== PropertyStatus.UNAVAILABLE
       ) {
         throw new UnprocessableEntityException({
           code: ErrorCode.INVALID_STATUS_TRANSITION,
-          message: 'Only approved properties can be restored to available status.',
+          message:
+            'Only approved, rented, or unavailable properties can be restored to available status.',
         });
       }
 
@@ -443,7 +570,7 @@ export class PropertyService {
         action: 'property:restore_available',
         targetType: 'property',
         targetId: propertyId,
-        before: { isAvailable: property.isAvailable },
+        before: { isAvailable: property.isAvailable, status: property.status },
         after: { isAvailable: true, status: PropertyStatus.APPROVED },
       });
 
@@ -1159,5 +1286,406 @@ export class PropertyService {
       { limit, sort: 'newest', tenantType },
       tenantType ? { tenantType } : undefined,
     );
+  }
+
+  /**
+   * Record real view event for analytics and increment property viewCount
+   */
+  async recordView(
+    propertyId: string,
+    dto: RecordPropertyViewRequestDto,
+    viewerId?: string,
+    clientIp?: string,
+  ) {
+    const property = await this.prisma.property.findUnique({
+      where: { id: propertyId },
+      select: { id: true, localityId: true, deletedAt: true },
+    });
+
+    if (!property || property.deletedAt) {
+      throw new NotFoundException(`Property with ID '${propertyId}' not found.`);
+    }
+
+    const ipHash = clientIp ? crypto.createHash('sha256').update(clientIp).digest('hex') : null;
+
+    const sourceEnum = dto.source ? (dto.source as unknown as ViewSource) : ViewSource.WEB;
+
+    await this.prisma.propertyViewEvent.create({
+      data: {
+        propertyId,
+        viewerId: viewerId || null,
+        ipHash,
+        source: sourceEnum,
+        localityId: dto.localityId || property.localityId || null,
+      },
+    });
+
+    await this.prisma.property.update({
+      where: { id: propertyId },
+      data: { viewCount: { increment: 1 } },
+    });
+
+    return { success: true };
+  }
+
+  /**
+   * Landlord: Get comprehensive real listing analytics for own property
+   */
+  async getPropertyAnalytics(
+    propertyId: string,
+    landlordId: string,
+  ): Promise<PropertyAnalyticsDto> {
+    const property = await this.findByIdForLandlord(propertyId, landlordId);
+
+    // 1. Total views
+    const totalViews = await this.prisma.propertyViewEvent.count({
+      where: { propertyId },
+    });
+
+    // 2. Unique views (distinct viewerIds + distinct ipHashes for anonymous)
+    const distinctUsers = await this.prisma.propertyViewEvent.findMany({
+      where: { propertyId, viewerId: { not: null } },
+      distinct: ['viewerId'],
+      select: { viewerId: true },
+    });
+    const distinctIps = await this.prisma.propertyViewEvent.findMany({
+      where: { propertyId, viewerId: null, ipHash: { not: null } },
+      distinct: ['ipHash'],
+      select: { ipHash: true },
+    });
+    const uniqueViews = distinctUsers.length + distinctIps.length;
+
+    // 3. Favorites count
+    const favoritesCount = await this.prisma.favorite.count({
+      where: { propertyId },
+    });
+
+    // 4. Inquiries & response analytics
+    const inquiries = await this.prisma.inquiry.findMany({
+      where: { propertyId },
+      select: {
+        id: true,
+        status: true,
+        createdAt: true,
+        conversation: { select: { id: true } },
+      },
+    });
+    const inquiriesCount = inquiries.length;
+
+    const respondedInquiries = inquiries.filter((inq) =>
+      ['REPLIED', 'ACCEPTED', 'DECLINED', 'CLOSED'].includes(inq.status),
+    );
+
+    const responseRatePercent =
+      inquiriesCount > 0 ? Math.round((respondedInquiries.length / inquiriesCount) * 100) : null;
+
+    // Calculate average response time in minutes from conversation messages
+    let totalResponseMinutes = 0;
+    let timedInquiriesCount = 0;
+
+    for (const inq of respondedInquiries) {
+      const convId = inq.conversation?.id;
+      if (convId) {
+        const firstReply = await this.prisma.message.findFirst({
+          where: {
+            conversationId: convId,
+            senderId: landlordId,
+          },
+          orderBy: { createdAt: 'asc' },
+          select: { createdAt: true },
+        });
+
+        if (firstReply) {
+          const diffMs = firstReply.createdAt.getTime() - inq.createdAt.getTime();
+          if (diffMs > 0) {
+            totalResponseMinutes += diffMs / (1000 * 60);
+            timedInquiriesCount++;
+          }
+        }
+      }
+    }
+
+    const averageResponseTimeMinutes =
+      timedInquiriesCount > 0 ? Math.round(totalResponseMinutes / timedInquiriesCount) : null;
+
+    // 5. Listing quality score (0 - 100)
+    const qualityScore = calculateListingQualityScore(property);
+
+    // 6. Views by source
+    const sourceGroups = await this.prisma.propertyViewEvent.groupBy({
+      by: ['source'],
+      where: { propertyId },
+      _count: { id: true },
+    });
+
+    const viewsBySource = {
+      mobile: 0,
+      web: 0,
+      adminReferral: 0,
+    };
+    for (const sg of sourceGroups) {
+      if (sg.source === ViewSource.MOBILE) viewsBySource.mobile = sg._count.id;
+      else if (sg.source === ViewSource.WEB) viewsBySource.web = sg._count.id;
+      else if (sg.source === ViewSource.ADMIN_REFERRAL) viewsBySource.adminReferral = sg._count.id;
+    }
+
+    // 7. Views by locality
+    const localityGroups = await this.prisma.propertyViewEvent.groupBy({
+      by: ['localityId'],
+      where: { propertyId, localityId: { not: null } },
+      _count: { id: true },
+    });
+
+    const viewsByLocality: Record<string, number> = {};
+    for (const lg of localityGroups) {
+      if (lg.localityId) {
+        viewsByLocality[lg.localityId] = lg._count.id;
+      }
+    }
+
+    return {
+      propertyId,
+      propertyTitle: property.title,
+      totalViews,
+      uniqueViews,
+      favoritesCount,
+      inquiriesCount,
+      responseRatePercent,
+      averageResponseTimeMinutes,
+      qualityScore,
+      viewsBySource,
+      viewsByLocality,
+    };
+  }
+
+  /**
+   * Landlord: Get aggregate overview metrics and recent activity for dashboard
+   */
+  async getLandlordDashboard(landlordId: string): Promise<LandlordDashboardSummaryDto> {
+    // 1. Property counts
+    const [totalProperties, activeListings, pendingReview, rentedCount, unavailableCount] =
+      await Promise.all([
+        this.prisma.property.count({ where: { landlordId, deletedAt: null } }),
+        this.prisma.property.count({
+          where: {
+            landlordId,
+            deletedAt: null,
+            status: PropertyStatus.APPROVED,
+            isAvailable: true,
+          },
+        }),
+        this.prisma.property.count({
+          where: {
+            landlordId,
+            deletedAt: null,
+            status: PropertyStatus.PENDING_REVIEW,
+          },
+        }),
+        this.prisma.property.count({
+          where: { landlordId, deletedAt: null, status: PropertyStatus.RENTED },
+        }),
+        this.prisma.property.count({
+          where: { landlordId, deletedAt: null, status: PropertyStatus.UNAVAILABLE },
+        }),
+      ]);
+
+    // 2. Inquiries
+    const landlordProperties = await this.prisma.property.findMany({
+      where: { landlordId, deletedAt: null },
+      select: { id: true },
+    });
+    const propertyIds = landlordProperties.map((p) => p.id);
+
+    const totalInquiries = await this.prisma.inquiry.count({
+      where: { propertyId: { in: propertyIds } },
+    });
+
+    const unreadInquiries = await this.prisma.inquiry.count({
+      where: { propertyId: { in: propertyIds }, status: 'SUBMITTED' },
+    });
+
+    // 3. Unread messages for landlord
+    const unreadMessagesCount = await this.prisma.message.count({
+      where: {
+        isRead: false,
+        senderId: { not: landlordId },
+        conversation: {
+          participants: {
+            some: { userId: landlordId },
+          },
+        },
+      },
+    });
+
+    // 4. Total views across all properties
+    const totalViews = await this.prisma.propertyViewEvent.count({
+      where: { propertyId: { in: propertyIds } },
+    });
+
+    // 5. Response rate & response time across all inquiries
+    const allInquiries = await this.prisma.inquiry.findMany({
+      where: { propertyId: { in: propertyIds } },
+      select: {
+        id: true,
+        status: true,
+        createdAt: true,
+        conversation: { select: { id: true } },
+      },
+    });
+
+    const responded = allInquiries.filter((inq) =>
+      ['REPLIED', 'ACCEPTED', 'DECLINED', 'CLOSED'].includes(inq.status),
+    );
+
+    const responseRatePercent =
+      allInquiries.length > 0 ? Math.round((responded.length / allInquiries.length) * 100) : null;
+
+    let totalResponseMinutes = 0;
+    let timedCount = 0;
+
+    for (const inq of responded) {
+      const convId = inq.conversation?.id;
+      if (convId) {
+        const firstReply = await this.prisma.message.findFirst({
+          where: {
+            conversationId: convId,
+            senderId: landlordId,
+          },
+          orderBy: { createdAt: 'asc' },
+          select: { createdAt: true },
+        });
+        if (firstReply) {
+          const diffMs = firstReply.createdAt.getTime() - inq.createdAt.getTime();
+          if (diffMs > 0) {
+            totalResponseMinutes += diffMs / (1000 * 60);
+            timedCount++;
+          }
+        }
+      }
+    }
+
+    const averageResponseTimeMinutes =
+      timedCount > 0 ? Math.round(totalResponseMinutes / timedCount) : null;
+
+    // 6. Recent inquiries (latest 5)
+    const recentInquiriesRaw = await this.prisma.inquiry.findMany({
+      where: { propertyId: { in: propertyIds } },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      include: {
+        conversation: { select: { id: true } },
+        property: {
+          select: {
+            id: true,
+            title: true,
+            slug: true,
+            monthlyRentPkr: true,
+            locality: { select: { id: true, name: true, slug: true } },
+            images: { where: { isPrimary: true }, take: 1, select: { url: true } },
+          },
+        },
+        tenant: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            phoneNumber: true,
+          },
+        },
+      },
+    });
+
+    const recentInquiries = recentInquiriesRaw.map((inq) => ({
+      id: inq.id,
+      propertyId: inq.propertyId,
+      tenantId: inq.tenantId,
+      landlordId: inq.landlordId,
+      status: inq.status,
+      message: inq.message,
+      proposedRentPkr: inq.proposedRentPkr ? Number(inq.proposedRentPkr) : null,
+      proposedMoveInDate: inq.proposedMoveInDate ? inq.proposedMoveInDate.toISOString() : null,
+      preferredContactMethod: inq.preferredContactMethod,
+      conversationId: inq.conversation?.id || null,
+      createdAt: inq.createdAt.toISOString(),
+      updatedAt: inq.updatedAt.toISOString(),
+      property: inq.property
+        ? {
+            id: inq.property.id,
+            title: inq.property.title,
+            slug: inq.property.slug,
+            monthlyRentPkr: Number(inq.property.monthlyRentPkr),
+            localityName: inq.property.locality.name,
+            imageUrl: inq.property.images[0]?.url || null,
+          }
+        : undefined,
+      tenant: inq.tenant
+        ? {
+            id: inq.tenant.id,
+            fullName: inq.tenant.fullName,
+            email: inq.tenant.email,
+            phoneNumber: inq.tenant.phoneNumber,
+          }
+        : undefined,
+    })) as unknown as InquiryResponseDto[];
+
+    // 7. Verification info
+    const user = await this.prisma.user.findUnique({
+      where: { id: landlordId },
+      include: { landlordProfile: true },
+    });
+
+    const isVerified = user?.isVerified === true || user?.landlordProfile?.isCnicVerified === true;
+    const cnicNumber = user?.landlordProfile?.cnicNumber;
+    const cnicMasked = cnicNumber
+      ? `${cnicNumber.slice(0, 5)}-*******-${cnicNumber.slice(-1)}`
+      : null;
+
+    return {
+      totalProperties,
+      activeListings,
+      pendingReview,
+      rentedCount,
+      unavailableCount,
+      totalInquiries,
+      unreadInquiries,
+      unreadMessagesCount,
+      totalViews,
+      averageResponseTimeMinutes,
+      responseRatePercent,
+      recentInquiries,
+      verification: {
+        isVerified,
+        status: isVerified ? 'VERIFIED' : user?.landlordProfile ? 'PENDING' : 'UNVERIFIED',
+        cnicMasked,
+      },
+    };
+  }
+
+  /**
+   * Landlord: Reorder images or update primary cover
+   */
+  async updateImages(
+    propertyId: string,
+    landlordId: string,
+    images: { id: string; sortOrder?: number; isPrimary?: boolean }[],
+  ) {
+    await this.findByIdForLandlord(propertyId, landlordId);
+
+    const updates = images.map((img) =>
+      this.prisma.propertyImage.update({
+        where: { id: img.id, propertyId },
+        data: {
+          ...(img.sortOrder !== undefined && { sortOrder: img.sortOrder }),
+          ...(img.isPrimary !== undefined && { isPrimary: img.isPrimary }),
+        },
+      }),
+    );
+
+    await this.prisma.$transaction(updates);
+
+    return this.prisma.propertyImage.findMany({
+      where: { propertyId },
+      orderBy: { sortOrder: 'asc' },
+    });
   }
 }

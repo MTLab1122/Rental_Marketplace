@@ -400,3 +400,4 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     );
   }
 }
+

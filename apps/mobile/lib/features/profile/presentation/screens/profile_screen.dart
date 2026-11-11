@@ -120,6 +120,35 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 24),
 
+          // Landlord Section
+          const Text('Landlord & Property Manager', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+          _buildListTile(
+            icon: Icons.dashboard_outlined,
+            title: 'Landlord Dashboard',
+            subtitle: 'Overview, analytics, inquiry leads & verification',
+            onTap: () => context.push('/landlord'),
+          ),
+          _buildListTile(
+            icon: Icons.add_home_outlined,
+            title: 'Post New Property',
+            subtitle: '7-step wizard with duplicate protection & boundary check',
+            onTap: () => context.push('/landlord/properties/new'),
+          ),
+          _buildListTile(
+            icon: Icons.holiday_village_outlined,
+            title: 'Manage My Listings',
+            subtitle: 'Availability controls, pricing, photos & analytics',
+            onTap: () => context.push('/landlord/properties'),
+          ),
+          _buildListTile(
+            icon: Icons.verified_user_outlined,
+            title: 'CNIC & Identity Verification',
+            subtitle: 'NADRA document upload & liveness submission',
+            onTap: () => context.push('/landlord/verification'),
+          ),
+          const SizedBox(height: 24),
+
           // Settings / Navigation List
           const Text('Marketplace Information', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),

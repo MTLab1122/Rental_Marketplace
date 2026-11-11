@@ -45,3 +45,4 @@ CREATE INDEX IF NOT EXISTS "conversations_is_blocked_idx" ON "conversations"("is
 
 -- AlterTable messages
 ALTER TABLE "messages" ADD COLUMN IF NOT EXISTS "read_at" TIMESTAMPTZ(6);
+

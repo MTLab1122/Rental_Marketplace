@@ -4,6 +4,7 @@ import {
   CreatePropertyRequestDto,
   UpdatePropertyRequestDto,
   UpdatePropertyStatusRequestDto,
+  DuplicateCheckRequestDto,
 } from './dto/property.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -25,6 +26,14 @@ export class LandlordPropertyController {
     return this.propertyService.create(user.sub, dto);
   }
 
+  @Post('check-duplicate')
+  async checkDuplicate(
+    @Body() dto: DuplicateCheckRequestDto,
+    @CurrentUser() user: { sub: string },
+  ) {
+    return this.propertyService.checkDuplicate(user.sub, dto);
+  }
+
   @Get()
   async getProperties(@CurrentUser() user: { sub: string }) {
     return this.propertyService.findAllByLandlord(user.sub);
@@ -33,6 +42,11 @@ export class LandlordPropertyController {
   @Get(':id')
   async getProperty(@Param('id') id: string, @CurrentUser() user: { sub: string }) {
     return this.propertyService.findByIdForLandlord(id, user.sub);
+  }
+
+  @Get(':id/analytics')
+  async getPropertyAnalytics(@Param('id') id: string, @CurrentUser() user: { sub: string }) {
+    return this.propertyService.getPropertyAnalytics(id, user.sub);
   }
 
   @Patch(':id')
@@ -56,5 +70,14 @@ export class LandlordPropertyController {
     @CurrentUser() user: { sub: string },
   ) {
     return this.propertyService.updateStatusByLandlord(id, user.sub, dto.status);
+  }
+
+  @Patch(':id/images')
+  async updatePropertyImages(
+    @Param('id') id: string,
+    @Body() body: { images: { id: string; sortOrder?: number; isPrimary?: boolean }[] },
+    @CurrentUser() user: { sub: string },
+  ) {
+    return this.propertyService.updateImages(id, user.sub, body.images);
   }
 }

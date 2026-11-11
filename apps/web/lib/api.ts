@@ -97,6 +97,25 @@ export async function getLocalities(): Promise<LocalityDto[]> {
   return fetchWithAuth('/localities', { method: 'GET' });
 }
 
+export async function getAmenities(): Promise<
+  Array<{ id: string; name: string; code: string; category: string }>
+> {
+  try {
+    return await fetchWithAuth('/properties/amenities', { method: 'GET' });
+  } catch {
+    return [
+      { id: 'am-1', name: 'High-Speed Wi-Fi', code: 'WIFI', category: 'Connectivity' },
+      { id: 'am-2', name: 'Backup Generator', code: 'GENERATOR', category: 'Utilities' },
+      { id: 'am-3', name: 'UPS Inverter', code: 'UPS', category: 'Utilities' },
+      { id: 'am-4', name: 'Water Bore / Filter', code: 'WATER', category: 'Utilities' },
+      { id: 'am-5', name: 'Dedicated Car Parking', code: 'PARKING', category: 'Convenience' },
+      { id: 'am-6', name: '24/7 Security Guard', code: 'SECURITY', category: 'Safety' },
+      { id: 'am-7', name: 'Air Conditioning', code: 'AC', category: 'Comfort' },
+      { id: 'am-8', name: 'Separate Kitchen', code: 'KITCHEN', category: 'Features' },
+    ];
+  }
+}
+
 export async function addFavorite(propertyId: string, token: string) {
   return fetchWithAuth(`/properties/${propertyId}/favorite`, { method: 'POST' }, token);
 }
@@ -316,5 +335,145 @@ export async function registerTenant(dto: {
       ...dto,
       role: 'TENANT',
     }),
+  });
+}
+
+export async function registerLandlord(dto: {
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  password: string;
+}) {
+  return fetchWithAuth('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify({
+      ...dto,
+      role: 'LANDLORD',
+    }),
+  });
+}
+
+// ==========================================
+// LANDLORD OPERATIONS & ANALYTICS APIs
+// ==========================================
+
+export async function getLandlordDashboard(token: string) {
+  return fetchWithAuth('/landlord/dashboard', { method: 'GET' }, token);
+}
+
+export async function getLandlordProperties(token: string) {
+  return fetchWithAuth('/landlord/properties', { method: 'GET' }, token);
+}
+
+export async function getLandlordProperty(id: string, token: string) {
+  return fetchWithAuth(`/landlord/properties/${id}`, { method: 'GET' }, token);
+}
+
+export async function createLandlordProperty(data: any, token: string) {
+  return fetchWithAuth(
+    '/landlord/properties',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function updateLandlordProperty(id: string, data: any, token: string) {
+  return fetchWithAuth(
+    `/landlord/properties/${id}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function updateLandlordPropertyStatus(id: string, status: string, token: string) {
+  return fetchWithAuth(
+    `/landlord/properties/${id}/status`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    },
+    token,
+  );
+}
+
+export async function deleteLandlordProperty(id: string, token: string) {
+  return fetchWithAuth(`/landlord/properties/${id}`, { method: 'DELETE' }, token);
+}
+
+export async function getLandlordPropertyAnalytics(id: string, token: string) {
+  return fetchWithAuth(`/landlord/properties/${id}/analytics`, { method: 'GET' }, token);
+}
+
+export async function checkDuplicateListing(data: any, token: string) {
+  return fetchWithAuth(
+    '/landlord/properties/check-duplicate',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function updateLandlordPropertyImages(id: string, images: any[], token: string) {
+  return fetchWithAuth(
+    `/landlord/properties/${id}/images`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ images }),
+    },
+    token,
+  );
+}
+
+export async function getLandlordInquiry(id: string, token: string) {
+  return fetchWithAuth(`/landlord/inquiries/${id}`, { method: 'GET' }, token);
+}
+
+export async function updateLandlordInquiryStatus(
+  id: string,
+  status: string,
+  note: string | undefined,
+  token: string,
+) {
+  return fetchWithAuth(
+    `/landlord/inquiries/${id}/status`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ status, note }),
+    },
+    token,
+  );
+}
+
+export async function getLandlordVerification(token: string) {
+  return fetchWithAuth('/landlord/verification', { method: 'GET' }, token);
+}
+
+export async function submitLandlordVerification(data: any, token: string) {
+  return fetchWithAuth(
+    '/landlord/verification',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function recordPropertyView(
+  propertyId: string,
+  source: 'WEB' | 'MOBILE' | 'ADMIN_REFERRAL' = 'WEB',
+  localityId?: string,
+) {
+  return fetchWithAuth(`/properties/${propertyId}/view`, {
+    method: 'POST',
+    body: JSON.stringify({ source, localityId }),
   });
 }

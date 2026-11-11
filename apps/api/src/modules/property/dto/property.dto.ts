@@ -16,6 +16,7 @@ import {
   PropertyType,
   PropertyStatus,
   TenantType,
+  ViewSource,
 } from '@rental-peshawar/shared-types';
 
 export class PropertyImageInputDto {
@@ -95,6 +96,14 @@ export class CreatePropertyRequestDto {
   @IsString()
   @IsOptional()
   addressNote?: string;
+
+  @IsString()
+  @IsOptional()
+  availableFromDate?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  allowDuplicateBypass?: boolean;
 
   @IsNumber()
   @Type(() => Number)
@@ -181,6 +190,14 @@ export class UpdatePropertyRequestDto {
   @IsOptional()
   addressNote?: string;
 
+  @IsString()
+  @IsOptional()
+  availableFromDate?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  allowDuplicateBypass?: boolean;
+
   @IsNumber()
   @IsOptional()
   @Type(() => Number)
@@ -214,6 +231,42 @@ export class UpdatePropertyStatusRequestDto {
   @IsString()
   @IsOptional()
   reason?: string;
+}
+
+export class DuplicateCheckRequestDto {
+  @IsString()
+  @IsNotEmpty()
+  localityId!: string;
+
+  @IsEnum(PropertyType)
+  propertyType!: PropertyType;
+
+  @IsNumber()
+  @Min(500)
+  @Type(() => Number)
+  monthlyRentPkr!: number;
+
+  @IsNumber()
+  @Type(() => Number)
+  latitude!: number;
+
+  @IsNumber()
+  @Type(() => Number)
+  longitude!: number;
+
+  @IsString()
+  @IsNotEmpty()
+  title!: string;
+}
+
+export class RecordPropertyViewRequestDto {
+  @IsOptional()
+  @IsEnum(ViewSource)
+  source?: ViewSource;
+
+  @IsOptional()
+  @IsString()
+  localityId?: string;
 }
 
 export class SearchPropertyQueryDto {
