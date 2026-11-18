@@ -22,6 +22,11 @@ export class AdminLocalityController {
     return this.localityService.findAllAdmin();
   }
 
+  @Get(':id')
+  async getLocality(@Param('id') id: string) {
+    return this.localityService.findByIdOrSlug(id);
+  }
+
   @Post()
   async createLocality(
     @Body() dto: CreateLocalityRequestDto,

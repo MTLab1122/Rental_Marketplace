@@ -13,7 +13,7 @@ import { UserRole } from '@rental-peshawar/shared-types';
 
 @Controller('admin/properties')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MODERATOR)
 export class AdminPropertyController {
   constructor(private readonly propertyService: PropertyService) {}
 

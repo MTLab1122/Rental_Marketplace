@@ -8,7 +8,16 @@ import {
 const prisma = new PrismaClient();
 
 async function main() {
+  const isProdReferenceOnly =
+    process.argv.includes('--production-reference-only') ||
+    process.env['NODE_ENV'] === 'production';
+
   console.log('🌱 Starting Peshawar Rental Marketplace database seeding...');
+  if (isProdReferenceOnly) {
+    console.log(
+      '🔒 Operational Reference Seeding Mode Active: strictly operational reference data (Roles, Permissions, Amenities, Initial Peshawar Localities, Service Boundary). Zero fake properties/users/analytics.',
+    );
+  }
 
   // 1. Roles
   const rolesData = [

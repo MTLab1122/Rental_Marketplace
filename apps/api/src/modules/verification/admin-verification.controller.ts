@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Param,
   Body,
   Query,
@@ -19,13 +20,55 @@ import { UserRole, VerificationStatus } from '@rental-peshawar/shared-types';
 
 @Controller('admin/verifications')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.MODERATOR)
 export class AdminVerificationController {
   constructor(private readonly verificationService: VerificationService) {}
 
   @Get()
   async getVerifications(@Query('status') status?: VerificationStatus) {
     return this.verificationService.getVerificationsForAdmin(status);
+  }
+
+  @Get(':id')
+  async getVerificationDetail(@Param('id') id: string) {
+    return this.verificationService.getVerificationById(id);
+  }
+
+  @Patch(':id/approve')
+  async approveVerification(
+    @Param('id') id: string,
+    @CurrentUser() user: { sub: string },
+    @Body('reviewNotes') reviewNotes?: string,
+  ) {
+    return this.verificationService.reviewVerification(id, user.sub, {
+      status: VerificationStatus.VERIFIED,
+      reviewNotes: reviewNotes || 'Identity verified by administrator',
+    });
+  }
+
+  @Patch(':id/reject')
+  async rejectVerification(
+    @Param('id') id: string,
+    @CurrentUser() user: { sub: string },
+    @Body('reason') reason?: string,
+    @Body('reviewNotes') reviewNotes?: string,
+  ) {
+    return this.verificationService.reviewVerification(id, user.sub, {
+      status: VerificationStatus.REJECTED,
+      reviewNotes: reason || reviewNotes || 'Documents rejected due to quality or mismatch.',
+    });
+  }
+
+  @Patch(':id/expire')
+  async expireVerification(
+    @Param('id') id: string,
+    @CurrentUser() user: { sub: string },
+    @Body('reviewNotes') reviewNotes?: string,
+  ) {
+    return this.verificationService.reviewVerification(id, user.sub, {
+      status: VerificationStatus.EXPIRED,
+      reviewNotes: reviewNotes || 'Verification period expired.',
+    });
   }
 
   @Post(':id/review')

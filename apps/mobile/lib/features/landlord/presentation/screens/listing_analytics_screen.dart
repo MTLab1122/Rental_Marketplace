@@ -263,3 +263,4 @@ class _ListingAnalyticsScreenState extends ConsumerState<ListingAnalyticsScreen>
     );
   }
 }
+

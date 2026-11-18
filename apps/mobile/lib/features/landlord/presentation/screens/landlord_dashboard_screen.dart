@@ -375,3 +375,4 @@ class LandlordDashboardScreen extends ConsumerWidget {
     );
   }
 }
+

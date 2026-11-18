@@ -13,6 +13,11 @@ import { ReportModule } from './modules/report/report.module';
 import { FavoriteModule } from './modules/favorite/favorite.module';
 import { InquiryModule } from './modules/inquiry/inquiry.module';
 import { ConversationModule } from './modules/conversation/conversation.module';
+import { AdminModule } from './modules/admin/admin.module';
+import { SupplyModule } from './modules/supply/supply.module';
+import { GrowthModule } from './modules/growth/growth.module';
+import { MonetizationModule } from './modules/monetization/monetization.module';
+import { SupportModule } from './modules/support/support.module';
 import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
 
 @Module({
@@ -49,6 +54,11 @@ import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/requ
     FavoriteModule,
     InquiryModule,
     ConversationModule,
+    AdminModule,
+    SupplyModule,
+    GrowthModule,
+    MonetizationModule,
+    SupportModule,
   ],
 })
 export class AppModule implements NestModule {

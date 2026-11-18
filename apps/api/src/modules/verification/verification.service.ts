@@ -243,4 +243,30 @@ export class VerificationService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  /**
+   * Admin retrieves a single verification record with evidence details
+   */
+  async getVerificationById(id: string) {
+    const record = await this.prisma.verificationRecord.findUnique({
+      where: { id },
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            fullName: true,
+            phoneNumber: true,
+            isVerified: true,
+            isSuspended: true,
+            createdAt: true,
+          },
+        },
+      },
+    });
+    if (!record) {
+      throw new NotFoundException(`Verification record '${id}' not found`);
+    }
+    return record;
+  }
 }

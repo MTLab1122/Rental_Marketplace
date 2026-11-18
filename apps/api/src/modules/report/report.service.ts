@@ -111,6 +111,27 @@ export class ReportService {
   }
 
   /**
+   * Admin: Get report by ID
+   */
+  async getReportById(reportId: string) {
+    const report = await this.prisma.report.findUnique({
+      where: { id: reportId },
+      include: {
+        reporter: {
+          select: { id: true, email: true, fullName: true, phoneNumber: true },
+        },
+        resolvedBy: {
+          select: { id: true, email: true, fullName: true },
+        },
+      },
+    });
+    if (!report) {
+      throw new NotFoundException(`Report with ID '${reportId}' not found.`);
+    }
+    return report;
+  }
+
+  /**
    * Admin: Review and resolve a report
    */
   async reviewReport(reportId: string, adminId: string, dto: ReviewReportRequestDto) {

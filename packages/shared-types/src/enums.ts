@@ -188,3 +188,99 @@ export const PESHAWAR_LOCALITIES = [
   PeshawarLocalityName.NASIR_BAGH_ROAD,
   PeshawarLocalityName.WAPDA_TOWN,
 ] as const;
+
+/**
+ * Granular Administrative Permissions
+ */
+export enum AdminPermission {
+  MANAGE_USERS = 'MANAGE_USERS',
+  MANAGE_LANDLORDS = 'MANAGE_LANDLORDS',
+  MANAGE_PROPERTIES = 'MANAGE_PROPERTIES',
+  MODERATE_LISTINGS = 'MODERATE_LISTINGS',
+  REVIEW_REPORTS = 'REVIEW_REPORTS',
+  MANAGE_LOCALITIES = 'MANAGE_LOCALITIES',
+  MANAGE_NOTIFICATIONS = 'MANAGE_NOTIFICATIONS',
+  VIEW_ANALYTICS = 'VIEW_ANALYTICS',
+  MANAGE_SETTINGS = 'MANAGE_SETTINGS',
+  MANAGE_ADMINS = 'MANAGE_ADMINS',
+  VIEW_AUDIT_LOGS = 'VIEW_AUDIT_LOGS',
+}
+
+/**
+ * Role to Default Permissions Mapping
+ */
+export const ROLE_PERMISSIONS: Record<UserRole, AdminPermission[]> = {
+  [UserRole.SUPER_ADMIN]: Object.values(AdminPermission),
+  [UserRole.ADMIN]: [
+    AdminPermission.MANAGE_USERS,
+    AdminPermission.MANAGE_LANDLORDS,
+    AdminPermission.MANAGE_PROPERTIES,
+    AdminPermission.MODERATE_LISTINGS,
+    AdminPermission.REVIEW_REPORTS,
+    AdminPermission.MANAGE_LOCALITIES,
+    AdminPermission.MANAGE_NOTIFICATIONS,
+    AdminPermission.VIEW_ANALYTICS,
+    AdminPermission.VIEW_AUDIT_LOGS,
+  ],
+  [UserRole.MODERATOR]: [
+    AdminPermission.MODERATE_LISTINGS,
+    AdminPermission.REVIEW_REPORTS,
+    AdminPermission.MANAGE_PROPERTIES,
+    AdminPermission.VIEW_ANALYTICS,
+  ],
+  [UserRole.SUPPORT]: [
+    AdminPermission.MANAGE_USERS,
+    AdminPermission.MANAGE_LANDLORDS,
+    AdminPermission.REVIEW_REPORTS,
+    AdminPermission.MANAGE_NOTIFICATIONS,
+  ],
+  [UserRole.LANDLORD]: [],
+  [UserRole.TENANT]: [],
+};
+
+/**
+ * Support Ticket System Enums
+ */
+export enum TicketStatus {
+  OPEN = 'OPEN',
+  IN_PROGRESS = 'IN_PROGRESS',
+  WAITING_USER = 'WAITING_USER',
+  RESOLVED = 'RESOLVED',
+  CLOSED = 'CLOSED',
+}
+
+export enum TicketPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT',
+}
+
+export enum TicketCategory {
+  ACCOUNT = 'ACCOUNT',
+  LISTING_ISSUE = 'LISTING_ISSUE',
+  DISPUTE = 'DISPUTE',
+  INQUIRY = 'INQUIRY',
+  TECHNICAL = 'TECHNICAL',
+  FEEDBACK = 'FEEDBACK',
+}
+
+/**
+ * Growth & Referral Enums
+ */
+export enum ReferralType {
+  STUDENT = 'STUDENT',
+  FAMILY = 'FAMILY',
+  LANDLORD = 'LANDLORD',
+}
+
+/**
+ * Monetization & Promotion Enums
+ */
+export enum MonetizationFeature {
+  FEATURED_LISTING = 'FEATURED_LISTING',
+  VERIFIED_BADGE = 'VERIFIED_BADGE',
+  PROMOTED_SEARCH = 'PROMOTED_SEARCH',
+  LOCALITY_SPONSORSHIP = 'LOCALITY_SPONSORSHIP',
+  HOSTEL_SAAS = 'HOSTEL_SAAS',
+}
