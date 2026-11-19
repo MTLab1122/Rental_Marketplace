@@ -16,6 +16,7 @@ import {
   normalizeEmail,
   normalizePakistaniPhoneNumber,
   sanitizeInput,
+  isDisposableEmail,
 } from '../../common/security/sanitization';
 import {
   RegisterDto,
@@ -52,6 +53,13 @@ export class AuthService {
     const email = normalizeEmail(dto.email);
     const phoneNumber = normalizePakistaniPhoneNumber(dto.phoneNumber);
     const fullName = sanitizeInput(dto.fullName);
+
+    // Reject disposable / temporary email domains
+    if (isDisposableEmail(email)) {
+      throw new BadRequestException(
+        'Registration with disposable or temporary email addresses is prohibited.',
+      );
+    }
 
     // Validate password strength
     this.passwordService.validatePasswordStrength(dto.password);

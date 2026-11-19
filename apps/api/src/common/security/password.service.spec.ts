@@ -12,8 +12,8 @@ describe('PasswordService', () => {
     expect(() => service.validatePasswordStrength('Peshawar2026!#')).not.toThrow();
   });
 
-  it('should reject passwords shorter than 8 characters', () => {
-    expect(() => service.validatePasswordStrength('Psh1!#')).toThrow(BadRequestException);
+  it('should reject passwords shorter than 12 characters', () => {
+    expect(() => service.validatePasswordStrength('Psh123!#')).toThrow(BadRequestException);
   });
 
   it('should reject passwords missing uppercase characters', () => {

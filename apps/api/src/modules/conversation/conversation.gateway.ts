@@ -12,10 +12,30 @@ import { Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { ConversationService } from './conversation.service';
+import {
+  AbusePreventionService,
+  VelocityAction,
+} from '../../common/security/abuse-prevention.service';
 
 @WebSocketGateway({
   cors: {
-    origin: '*',
+    origin: (
+      origin: string | undefined,
+      callback: (err: Error | null, allow?: boolean) => void,
+    ) => {
+      // In dev or mobile environments, origin may be undefined
+      if (!origin) return callback(null, true);
+      const allowed = [
+        process.env['WEB_URL'] || 'http://localhost:3000',
+        process.env['ADMIN_URL'] || 'http://localhost:3001',
+        'http://localhost:3000',
+        'http://localhost:3001',
+      ];
+      if (allowed.includes(origin) || process.env['NODE_ENV'] !== 'production') {
+        return callback(null, true);
+      }
+      return callback(new Error('Disallowed Origin by CORS policy'));
+    },
     credentials: true,
   },
 })
@@ -30,15 +50,26 @@ export class ConversationGateway implements OnGatewayConnection, OnGatewayDiscon
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
     private readonly conversationService: ConversationService,
+    private readonly abusePreventionService: AbusePreventionService,
   ) {}
 
   async handleConnection(client: Socket) {
     try {
-      // Extract JWT token from auth handshake, query or header
-      let token =
-        client.handshake.auth?.token ||
-        client.handshake.query?.token ||
-        client.handshake.headers?.authorization;
+      // Reject JWT in query strings for OWASP ASVS compliance (avoids proxy and log exposure)
+      if (
+        client.handshake.query?.token &&
+        !client.handshake.auth?.token &&
+        !client.handshake.headers?.authorization
+      ) {
+        this.logger.warn(
+          `WebSocket connection rejected: JWT in query string is disallowed (socket: ${client.id})`,
+        );
+        client.disconnect();
+        return;
+      }
+
+      // Extract JWT token from auth handshake or Authorization header only
+      let token = client.handshake.auth?.token || client.handshake.headers?.authorization;
 
       if (token && typeof token === 'string' && token.startsWith('Bearer ')) {
         token = token.slice(7).trim();
@@ -128,6 +159,9 @@ export class ConversationGateway implements OnGatewayConnection, OnGatewayDiscon
     }
 
     try {
+      // Enforce message velocity limit (max 30 messages/min)
+      await this.abusePreventionService.checkVelocity(VelocityAction.SEND_MESSAGE, userId);
+
       // 1. Persist message in PostgreSQL
       const message = await this.conversationService.sendMessage(
         data.conversationId,

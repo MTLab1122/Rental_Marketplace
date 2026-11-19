@@ -6,20 +6,26 @@ export class PasswordService {
   private readonly saltRounds = 12;
 
   /**
-   * Enforces strict password complexity:
-   * - At least 8 characters
+   * Enforces hardened OWASP password policy:
+   * - Minimum 12 characters (prevent brute force & credential stuffing)
+   * - Maximum 128 characters without truncation
+   * - Unicode character support
    * - At least one uppercase letter
    * - At least one lowercase letter
    * - At least one digit
-   * - At least one special character
+   * - At least one special/symbol character
    */
   validatePasswordStrength(password: string): void {
-    if (!password || password.length < 8) {
-      throw new BadRequestException('Password must be at least 8 characters long.');
+    if (!password || password.length < 12) {
+      throw new BadRequestException('Password must be at least 12 characters long.');
+    }
+    if (password.length > 128) {
+      throw new BadRequestException('Password cannot exceed 128 characters.');
     }
     const hasUppercase = /[A-Z]/.test(password);
     const hasLowercase = /[a-z]/.test(password);
     const hasNumber = /[0-9]/.test(password);
+    // Unicode symbol & ASCII special character match
     const hasSpecial = /[^A-Za-z0-9]/.test(password);
 
     if (!hasUppercase || !hasLowercase || !hasNumber || !hasSpecial) {

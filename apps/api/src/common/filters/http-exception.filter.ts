@@ -87,7 +87,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         }
       }
     } else if (exception instanceof Error) {
-      message = exception.message;
+      const isProduction = process.env['NODE_ENV'] === 'production';
+      const isPrismaError =
+        (typeof (exception as any).code === 'string' && (exception as any).code.startsWith('P')) ||
+        exception.name?.includes('Prisma');
+
+      // Mask database/internal errors to prevent SQL and schema leakage
+      if (isProduction || isPrismaError) {
+        message = 'An unexpected internal error occurred. Please try again later.';
+      } else {
+        message = exception.message;
+      }
+
       this.logger.error(
         `[${requestId}] Unhandled exception: ${exception.message}`,
         exception.stack,

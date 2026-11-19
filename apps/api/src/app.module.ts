@@ -28,6 +28,7 @@ import { JobsModule } from './modules/jobs/jobs.module';
 import { DataPlatformModule } from './modules/data-platform/data-platform.module';
 import { ScaleModule } from './modules/scale/scale.module';
 import { AiModule } from './modules/ai/ai.module';
+import { SecurityModule } from './common/security/security.module';
 import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
 
 @Module({
@@ -79,6 +80,7 @@ import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/requ
     DataPlatformModule,
     ScaleModule,
     AiModule,
+    SecurityModule,
   ],
 })
 export class AppModule implements NestModule {
