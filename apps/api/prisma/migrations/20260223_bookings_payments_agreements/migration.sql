@@ -356,3 +356,4 @@ CREATE INDEX IF NOT EXISTS "ledger_entries_bookingId_idx" ON "ledger_entries"("b
 CREATE INDEX IF NOT EXISTS "ledger_entries_paymentId_idx" ON "ledger_entries"("paymentId");
 CREATE INDEX IF NOT EXISTS "ledger_entries_type_idx" ON "ledger_entries"("type");
 CREATE INDEX IF NOT EXISTS "ledger_entries_createdAt_idx" ON "ledger_entries"("createdAt");
+
