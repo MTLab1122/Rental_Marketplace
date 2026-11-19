@@ -92,6 +92,9 @@ async function bootstrap(): Promise<void> {
   SwaggerModule.setup('docs', app, document);
   SwaggerModule.setup('api/v1/docs', app, document);
 
+  // Graceful shutdown hooks for container orchestrators & horizontal scaling
+  app.enableShutdownHooks();
+
   const port = process.env['PORT'] ? Number(process.env['PORT']) : 4000;
   await app.listen(port);
   pinoLogger.log(`Application is running on: http://localhost:${port}/api/v1`);

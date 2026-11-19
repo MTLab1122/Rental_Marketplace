@@ -441,3 +441,54 @@ export enum DisputeStatus {
   REJECTED = 'REJECTED',
   ESCALATED = 'ESCALATED',
 }
+
+// ==========================================
+// PHASE 14: EVENT-DRIVEN & BACKGROUND JOBS
+// ==========================================
+
+export enum DomainEventType {
+  USER_REGISTERED = 'user_registered',
+  USER_VERIFIED = 'user_verified',
+  LANDLORD_VERIFIED = 'landlord_verified',
+  PROPERTY_CREATED = 'property_created',
+  PROPERTY_SUBMITTED = 'property_submitted',
+  PROPERTY_APPROVED = 'property_approved',
+  PROPERTY_REJECTED = 'property_rejected',
+  PROPERTY_SUSPENDED = 'property_suspended',
+  PROPERTY_MARKED_AVAILABLE = 'property_marked_available',
+  PROPERTY_MARKED_RENTED = 'property_marked_rented',
+  PROPERTY_VIEWED = 'property_viewed',
+  PROPERTY_FAVORITED = 'property_favorited',
+  INQUIRY_CREATED = 'inquiry_created',
+  INQUIRY_REPLIED = 'inquiry_replied',
+  MESSAGE_SENT = 'message_sent',
+  REVIEW_CREATED = 'review_created',
+  REVIEW_MODERATED = 'review_moderated',
+  BOOKING_CREATED = 'booking_created',
+  PAYMENT_SUCCEEDED = 'payment_succeeded',
+  PAYMENT_FAILED = 'payment_failed',
+  REFUND_CREATED = 'refund_created',
+  DISPUTE_OPENED = 'dispute_opened',
+  REPORT_CREATED = 'report_created',
+  REPORT_RESOLVED = 'report_resolved',
+}
+
+export enum BackgroundJobName {
+  SEND_NOTIFICATION = 'send_notification',
+  SEND_EMAIL = 'send_email',
+  RESIZE_IMAGE = 'resize_image',
+  GENERATE_THUMBNAIL = 'generate_thumbnail',
+  CALCULATE_REPUTATION = 'calculate_reputation',
+  CALCULATE_PROPERTY_QUALITY = 'calculate_property_quality',
+  CALCULATE_LOCALITY_DEMAND = 'calculate_locality_demand',
+  EXPIRE_UNPAID_BOOKINGS = 'expire_unpaid_bookings',
+  EXPIRE_VERIFICATION_REQUESTS = 'expire_verification_requests',
+  REINDEX_SEARCH = 'reindex_search',
+  CLEAN_EXPIRED_TOKENS = 'clean_expired_tokens',
+  CLEAN_EXPIRED_SESSIONS = 'clean_expired_sessions',
+  CLEAN_ORPHAN_MEDIA = 'clean_orphan_media',
+  GENERATE_DAILY_ANALYTICS = 'generate_daily_analytics',
+  GENERATE_WEEKLY_REPORTS = 'generate_weekly_reports',
+  PROCESS_WEBHOOK_RETRIES = 'process_webhook_retries',
+  PROCESS_DLQ = 'process_dlq',
+}

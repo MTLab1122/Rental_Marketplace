@@ -17,6 +17,8 @@ import {
   LedgerEntryType,
   DisputeCategory,
   DisputeStatus,
+  DomainEventType,
+  BackgroundJobName,
 } from './enums.js';
 
 export interface HealthStatusDto {
@@ -1104,4 +1106,81 @@ export interface LedgerEntryDto {
   isImmutable: boolean;
   metadata?: Record<string, any> | null;
   createdAt: string;
+}
+
+// ==========================================
+// PHASE 14: EVENT-DRIVEN ARCHITECTURE & DATA PLATFORM
+// ==========================================
+
+export interface DomainEventDto {
+  id?: string;
+  eventId: string;
+  eventType: DomainEventType;
+  aggregateType: string;
+  aggregateId: string;
+  schemaVersion?: number;
+  payload: Record<string, any>;
+  metadata?: Record<string, any>;
+  occurredAt: string;
+}
+
+export interface JobDto {
+  id: string;
+  name: BackgroundJobName;
+  data: Record<string, any>;
+  attemptsMade: number;
+  maxAttempts: number;
+  state: 'waiting' | 'active' | 'completed' | 'failed' | 'delayed';
+  failedReason?: string;
+  idempotencyKey?: string;
+  createdAt: string;
+  processedAt?: string;
+}
+
+export interface QueueMetricsDto {
+  waiting: number;
+  active: number;
+  completed: number;
+  failed: number;
+  delayed: number;
+  deadLetter: number;
+  backlogAlert: boolean;
+}
+
+export interface DeadLetterJobDto {
+  id: string;
+  jobId: string;
+  queueName: string;
+  jobName: string;
+  payload: Record<string, any>;
+  errorReason: string;
+  attempts: number;
+  failedAt: string;
+  isResolved: boolean;
+  resolvedAt?: string | null;
+}
+
+export interface ReplayEventsDto {
+  fromTimestamp: string;
+  toTimestamp?: string;
+  eventTypes?: DomainEventType[];
+}
+
+export interface DataRetentionPolicyDto {
+  id: string;
+  tableName: string;
+  retentionDays: number;
+  archiveEnabled: boolean;
+  anonymizePii: boolean;
+  lastRunAt?: string | null;
+}
+
+export interface UserDataExportDto {
+  exportedAt: string;
+  user: Record<string, any>;
+  properties: any[];
+  inquiries: any[];
+  bookings: any[];
+  payments: any[];
+  reviews: any[];
 }

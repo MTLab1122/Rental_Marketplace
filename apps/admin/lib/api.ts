@@ -409,3 +409,82 @@ export async function refundPaymentAdmin(
     body: JSON.stringify(data),
   });
 }
+
+// ==========================================
+// PHASE 14: JOBS, EVENTS, CACHE & DATA PLATFORM
+// ==========================================
+
+export async function getQueueMetricsAdmin() {
+  return request<any[]>('/admin/jobs/metrics');
+}
+
+export async function getDeadLetterJobsAdmin(queueName?: string, isResolved?: boolean) {
+  const qs = new URLSearchParams();
+  if (queueName) qs.append('queueName', queueName);
+  if (isResolved !== undefined) qs.append('isResolved', String(isResolved));
+  return request<any[]>(`/admin/jobs/dlq?${qs.toString()}`);
+}
+
+export async function retryDlqJobAdmin(id: string) {
+  return request<any>(`/admin/jobs/dlq/${id}/retry`, {
+    method: 'POST',
+  });
+}
+
+export async function resolveDlqJobAdmin(id: string) {
+  return request<any>(`/admin/jobs/dlq/${id}/resolve`, {
+    method: 'POST',
+  });
+}
+
+export async function processOutboxAdmin(batchSize?: number) {
+  const qs = batchSize ? `?batchSize=${batchSize}` : '';
+  return request<any>(`/admin/jobs/outbox/process${qs}`, {
+    method: 'POST',
+  });
+}
+
+export async function replayEventsAdmin(payload: { fromTimestamp: string; eventTypes?: string[] }) {
+  return request<any>('/admin/events/replay', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function flushCacheAdmin() {
+  return request<any>('/admin/cache/flush', {
+    method: 'POST',
+  });
+}
+
+export async function invalidateCacheAdmin(pattern: string) {
+  return request<any>('/admin/cache/invalidate', {
+    method: 'POST',
+    body: JSON.stringify({ pattern }),
+  });
+}
+
+export async function exportUserDataAdmin(userId: string) {
+  return request<any>(`/admin/data-platform/export/${userId}`);
+}
+
+export async function anonymizeUserDataAdmin(userId: string) {
+  return request<any>(`/admin/data-platform/anonymize/${userId}`, {
+    method: 'POST',
+  });
+}
+
+export async function runRetentionPoliciesAdmin() {
+  return request<any>('/admin/data-platform/retention/run', {
+    method: 'POST',
+  });
+}
+
+export async function getPartitionDdlAdmin(year?: number, month?: number) {
+  const qs = new URLSearchParams();
+  if (year) qs.append('year', String(year));
+  if (month) qs.append('month', String(month));
+  return request<{ year: number; month: number; ddl: string[] }>(
+    `/admin/data-platform/partitions/ddl?${qs.toString()}`,
+  );
+}

@@ -22,6 +22,11 @@ import { ReviewModule } from './modules/review/review.module';
 import { DiscoveryModule } from './modules/discovery/discovery.module';
 import { BookingModule } from './modules/booking/booking.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { EventsModule } from './modules/events/events.module';
+import { CacheModule } from './modules/cache/cache.module';
+import { JobsModule } from './modules/jobs/jobs.module';
+import { DataPlatformModule } from './modules/data-platform/data-platform.module';
+import { ScaleModule } from './modules/scale/scale.module';
 import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
 
 @Module({
@@ -67,6 +72,11 @@ import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/requ
     DiscoveryModule,
     BookingModule,
     PaymentModule,
+    EventsModule,
+    CacheModule,
+    JobsModule,
+    DataPlatformModule,
+    ScaleModule,
   ],
 })
 export class AppModule implements NestModule {

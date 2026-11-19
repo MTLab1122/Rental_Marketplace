@@ -21,6 +21,10 @@ const NAV_ITEMS = [
   { label: 'Bookings & Leases', href: '/bookings', icon: '📝' },
   { label: 'Escrow Ledger', href: '/ledger', icon: '💰' },
   { label: 'Disputes Console', href: '/disputes', icon: '⚖️' },
+  { label: 'Background Jobs & DLQ', href: '/jobs', icon: '⚡' },
+  { label: 'Event Replay & Outbox', href: '/events', icon: '🔄' },
+  { label: 'Cache & Performance', href: '/cache', icon: '💾' },
+  { label: 'Data Retention & GDPR', href: '/retention', icon: '🗄️' },
   { label: 'Settings', href: '/settings', icon: '⚙️' },
   { label: 'Feature Flags', href: '/feature-flags', icon: '🚩' },
 ];

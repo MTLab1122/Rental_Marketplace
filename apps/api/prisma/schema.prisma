@@ -1562,4 +1562,98 @@ model LedgerEntry {
   @@map("ledger_entries")
 }
 
+// ==========================================
+// PHASE 14: EVENT-DRIVEN ARCHITECTURE, JOBS & DATA PLATFORM
+// ==========================================
+
+model DomainEventOutbox {
+  id            String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  eventType     String    @db.VarChar(100)
+  aggregateType String    @db.VarChar(100)
+  aggregateId   String    @db.VarChar(100)
+  payload       Json
+  metadata      Json?
+  status        String    @default("PENDING") @db.VarChar(30)
+  retryCount    Int       @default(0)
+  nextRetryAt   DateTime? @db.Timestamptz(6)
+  lastError     String?   @db.Text
+  publishedAt   DateTime? @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([status, nextRetryAt])
+  @@index([eventType])
+  @@index([aggregateId])
+  @@index([createdAt])
+  @@map("domain_event_outbox")
+}
+
+model EventStore {
+  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  eventId       String   @unique @db.VarChar(100)
+  eventType     String   @db.VarChar(100)
+  aggregateType String   @db.VarChar(100)
+  aggregateId   String   @db.VarChar(100)
+  schemaVersion Int      @default(1)
+  payload       Json
+  metadata      Json?
+  occurredAt    DateTime @db.Timestamptz(6)
+  recordedAt    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([eventType, occurredAt])
+  @@index([aggregateType, aggregateId])
+  @@index([occurredAt])
+  @@map("event_store")
+}
+
+model DeadLetterJob {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId       String    @db.VarChar(100)
+  queueName   String    @db.VarChar(100)
+  jobName     String    @db.VarChar(100)
+  payload     Json
+  errorReason String    @db.Text
+  attempts    Int       @default(0)
+  failedAt    DateTime  @default(now()) @db.Timestamptz(6)
+  isResolved  Boolean   @default(false)
+  resolvedAt  DateTime? @db.Timestamptz(6)
+  resolvedBy  String?   @db.Uuid
+
+  @@index([queueName, isResolved])
+  @@index([failedAt])
+  @@map("dead_letter_jobs")
+}
+
+model DailyAnalyticsAggregate {
+  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  date            DateTime @db.Date
+  dimension       String   @db.VarChar(50)
+  dimensionValue  String   @default("ALL") @db.VarChar(100)
+  totalViews      Int      @default(0)
+  totalClicks     Int      @default(0)
+  totalInquiries  Int      @default(0)
+  totalBookings   Int      @default(0)
+  totalRevenuePkr Decimal  @default(0) @db.Decimal(14, 2)
+  activeListings  Int      @default(0)
+  metadata        Json?
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([date, dimension, dimensionValue])
+  @@index([date])
+  @@map("daily_analytics_aggregates")
+}
+
+model DataRetentionPolicy {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tableName      String    @unique @db.VarChar(100)
+  retentionDays  Int       @default(90)
+  archiveEnabled Boolean   @default(true)
+  anonymizePii   Boolean   @default(false)
+  lastRunAt      DateTime? @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @db.Timestamptz(6)
+
+  @@map("data_retention_policies")
+}
+
+
 

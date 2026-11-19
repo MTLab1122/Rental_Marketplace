@@ -1,0 +1,275 @@
+# ==============================================================================
+# Rental Peshawar - Horizontally Scalable & Resilient Cluster Orchestration
+# Phase 14: Scale-Ready Architecture with Multi-Instance API, Queue Workers & Caching
+# ==============================================================================
+
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. Edge Ingress & Load Balancer (Nginx)
+  # ----------------------------------------------------------------------------
+  lb:
+    image: nginx:1.25-alpine
+    container_name: rental_peshawar_scale_lb
+    restart: always
+    ports:
+      - '80:80'
+      - '443:443'
+      - '3000:3000'
+    volumes:
+      - ./infra/nginx/nginx.scale.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api
+      - web
+      - admin
+    networks:
+      - rental_scale_net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  # ----------------------------------------------------------------------------
+  # 2. Primary Database (PostGIS 16) with Declarative Partitioning Support
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: rental_peshawar_scale_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-PeshawarSecureProd2026!}
+      POSTGRES_DB: ${POSTGRES_DB:-rental_peshawar_prod}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    command: >
+      postgres -c max_connections=400
+               -c shared_buffers=1GB
+               -c effective_cache_size=3GB
+               -c maintenance_work_mem=256MB
+               -c checkpoint_completion_target=0.9
+               -c wal_buffers=32MB
+               -c default_statistics_target=100
+               -c random_page_cost=1.1
+               -c effective_io_concurrency=200
+               -c work_mem=5242kB
+               -c min_wal_size=2GB
+               -c max_wal_size=8GB
+    volumes:
+      - scale_postgres_data:/var/lib/postgresql/data
+      - ./infra/postgres/init-postgis.sql:/docker-entrypoint-initdb.d/init-postgis.sql:ro
+    ports:
+      - '5432:5432'
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-rental_peshawar_prod}',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    networks:
+      - rental_scale_net
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2048M
+
+  # ----------------------------------------------------------------------------
+  # 3. High-Throughput Redis Cache & BullMQ Job Broker
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: rental_peshawar_scale_redis
+    restart: always
+    command: >
+      redis-server --appendonly yes
+                   --maxmemory 1024mb
+                   --maxmemory-policy allkeys-lru
+                   --requirepass ${REDIS_PASSWORD:-RedisSecureProd2026!}
+                   --tcp-backlog 511
+                   --timeout 0
+                   --tcp-keepalive 300
+    volumes:
+      - scale_redis_data:/data
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', '${REDIS_PASSWORD:-RedisSecureProd2026!}', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rental_scale_net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1280M
+
+  # ----------------------------------------------------------------------------
+  # 4. Horizontally Scaled Stateless API Replicas
+  # ----------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-PeshawarSecureProd2026!}@postgres:5432/${POSTGRES_DB:-rental_peshawar_prod}?schema=public&connection_limit=30
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-RedisSecureProd2026!}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-ProdJwtAccessSecretPeshawar2026!32CharsMin}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-ProdJwtRefreshSecretPeshawar2026!32CharsMin}
+      CORS_ORIGINS: ${CORS_ORIGINS:-https://rentalpeshawar.pk,https://admin.rentalpeshawar.pk}
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:-rentalminioprod}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-MinioSecureProdPass2026!}
+      S3_BUCKET: ${S3_BUCKET:-rental-peshawar-media}
+      S3_REGION: ${S3_REGION:-us-east-1}
+      ENABLE_OUTBOX_WORKER: 'false' # Offloaded to dedicated worker instances
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/v1/health']
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    networks:
+      - rental_scale_net
+    deploy:
+      mode: replicated
+      replicas: 3
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # ----------------------------------------------------------------------------
+  # 5. Dedicated Background Queue & Outbox Worker
+  # ----------------------------------------------------------------------------
+  worker:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: rental_peshawar_scale_worker
+    restart: always
+    command: ['node', 'dist/main.js']
+    environment:
+      NODE_ENV: production
+      PORT: 3010
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-PeshawarSecureProd2026!}@postgres:5432/${POSTGRES_DB:-rental_peshawar_prod}?schema=public&connection_limit=20
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-RedisSecureProd2026!}
+      ENABLE_OUTBOX_WORKER: 'true'
+      WORKER_CONCURRENCY: '10'
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rental_scale_net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'
+          memory: 1024M
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # ----------------------------------------------------------------------------
+  # 6. Public Web Application (Next.js)
+  # ----------------------------------------------------------------------------
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3001
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.rentalpeshawar.pk/api/v1}
+    depends_on:
+      - api
+    networks:
+      - rental_scale_net
+    deploy:
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 768M
+
+  # ----------------------------------------------------------------------------
+  # 7. Admin Operations Console (Next.js)
+  # ----------------------------------------------------------------------------
+  admin:
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    container_name: rental_peshawar_scale_admin
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3002
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.rentalpeshawar.pk/api/v1}
+    depends_on:
+      - api
+    ports:
+      - '3002:3002'
+    networks:
+      - rental_scale_net
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 768M
+
+  # ----------------------------------------------------------------------------
+  # 8. S3 Object Storage (MinIO)
+  # ----------------------------------------------------------------------------
+  minio:
+    image: minio/minio:latest
+    container_name: rental_peshawar_scale_minio
+    restart: always
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-rentalminioprod}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-MinioSecureProdPass2026!}
+    volumes:
+      - scale_minio_data:/data
+    ports:
+      - '9000:9000'
+      - '9001:9001'
+    networks:
+      - rental_scale_net
+
+volumes:
+  scale_postgres_data:
+    driver: local
+  scale_redis_data:
+    driver: local
+  scale_minio_data:
+    driver: local
+
+networks:
+  rental_scale_net:
+    driver: bridge
