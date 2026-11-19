@@ -686,3 +686,51 @@ export async function triggerEmergencyRollbackAdmin(reason: string) {
     body: JSON.stringify({ reason }),
   });
 }
+
+// ==========================================
+// PHASE 22: RELIABILITY, ERROR BUDGETS & EXPERIMENTATION
+// ==========================================
+
+export async function getReliabilitySlosAdmin() {
+  return request<any>('/reliability/slos');
+}
+
+export async function simulateErrorBudgetAdmin(consumptionPercent: number | null) {
+  return request<any>('/reliability/error-budget/simulate', {
+    method: 'POST',
+    body: JSON.stringify({ consumptionPercent }),
+  });
+}
+
+export async function getFeatureFreezeStatusAdmin() {
+  return request<any>('/reliability/feature-freeze');
+}
+
+export async function getFeedbackSummaryAdmin() {
+  return request<any>('/feedback');
+}
+
+export async function listExperimentsAdmin() {
+  return request<any>('/experiments');
+}
+
+export async function toggleExperimentAdmin(key: string, enabled: boolean) {
+  return request<any>(`/experiments/${key}/toggle`, {
+    method: 'PATCH',
+    body: JSON.stringify({ enabled }),
+  });
+}
+
+export async function emergencyKillExperimentAdmin(key: string, reason: string) {
+  return request<any>(`/experiments/${key}/kill`, {
+    method: 'POST',
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export async function updateExperimentRolloutAdmin(key: string, percentage: number) {
+  return request<any>(`/experiments/${key}/rollout`, {
+    method: 'PATCH',
+    body: JSON.stringify({ percentage }),
+  });
+}

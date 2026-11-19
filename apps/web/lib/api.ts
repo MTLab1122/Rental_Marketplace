@@ -955,3 +955,45 @@ export async function searchSemantic(query: string, filters?: Record<string, any
   if (filters?.bedrooms) params.append('bedrooms', String(filters.bedrooms));
   return fetchWithAuth(`/search/semantic?${params.toString()}`, { method: 'GET' });
 }
+
+// ==========================================
+// PHASE 22: USER FEEDBACK & FEATURE EXPERIMENTATION
+// ==========================================
+
+export async function submitUserFeedback(
+  data: {
+    rating: number;
+    category: string;
+    comment: string;
+    persona: 'TENANT' | 'LANDLORD' | 'AGENT';
+    pageUrl?: string;
+    locality?: string;
+    metadata?: Record<string, any>;
+  },
+  token?: string,
+) {
+  return fetchWithAuth(
+    '/feedback',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function evaluateFeatureFlags(
+  context: {
+    userId?: string;
+    role?: string;
+    locality?: string;
+    platform?: string;
+  } = {},
+) {
+  const params = new URLSearchParams();
+  if (context.userId) params.append('userId', context.userId);
+  if (context.role) params.append('role', context.role);
+  if (context.locality) params.append('locality', context.locality);
+  if (context.platform) params.append('platform', context.platform);
+  return fetchWithAuth(`/experiments/flags?${params.toString()}`, { method: 'GET' });
+}

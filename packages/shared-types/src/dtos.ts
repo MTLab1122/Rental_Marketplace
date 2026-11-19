@@ -25,6 +25,10 @@ import {
   AiSuggestionStatus,
   PriceContextIndicator,
   ContentModerationFlag,
+  ErrorBudgetTier,
+  SloStatus,
+  FeedbackCategory,
+  ExperimentStatus,
 } from './enums.js';
 
 export interface HealthStatusDto {
@@ -1450,4 +1454,114 @@ export interface CommercialOverviewDto {
   totalInvoicesPaid: number;
   recentTransactionsCount: number;
   localityRevenueBreakdown: { localityName: string; revenuePkr: number }[];
+}
+
+export interface SloMetricDto {
+  id: string;
+  name: string;
+  category: 'AVAILABILITY' | 'LATENCY' | 'DATA_INTEGRITY' | 'OPERATIONS';
+  target: number;
+  unit: '%' | 'ms' | 's' | 'hours';
+  currentValue: number;
+  status: SloStatus;
+  budgetTotalAllowed: number;
+  budgetConsumedPercent: number;
+  burnRate1h: number;
+  burnRate24h: number;
+}
+
+export interface ErrorBudgetSummaryDto {
+  cumulativeConsumptionPercent: number;
+  tier: ErrorBudgetTier;
+  isFeatureFreezeActive: boolean;
+  activeFreezeReason?: string;
+  evaluationWindowDays: number;
+  slosBreachedCount: number;
+  slosDegradedCount: number;
+  totalSlosMonitored: number;
+  lastUpdated: string;
+}
+
+export interface ReliabilityOverviewDto {
+  summary: ErrorBudgetSummaryDto;
+  slos: SloMetricDto[];
+  recentIncidents: {
+    id: string;
+    severity: 'SEV-1' | 'SEV-2' | 'SEV-3';
+    title: string;
+    startedAt: string;
+    resolvedAt?: string;
+    status: 'ACTIVE' | 'RESOLVED';
+  }[];
+}
+
+export interface SubmitFeedbackDto {
+  rating: number;
+  category: FeedbackCategory;
+  comment: string;
+  persona: 'TENANT' | 'LANDLORD' | 'AGENT';
+  pageUrl?: string;
+  locality?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface FeedbackItemDto {
+  id: string;
+  userId?: string;
+  persona: 'TENANT' | 'LANDLORD' | 'AGENT';
+  rating: number;
+  category: FeedbackCategory;
+  comment: string;
+  pageUrl?: string;
+  locality?: string;
+  sentiment: 'POSITIVE' | 'NEUTRAL' | 'NEGATIVE';
+  createdAt: string;
+  requiresFollowUp: boolean;
+}
+
+export interface FeedbackSummaryDto {
+  totalCount: number;
+  averageRating: number;
+  npsScore: number;
+  categoryCounts: Record<FeedbackCategory, number>;
+  sentimentCounts: {
+    positive: number;
+    neutral: number;
+    negative: number;
+  };
+  recentFeedback: FeedbackItemDto[];
+}
+
+export interface ExperimentVariantDto {
+  key: string;
+  weight: number;
+  payload?: Record<string, any>;
+}
+
+export interface ExperimentDto {
+  key: string;
+  name: string;
+  description: string;
+  status: ExperimentStatus;
+  targetRoles: ('TENANT' | 'LANDLORD' | 'ADMIN')[];
+  targetLocalities?: string[];
+  percentage: number;
+  variants: ExperimentVariantDto[];
+  killSwitchTriggered: boolean;
+  guardrails: {
+    enforceEligibilitySegregation: boolean;
+    enforceGeofence: boolean;
+    enforceModeration: boolean;
+    enforcePiiProtection: boolean;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EvaluateExperimentDto {
+  userId?: string;
+  role?: 'TENANT' | 'LANDLORD' | 'ADMIN';
+  locality?: string;
+  platform?: 'web' | 'mobile_android' | 'mobile_ios';
+  appVersion?: string;
 }

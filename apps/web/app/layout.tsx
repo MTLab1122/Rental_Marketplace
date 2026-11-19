@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '../lib/auth-context';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import FeedbackWidget from '../components/FeedbackWidget';
 import JsonLd from '../components/JsonLd';
 import { constructMetadata } from '../lib/seo';
 import { generateOrganizationSchema, generateWebsiteSchema } from '../lib/structured-data';
@@ -29,6 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <Navbar />
           <div className="flex-grow">{children}</div>
+          <FeedbackWidget />
           <Footer />
         </AuthProvider>
       </body>

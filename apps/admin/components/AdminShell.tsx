@@ -8,6 +8,7 @@ import { removeAuthToken } from '../lib/api';
 const NAV_ITEMS = [
   { label: 'Overview', href: '/', icon: '📊' },
   { label: 'Go-Live Command Center', href: '/command-center', icon: '🚀' },
+  { label: 'Reliability & SLOs', href: '/reliability', icon: '⏱️' },
   { label: 'Moderation Queue', href: '/moderation', icon: '🛡️' },
   { label: 'Verification Queue', href: '/verifications', icon: '🪪' },
   { label: 'Properties', href: '/properties', icon: '🏠' },

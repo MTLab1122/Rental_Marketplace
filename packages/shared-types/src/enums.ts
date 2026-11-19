@@ -652,3 +652,32 @@ export enum RevenueEventType {
   PLATFORM_FEE = 'PLATFORM_FEE',
   ADJUSTMENT = 'ADJUSTMENT',
 }
+
+export enum ErrorBudgetTier {
+  GREEN = 'GREEN',
+  AMBER = 'AMBER',
+  ORANGE = 'ORANGE',
+  RED = 'RED',
+}
+
+export enum SloStatus {
+  HEALTHY = 'HEALTHY',
+  DEGRADED = 'DEGRADED',
+  BREACHED = 'BREACHED',
+}
+
+export enum FeedbackCategory {
+  BUG = 'BUG',
+  FEATURE_REQUEST = 'FEATURE_REQUEST',
+  SEARCH_QUALITY = 'SEARCH_QUALITY',
+  LANDLORD_ISSUE = 'LANDLORD_ISSUE',
+  GENERAL = 'GENERAL',
+}
+
+export enum ExperimentStatus {
+  DRAFT = 'DRAFT',
+  RUNNING = 'RUNNING',
+  PAUSED = 'PAUSED',
+  HALTED_GUARDRAIL = 'HALTED_GUARDRAIL',
+  CONCLUDED = 'CONCLUDED',
+}
