@@ -147,6 +147,16 @@ export class GrowthController {
   }
 
   /**
+   * Admin SEO health, indexability metrics and alerts
+   */
+  @Get('admin/seo-health')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+  async getSeoHealthReport() {
+    return this.growthService.getSeoHealthReport();
+  }
+
+  /**
    * Localized landing page benchmarks and properties
    */
   @Get('localities/:slug')

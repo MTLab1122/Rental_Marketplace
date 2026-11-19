@@ -559,3 +559,11 @@ export async function reviewModerationRecordAdmin(
     body: JSON.stringify({ reviewerAction }),
   });
 }
+
+export async function getSeoHealthReportAdmin() {
+  return request<any>('/growth/admin/seo-health');
+}
+
+export async function triggerSitemapRegenerateAdmin() {
+  return request<any>('/growth/seo/sitemap.xml');
+}

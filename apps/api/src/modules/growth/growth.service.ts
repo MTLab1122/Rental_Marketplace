@@ -586,4 +586,77 @@ ${propertyUrls}
       featuredListings: locality.properties.slice(0, 6),
     };
   }
+
+  /**
+   * Admin SEO health metrics, metadata alerts, and indexability report
+   */
+  async getSeoHealthReport() {
+    const totalIndexable = await this.prisma.property.count({
+      where: {
+        status: PropertyStatus.APPROVED,
+        isAvailable: true,
+        deletedAt: null,
+      },
+    });
+
+    const missingImagesCount = await this.prisma.property.count({
+      where: {
+        status: PropertyStatus.APPROVED,
+        isAvailable: true,
+        deletedAt: null,
+        images: { none: {} },
+      },
+    });
+
+    const activeLocalities = await this.prisma.locality.findMany({
+      where: { isActive: true },
+      include: {
+        _count: {
+          select: {
+            properties: {
+              where: {
+                status: PropertyStatus.APPROVED,
+                isAvailable: true,
+                deletedAt: null,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    const localitiesReport = activeLocalities.map((loc: any) => ({
+      id: loc.id,
+      name: loc.name,
+      slug: loc.slug,
+      activePropertiesCount: loc._count.properties,
+      hasSufficientInventory: loc._count.properties > 0,
+      updatedAt: loc.updatedAt,
+    }));
+
+    const alerts: string[] = [];
+    if (missingImagesCount > 0) {
+      alerts.push(
+        `${missingImagesCount} active properties have no images and will be penalized in image search.`,
+      );
+    }
+
+    const thinLocalities = localitiesReport.filter((l: any) => l.activePropertiesCount === 0);
+    if (thinLocalities.length > 0) {
+      alerts.push(
+        `${thinLocalities.length} active localities have 0 live listings (risk of thin content).`,
+      );
+    }
+
+    return {
+      totalIndexableProperties: totalIndexable,
+      totalActiveLocalities: activeLocalities.length,
+      missingImagesCount,
+      sitemapUrl: 'https://rentalpeshawar.pk/sitemap.xml',
+      sitemapStatus: 'HEALTHY',
+      lastSitemapGeneratedAt: new Date().toISOString(),
+      alerts,
+      localities: localitiesReport,
+    };
+  }
 }

@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { label: 'Localities', href: '/localities', icon: '📍' },
   { label: 'Audit Logs', href: '/audit-logs', icon: '📜' },
   { label: 'Analytics', href: '/analytics', icon: '📈' },
+  { label: 'SEO & Discovery', href: '/seo', icon: '🌐' },
   { label: 'Discovery & Alerts', href: '/discovery', icon: '🔔' },
   { label: 'Bookings & Leases', href: '/bookings', icon: '📝' },
   { label: 'Escrow Ledger', href: '/ledger', icon: '💰' },
