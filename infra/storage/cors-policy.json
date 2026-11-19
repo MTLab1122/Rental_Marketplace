@@ -1,0 +1,15 @@
+{
+  "CORSRules": [
+    {
+      "AllowedOrigins": [
+        "https://rentalpeshawar.pk",
+        "https://admin.rentalpeshawar.pk",
+        "https://staging.rentalpeshawar.pk"
+      ],
+      "AllowedMethods": ["GET", "PUT", "HEAD"],
+      "AllowedHeaders": ["*"],
+      "ExposeHeaders": ["ETag", "x-amz-server-side-encryption"],
+      "MaxAgeSeconds": 3600
+    }
+  ]
+}

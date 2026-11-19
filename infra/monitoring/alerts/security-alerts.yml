@@ -1,0 +1,150 @@
+# =============================================================================
+# Rental Peshawar - Prometheus Security Alerting Rules
+# Detection of Anomalies, Attacks, Auth Failures & Zero-Trust Violations
+# =============================================================================
+
+groups:
+  - name: rental_peshawar_security_alerts
+    rules:
+      # 1. Failed Login Spike (Potential Credential Stuffing / Brute Force)
+      - alert: FailedLoginSpike
+        expr: rate(auth_login_failures_total[5m]) > 10
+        for: 2m
+        labels:
+          severity: critical
+          category: authentication
+        annotations:
+          summary: 'High volume of failed login attempts detected'
+          description: 'Over 10 failed logins per second over the last 5 minutes. Possible brute-force attack.'
+
+      # 2. Refresh Token Family Reuse Detected (Potential Session Hijack)
+      - alert: RefreshTokenReuseDetected
+        expr: increase(security_token_reuse_events_total[1m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          category: session_security
+        annotations:
+          summary: 'Refresh token reuse detected'
+          description: 'A revoked or already-exchanged refresh token was re-submitted. Possible token theft. Token family automatically revoked.'
+
+      # 3. Privilege Escalation Attempt
+      - alert: PrivilegeEscalationAttempt
+        expr: increase(security_privilege_escalation_denied_total[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+          category: rbac
+        annotations:
+          summary: 'Unauthorized privilege escalation attempted'
+          description: 'A non-SUPER_ADMIN attempted to assign high-privilege roles or modify system policies.'
+
+      # 4. Unauthorized Admin Console Access
+      - alert: UnauthorizedAdminAccess
+        expr: rate(http_requests_total{status="403", path=~"/admin/.*"}[5m]) > 5
+        for: 1m
+        labels:
+          severity: high
+          category: access_control
+        annotations:
+          summary: 'Repeated forbidden access to admin resources'
+          description: 'Multiple 403 Forbidden responses detected on administrative routes.'
+
+      # 5. Database Authentication Failures
+      - alert: PostgresAuthFailures
+        expr: increase(pg_stat_database_authentication_failures_total[5m]) > 5
+        for: 1m
+        labels:
+          severity: critical
+          category: database
+        annotations:
+          summary: 'PostgreSQL authentication failures detected'
+          description: 'Repeated failed attempts to connect to PostgreSQL. Possible unauthorized intrusion attempt.'
+
+      # 6. Redis Authentication Failures
+      - alert: RedisAuthFailures
+        expr: increase(redis_rejected_connections_total[5m]) > 5
+        for: 1m
+        labels:
+          severity: high
+          category: cache
+        annotations:
+          summary: 'Redis rejected connection spike'
+          description: 'Multiple connections rejected by Redis due to invalid authentication or ACL rejection.'
+
+      # 7. Object Storage Access Anomaly
+      - alert: ObjectStorageAccessAnomaly
+        expr: rate(s3_requests_total{status="403"}[5m]) > 20
+        for: 2m
+        labels:
+          severity: high
+          category: cloud_storage
+        annotations:
+          summary: 'Spike in S3 403 Access Denied errors'
+          description: 'Abnormal number of unauthorized attempts to read or write to the media bucket.'
+
+      # 8. Large Data Export Attempt
+      - alert: LargeDataExportDetected
+        expr: increase(audit_large_data_export_total[5m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+          category: data_loss_prevention
+        annotations:
+          summary: 'Large data export triggered'
+          description: 'A user or administrator initiated a bulk data export. Verify approval ticket.'
+
+      # 9. Sensitive Admin Action Spike
+      - alert: UnusualAdminActionVolume
+        expr: rate(audit_sensitive_admin_actions_total[10m]) > 10
+        for: 3m
+        labels:
+          severity: high
+          category: audit
+        annotations:
+          summary: 'Unusual volume of sensitive admin actions'
+          description: 'Elevated rate of high-impact administrative actions (refunds, role changes, overrides) in the last 10 minutes.'
+
+      # 10. TLS Certificate Expiry Approaching
+      - alert: TlsCertificateExpiringSoon
+        expr: (ssl_certificate_expiry_timestamp_seconds - time()) / 86400 < 14
+        for: 1h
+        labels:
+          severity: high
+          category: certificates
+        annotations:
+          summary: 'TLS certificate expires in less than 14 days'
+          description: 'Edge TLS certificate is expiring soon. Ensure automated ACME renewal is functioning.'
+
+      # 11. WAF Block Spike
+      - alert: WafBlockSpike
+        expr: rate(waf_blocked_requests_total[5m]) > 50
+        for: 2m
+        labels:
+          severity: high
+          category: edge_defense
+        annotations:
+          summary: 'Spike in WAF blocked requests'
+          description: 'WAF is dropping an unusually high volume of malicious or rate-limited requests.'
+
+      # 12. Backup Pipeline Failure
+      - alert: DatabaseBackupFailed
+        expr: time() - backup_last_successful_timestamp_seconds > 86400
+        for: 15m
+        labels:
+          severity: critical
+          category: disaster_recovery
+        annotations:
+          summary: 'Automated database backup has not succeeded in 24 hours'
+          description: 'The daily encrypted database backup job failed or did not run. Immediate investigation required.'
+
+      # 13. Backup Restore Verification Failure
+      - alert: BackupRestoreTestFailed
+        expr: backup_restore_test_success == 0
+        for: 0m
+        labels:
+          severity: critical
+          category: disaster_recovery
+        annotations:
+          summary: 'Automated disaster recovery test failed'
+          description: 'Scheduled test restoration of encrypted backup failed SHA-256 verification or database initialization.'

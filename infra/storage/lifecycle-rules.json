@@ -1,0 +1,40 @@
+{
+  "Rules": [
+    {
+      "ID": "AbortIncompleteMultipartUploads",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": ""
+      },
+      "AbortIncompleteMultipartUpload": {
+        "DaysAfterInitiation": 1
+      }
+    },
+    {
+      "ID": "ExpireRejectedVerificationArtifacts",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": "verifications/rejected/"
+      },
+      "Expiration": {
+        "Days": 90
+      }
+    },
+    {
+      "ID": "TransitionDeletedPropertyMediaToColdArchive",
+      "Status": "Enabled",
+      "Filter": {
+        "Prefix": "properties/deleted/"
+      },
+      "Transitions": [
+        {
+          "Days": 30,
+          "StorageClass": "GLACIER"
+        }
+      ],
+      "Expiration": {
+        "Days": 365
+      }
+    }
+  ]
+}

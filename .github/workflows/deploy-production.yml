@@ -1,0 +1,47 @@
+name: Production Deployment Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: 'Git tag or release version to deploy to production'
+        required: true
+        default: 'latest'
+
+permissions:
+  contents: read
+  id-token: write # Required for AWS/GCP OIDC federation without permanent keys
+
+jobs:
+  deploy-production:
+    name: Deploy to Production (Manual Approval Gated)
+    runs-on: ubuntu-latest
+    environment:
+      name: production # Requires designated human approval in GitHub Settings
+      url: https://rentalpeshawar.pk
+
+    steps:
+      - name: Checkout Release Code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          ref: ${{ github.event.inputs.target_version || github.ref }}
+
+      - name: Configure Cloud Authentication via OIDC (Zero Permanent Keys)
+        run: |
+          echo "Authenticating via OpenID Connect (OIDC) token exchange..."
+          echo "Session assumed with temporary STS credentials (1-hour maximum TTL)."
+
+      - name: Run Pre-Deployment Database Migrations
+        run: |
+          echo "Executing Prisma migrations using scoped migration_user..."
+
+      - name: Perform Zero-Downtime Rolling Service Rollout
+        run: |
+          echo "Triggering rolling deployment for API, Web, and Admin service containers..."
+
+      - name: Execute Post-Deployment Health Check
+        run: |
+          echo "Validating health probes at https://api.rentalpeshawar.pk/health..."

@@ -29,6 +29,59 @@ export interface AppEnvironmentConfig {
 }
 
 /**
+ * Validates environment safety rules to prevent cross-environment credential leaks
+ * and ensure production does not execute with unhardened dev settings.
+ */
+export function assertEnvironmentSafety(config: AppEnvironmentConfig): void {
+  const isProd = config.NODE_ENV === 'production';
+
+  if (isProd) {
+    // 1. JWT Secrets must not be default dev secrets and must be high-entropy >= 32 chars
+    if (config.JWT_ACCESS_SECRET.includes('dev_jwt') || config.JWT_ACCESS_SECRET.length < 32) {
+      throw new Error(
+        'SECURITY VIOLATION: Production requires a secure JWT_ACCESS_SECRET (minimum 32 characters, no dev placeholders).',
+      );
+    }
+    if (config.JWT_REFRESH_SECRET.includes('dev_jwt') || config.JWT_REFRESH_SECRET.length < 32) {
+      throw new Error(
+        'SECURITY VIOLATION: Production requires a secure JWT_REFRESH_SECRET (minimum 32 characters, no dev placeholders).',
+      );
+    }
+
+    // 2. Database URL must not use default local passwords
+    if (config.DATABASE_URL.includes('postgres:postgres@localhost')) {
+      throw new Error(
+        'SECURITY VIOLATION: Production cannot use default local database credentials.',
+      );
+    }
+
+    // 3. Web and Admin URLs must use HTTPS in production
+    if (config.WEB_URL.startsWith('http://') || config.ADMIN_URL.startsWith('http://')) {
+      throw new Error('SECURITY VIOLATION: Production WEB_URL and ADMIN_URL must enforce HTTPS.');
+    }
+  } else {
+    // Non-production guard: Prevent non-production environments (dev/staging) from using production database/hosts
+    if (
+      config.DATABASE_URL.includes('rental_peshawar_prod') ||
+      config.DATABASE_URL.includes('prod.db.rentalpeshawar.pk')
+    ) {
+      throw new Error(
+        `SECURITY VIOLATION: Non-production environment '${config.NODE_ENV}' is attempting to connect to the production database. Connection blocked.`,
+      );
+    }
+
+    if (
+      config.WEB_URL === 'https://rentalpeshawar.pk' ||
+      config.ADMIN_URL === 'https://admin.rentalpeshawar.pk'
+    ) {
+      throw new Error(
+        `SECURITY VIOLATION: Non-production environment '${config.NODE_ENV}' cannot use production URLs.`,
+      );
+    }
+  }
+}
+
+/**
  * Validates and normalizes environment variables.
  */
 export function validateEnvironment(config: Record<string, unknown>): AppEnvironmentConfig {
@@ -58,7 +111,7 @@ export function validateEnvironment(config: Record<string, unknown>): AppEnviron
   const storageProvider = ((config['STORAGE_PROVIDER'] as string) || 's3') as
     's3' | 'cloudinary' | 'local';
 
-  return {
+  const envConfig: AppEnvironmentConfig = {
     NODE_ENV: nodeEnv as AppEnvironmentConfig['NODE_ENV'],
     PORT: port,
     API_PREFIX: apiPrefix,
@@ -89,4 +142,8 @@ export function validateEnvironment(config: Record<string, unknown>): AppEnviron
     MOBILE_DEEP_LINK_SCHEME: mobileDeepLinkScheme,
     ENFORCE_PESHAWAR_BOUNDARY: config['ENFORCE_PESHAWAR_BOUNDARY'] !== 'false',
   };
+
+  assertEnvironmentSafety(envConfig);
+
+  return envConfig;
 }
