@@ -21,6 +21,8 @@ const NAV_ITEMS = [
   { label: 'Bookings & Leases', href: '/bookings', icon: '📝' },
   { label: 'Escrow Ledger', href: '/ledger', icon: '💰' },
   { label: 'Disputes Console', href: '/disputes', icon: '⚖️' },
+  { label: 'Fraud & Risk Radar', href: '/risk', icon: '🛡️' },
+  { label: 'Market Intelligence', href: '/intelligence', icon: '🧠' },
   { label: 'Background Jobs & DLQ', href: '/jobs', icon: '⚡' },
   { label: 'Event Replay & Outbox', href: '/events', icon: '🔄' },
   { label: 'Cache & Performance', href: '/cache', icon: '💾' },

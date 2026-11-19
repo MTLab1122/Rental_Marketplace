@@ -907,3 +907,51 @@ export async function sendDisputeMessage(
     token,
   );
 }
+
+// ==========================================
+// PHASE 15: AI QUALITY, PRICING & SEMANTIC SEARCH
+// ==========================================
+
+export async function getPropertyQualitySuggestions(propertyId: string, token: string) {
+  return fetchWithAuth(
+    `/landlord/properties/${propertyId}/quality-suggestions`,
+    { method: 'POST' },
+    token,
+  );
+}
+
+export async function updateQualitySuggestion(
+  propertyId: string,
+  suggestionId: string,
+  status: 'ACCEPTED' | 'DISMISSED',
+  token: string,
+) {
+  return fetchWithAuth(
+    `/landlord/properties/${propertyId}/quality-suggestions/${suggestionId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    },
+    token,
+  );
+}
+
+export async function getPropertyPriceInsights(propertyId: string, token?: string) {
+  return fetchWithAuth(
+    `/landlord/properties/${propertyId}/price-insights`,
+    { method: 'POST' },
+    token,
+  );
+}
+
+export async function searchSemantic(query: string, filters?: Record<string, any>) {
+  const params = new URLSearchParams();
+  params.append('query', query);
+  if (filters?.eligibility) params.append('eligibility', filters.eligibility);
+  if (filters?.localityId) params.append('localityId', filters.localityId);
+  if (filters?.propertyType) params.append('propertyType', filters.propertyType);
+  if (filters?.minPrice) params.append('minPrice', String(filters.minPrice));
+  if (filters?.maxPrice) params.append('maxPrice', String(filters.maxPrice));
+  if (filters?.bedrooms) params.append('bedrooms', String(filters.bedrooms));
+  return fetchWithAuth(`/search/semantic?${params.toString()}`, { method: 'GET' });
+}

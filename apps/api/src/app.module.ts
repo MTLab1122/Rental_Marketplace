@@ -27,6 +27,7 @@ import { CacheModule } from './modules/cache/cache.module';
 import { JobsModule } from './modules/jobs/jobs.module';
 import { DataPlatformModule } from './modules/data-platform/data-platform.module';
 import { ScaleModule } from './modules/scale/scale.module';
+import { AiModule } from './modules/ai/ai.module';
 import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
 
 @Module({
@@ -77,6 +78,7 @@ import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/requ
     JobsModule,
     DataPlatformModule,
     ScaleModule,
+    AiModule,
   ],
 })
 export class AppModule implements NestModule {

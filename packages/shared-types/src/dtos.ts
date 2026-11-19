@@ -19,6 +19,12 @@ import {
   DisputeStatus,
   DomainEventType,
   BackgroundJobName,
+  RiskLevel,
+  RiskEntityType,
+  AiSuggestionType,
+  AiSuggestionStatus,
+  PriceContextIndicator,
+  ContentModerationFlag,
 } from './enums.js';
 
 export interface HealthStatusDto {
@@ -1183,4 +1189,130 @@ export interface UserDataExportDto {
   bookings: any[];
   payments: any[];
   reviews: any[];
+}
+
+// ==========================================
+// PHASE 15: AI, FRAUD & MARKET INTELLIGENCE DTOs
+// ==========================================
+
+export interface AiQualitySuggestionDto {
+  id: string;
+  propertyId: string;
+  suggestionType: AiSuggestionType;
+  title: string;
+  message: string;
+  actionableStep?: string;
+  status: AiSuggestionStatus;
+  modelVersion: string;
+  metadata?: Record<string, any>;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PricingInsightDto {
+  propertyId: string;
+  localityId: string;
+  currentRentPkr: number;
+  medianRentPkr: number;
+  percentile25Pkr: number;
+  percentile75Pkr: number;
+  recommendedMinRentPkr: number;
+  recommendedMaxRentPkr: number;
+  priceContext: PriceContextIndicator;
+  sampleCount: number;
+  disclaimer: string;
+}
+
+export interface SemanticSearchQueryDto {
+  query: string;
+  eligibility?: PropertyEligibility;
+  localityId?: string;
+  propertyType?: PropertyType;
+  minPrice?: number;
+  maxPrice?: number;
+  bedrooms?: number;
+  limit?: number;
+  offset?: number;
+}
+
+export interface SemanticSearchResultDto {
+  property: PropertySummaryDto;
+  relevanceScore: number;
+  matchExplanation: {
+    semanticMatch: boolean;
+    localityMatch: boolean;
+    priceMatch: boolean;
+    amenityMatch: boolean;
+    newListingBoost: boolean;
+    explanationText: string;
+  };
+}
+
+export interface RiskAssessmentDto {
+  id: string;
+  entityType: RiskEntityType;
+  entityId: string;
+  riskScore: number;
+  riskLevel: RiskLevel;
+  signals: {
+    ruleName: string;
+    description: string;
+    severity: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+    scoreContribution: number;
+  }[];
+  decision: string;
+  isResolved: boolean;
+  resolvedBy?: string | null;
+  resolvedAt?: string | null;
+  resolutionNotes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ContentModerationRecordDto {
+  id: string;
+  contentType: 'TEXT' | 'IMAGE';
+  entityType: string;
+  entityId: string;
+  flag: ContentModerationFlag;
+  confidence: number;
+  reason: string;
+  actionTaken: 'FLAGGED' | 'BLOCKED' | 'APPROVED' | 'REQUIRES_HUMAN_REVIEW';
+  reviewerAction?: string | null;
+  reviewerId?: string | null;
+  reviewedAt?: string | null;
+  modelVersion: string;
+  createdAt: string;
+}
+
+export interface MarketplaceIntelligenceOverviewDto {
+  overallDemandIndex: number;
+  supplyDemandRatio: number;
+  avgDaysToInquiry: number;
+  avgDaysToBooking: number;
+  searchToInquiryConversionRate: number;
+  inquiryToBookingConversionRate: number;
+  averageLandlordResponseRate: number;
+  listingQualityScoreAverage: number;
+  fraudAlertsCount: number;
+  timestamp: string;
+}
+
+export interface LocalityIntelligenceDto {
+  localityId: string;
+  localityName: string;
+  demandIndex: number;
+  activeListingsCount: number;
+  inquiryVolume30Days: number;
+  medianRentPkr: number;
+  supplyDemandRatio: number;
+  growthTrendPercentage: number;
+}
+
+export interface FraudTrendDto {
+  date: string;
+  flaggedCount: number;
+  resolvedCount: number;
+  blockedCount: number;
+  criticalRiskCount: number;
 }

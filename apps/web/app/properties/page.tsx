@@ -9,6 +9,7 @@ import {
   getFavoriteIds,
   PropertyFilterParams,
   recordSearchQueryEvent,
+  searchSemantic,
 } from '../../lib/api';
 import PropertyCard from '../../components/PropertyCard';
 import PropertyFilterBar from '../../components/PropertyFilterBar';
@@ -17,6 +18,7 @@ import { PropertyGridSkeleton } from '../../components/SkeletonLoader';
 import SaveSearchModal from '../../components/SaveSearchModal';
 import RecommendationFeed from '../../components/RecommendationFeed';
 import TrendingSection from '../../components/TrendingSection';
+import TrustSafetyBanner from '../../components/TrustSafetyBanner';
 import { PropertySummaryDto, LocalityDto, TenantType } from '@rental-peshawar/shared-types';
 
 function PropertiesContent() {
@@ -31,6 +33,9 @@ function PropertiesContent() {
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
   const [saveModalOpen, setSaveModalOpen] = useState(false);
+  const [aiQuery, setAiQuery] = useState('');
+  const [isAiMode, setIsAiMode] = useState(false);
+  const [semanticExplanations, setSemanticExplanations] = useState<Record<string, string>>({});
 
   // Initialize filters from URL parameters or defaults
   const [filters, setFilters] = useState<PropertyFilterParams>({
@@ -100,10 +105,51 @@ function PropertiesContent() {
   };
 
   const handleResetFilters = () => {
+    setIsAiMode(false);
+    setAiQuery('');
+    setSemanticExplanations({});
     setFilters({
       tenantType,
       sortBy: 'NEWEST',
     });
+  };
+
+  const handleAiSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!aiQuery.trim()) return;
+    setLoading(true);
+    try {
+      const eligibility = isStudent ? 'STUDENTS_ONLY' : 'FAMILIES_ONLY';
+      const res = await searchSemantic(aiQuery.trim(), {
+        eligibility,
+        localityId: filters.localityId,
+        minPrice: filters.minRent,
+        maxPrice: filters.maxRent,
+        bedrooms: filters.minBedrooms,
+      });
+      const results = res?.data?.results || [];
+      const props = results.map((r: any) => r.property);
+      const explanations: Record<string, string> = {};
+      results.forEach((r: any) => {
+        if (r.property?.id && r.matchExplanation?.explanationText) {
+          explanations[r.property.id] = r.matchExplanation.explanationText;
+        }
+      });
+      setProperties(props);
+      setSemanticExplanations(explanations);
+      setIsAiMode(true);
+    } catch (err) {
+      console.error('Semantic search failed', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClearAiSearch = () => {
+    setIsAiMode(false);
+    setAiQuery('');
+    setSemanticExplanations({});
+    fetchProperties();
   };
 
   const handleLoadMore = async () => {
@@ -150,6 +196,45 @@ function PropertiesContent() {
         </div>
       </div>
 
+      {/* Trust & Safety Banner */}
+      <TrustSafetyBanner />
+
+      {/* AI Semantic Search Bar */}
+      <div className="bg-white p-4 rounded-xl border border-navy-100 shadow-sm space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-xs font-bold text-navy-800">
+            <span>✨</span>
+            <span>AI Semantic Property Search</span>
+          </div>
+          {isAiMode && (
+            <button
+              onClick={handleClearAiSearch}
+              className="text-xs text-peshawar-600 hover:underline font-semibold"
+            >
+              Clear AI Search (Back to Standard Feed)
+            </button>
+          )}
+        </div>
+
+        <form onSubmit={handleAiSearch} className="flex gap-2">
+          <input
+            type="text"
+            placeholder="Search naturally: e.g., '2 bed furnished portion in Hayatabad with backup power and parking'"
+            value={aiQuery}
+            onChange={(e) => setAiQuery(e.target.value)}
+            className="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3.5 py-2 text-xs text-slate-800 focus:outline-none focus:ring-1 focus:ring-sky-500"
+          />
+          <button
+            type="submit"
+            disabled={loading || !aiQuery.trim()}
+            className="px-4 py-2 bg-navy-900 hover:bg-navy-800 text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 flex items-center gap-1.5"
+          >
+            <span>✨</span>
+            <span>Search with AI</span>
+          </button>
+        </form>
+      </div>
+
       {/* Filter Component */}
       <PropertyFilterBar
         filters={filters}
@@ -192,11 +277,18 @@ function PropertiesContent() {
         <div className="space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {properties.map((prop) => (
-              <PropertyCard
-                key={prop.id}
-                property={prop}
-                isFavoritedInitially={favoriteIds.includes(prop.id)}
-              />
+              <div key={prop.id} className="flex flex-col">
+                <PropertyCard
+                  property={prop}
+                  isFavoritedInitially={favoriteIds.includes(prop.id)}
+                />
+                {isAiMode && semanticExplanations[prop.id] && (
+                  <div className="mt-1 px-3 py-1.5 bg-sky-50 border border-sky-100 rounded-lg text-[11px] text-sky-800 flex items-center gap-1.5">
+                    <span>💡</span>
+                    <span>{semanticExplanations[prop.id]}</span>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
 

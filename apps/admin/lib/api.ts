@@ -488,3 +488,74 @@ export async function getPartitionDdlAdmin(year?: number, month?: number) {
     `/admin/data-platform/partitions/ddl?${qs.toString()}`,
   );
 }
+
+// ==========================================
+// PHASE 15: AI, RISK, FRAUD & INTELLIGENCE
+// ==========================================
+
+export async function getRiskEntitiesAdmin(params?: {
+  entityType?: string;
+  riskLevel?: string;
+  isResolved?: boolean;
+  page?: number;
+  limit?: number;
+}) {
+  const qs = new URLSearchParams();
+  if (params?.entityType) qs.append('entityType', params.entityType);
+  if (params?.riskLevel) qs.append('riskLevel', params.riskLevel);
+  if (params?.isResolved !== undefined) qs.append('isResolved', String(params.isResolved));
+  if (params?.page) qs.append('page', String(params.page));
+  if (params?.limit) qs.append('limit', String(params.limit));
+  return request<any>(`/admin/risk/entities?${qs.toString()}`);
+}
+
+export async function getEntityRiskAdmin(entityType: string, entityId: string) {
+  return request<any[]>(`/admin/risk/${entityType}/${entityId}`);
+}
+
+export async function reviewEntityRiskAdmin(
+  entityType: string,
+  entityId: string,
+  data: { isResolved: boolean; decision: string; resolutionNotes?: string },
+) {
+  return request<any>(`/admin/risk/${entityType}/${entityId}/review`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getIntelligenceOverviewAdmin() {
+  return request<any>('/admin/intelligence/overview');
+}
+
+export async function getLocalityIntelligenceAdmin() {
+  return request<any[]>('/admin/intelligence/localities');
+}
+
+export async function getFraudTrendsAdmin() {
+  return request<any[]>('/admin/intelligence/fraud');
+}
+
+export async function getModerationRecordsAdmin(params?: {
+  flag?: string;
+  actionTaken?: string;
+  page?: number;
+  limit?: number;
+}) {
+  const qs = new URLSearchParams();
+  if (params?.flag) qs.append('flag', params.flag);
+  if (params?.actionTaken) qs.append('actionTaken', params.actionTaken);
+  if (params?.page) qs.append('page', String(params.page));
+  if (params?.limit) qs.append('limit', String(params.limit));
+  return request<any>(`/admin/moderation/records?${qs.toString()}`);
+}
+
+export async function reviewModerationRecordAdmin(
+  id: string,
+  reviewerAction: 'APPROVED' | 'BLOCKED' | 'DISMISSED',
+) {
+  return request<any>(`/admin/moderation/records/${id}/review`, {
+    method: 'PATCH',
+    body: JSON.stringify({ reviewerAction }),
+  });
+}

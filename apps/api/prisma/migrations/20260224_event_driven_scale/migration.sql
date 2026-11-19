@@ -99,3 +99,4 @@ CREATE UNIQUE INDEX IF NOT EXISTS "daily_analytics_aggregates_date_dimension_dim
 CREATE INDEX IF NOT EXISTS "daily_analytics_aggregates_date_idx" ON "daily_analytics_aggregates"("date");
 
 CREATE UNIQUE INDEX IF NOT EXISTS "data_retention_policies_tableName_key" ON "data_retention_policies"("tableName");
+
