@@ -327,3 +327,22 @@ export async function updateAdminFeatureFlag(key: string, enabled: boolean) {
     body: JSON.stringify({ enabled }),
   });
 }
+
+// ==========================================
+// PHASE 12: DISCOVERY, ALERTS & DEMAND APIS
+// ==========================================
+
+export async function getDiscoveryAnalytics() {
+  return request<any>('/admin/discovery/analytics');
+}
+
+export async function getDiscoveryAlerts(limit = 50) {
+  return request<any[]>(`/admin/discovery/alerts?limit=${limit}`);
+}
+
+export async function getLocalityDemand(localityId?: string, period = 'DAILY') {
+  const qs = new URLSearchParams();
+  if (localityId) qs.append('localityId', localityId);
+  if (period) qs.append('period', period);
+  return request<any[]>(`/admin/discovery/locality-demand?${qs.toString()}`);
+}

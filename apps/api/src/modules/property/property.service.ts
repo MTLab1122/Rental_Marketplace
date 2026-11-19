@@ -323,6 +323,7 @@ export class PropertyService {
         locality: true,
         images: { orderBy: { sortOrder: 'asc' } },
         amenities: { include: { amenity: true } },
+        landlord: { select: { id: true, fullName: true, isVerified: true, createdAt: true } },
       },
     });
 
@@ -401,6 +402,7 @@ export class PropertyService {
         locality: true,
         images: { orderBy: { sortOrder: 'asc' } },
         amenities: { include: { amenity: true } },
+        landlord: { select: { id: true, fullName: true, isVerified: true, createdAt: true } },
       },
     });
 
@@ -1185,6 +1187,7 @@ export class PropertyService {
         locality: true,
         images: { orderBy: { sortOrder: 'asc' } },
         amenities: { include: { amenity: true } },
+        landlord: { select: { id: true, fullName: true, isVerified: true, createdAt: true } },
       },
     });
 
@@ -1268,6 +1271,15 @@ export class PropertyService {
             ),
       amenities: property.amenities.map((a) => a.amenity),
       createdAt: property.createdAt,
+      landlordId: property.landlordId,
+      landlord: property.landlord
+        ? {
+            id: property.landlord.id,
+            name: property.landlord.fullName,
+            isVerified: property.landlord.isVerified,
+            createdAt: property.landlord.createdAt,
+          }
+        : undefined,
     };
   }
 

@@ -14,6 +14,8 @@ import ImageGallery from '../../../components/ImageGallery';
 import InquiryModal from '../../../components/InquiryModal';
 import ReportModal from '../../../components/ReportModal';
 import EmptyState from '../../../components/EmptyState';
+import SimilarPropertiesCarousel from '../../../components/SimilarPropertiesCarousel';
+import RecentlyViewedSection from '../../../components/RecentlyViewedSection';
 import { PropertySummaryDto, PropertyEligibility } from '@rental-peshawar/shared-types';
 
 export default function PropertyDetailPage() {
@@ -302,6 +304,12 @@ export default function PropertyDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Similar Properties Carousel */}
+      <SimilarPropertiesCarousel propertyId={property.id} />
+
+      {/* Recently Viewed Section */}
+      <RecentlyViewedSection />
 
       {/* Inquiry Modal */}
       <InquiryModal

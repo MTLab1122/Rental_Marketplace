@@ -477,3 +477,239 @@ export async function recordPropertyView(
     body: JSON.stringify({ source, localityId }),
   });
 }
+
+// ==========================================
+// PHASE 11: REVIEWS, REPUTATION & TRUST APIS
+// ==========================================
+
+export async function getPropertyReviews(propertyId: string, query?: Record<string, any>) {
+  const qs = query ? `?${new URLSearchParams(query).toString()}` : '';
+  return fetchWithAuth(`/properties/${propertyId}/reviews${qs}`, { method: 'GET' });
+}
+
+export async function submitPropertyReview(propertyId: string, data: any, token: string) {
+  return fetchWithAuth(
+    `/properties/${propertyId}/reviews`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function getMyReviews(token: string) {
+  return fetchWithAuth('/reviews/my', { method: 'GET' }, token);
+}
+
+export async function updateReview(reviewId: string, data: any, token: string) {
+  return fetchWithAuth(
+    `/reviews/${reviewId}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function deleteReview(reviewId: string, token: string) {
+  return fetchWithAuth(`/reviews/${reviewId}`, { method: 'DELETE' }, token);
+}
+
+export async function replyToReview(reviewId: string, content: string, token: string) {
+  return fetchWithAuth(
+    `/reviews/${reviewId}/reply`,
+    {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    },
+    token,
+  );
+}
+
+export async function reportReview(
+  reviewId: string,
+  data: { reason: string; details?: string },
+  token: string,
+) {
+  return fetchWithAuth(
+    `/reviews/${reviewId}/report`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function getLandlordReputation(landlordId: string) {
+  return fetchWithAuth(`/landlords/${landlordId}/reputation`, { method: 'GET' });
+}
+
+export async function getPropertyQuality(propertyId: string) {
+  return fetchWithAuth(`/properties/${propertyId}/quality`, { method: 'GET' });
+}
+
+// ==========================================
+// PHASE 12: SAVED SEARCHES, ALERTS & RECOMMENDATIONS
+// ==========================================
+
+export async function createSavedSearch(data: any, token: string) {
+  return fetchWithAuth(
+    '/saved-searches',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function getMySavedSearches(token: string) {
+  return fetchWithAuth('/saved-searches', { method: 'GET' }, token);
+}
+
+export async function getSavedSearch(id: string, token: string) {
+  return fetchWithAuth(`/saved-searches/${id}`, { method: 'GET' }, token);
+}
+
+export async function updateSavedSearch(id: string, data: any, token: string) {
+  return fetchWithAuth(
+    `/saved-searches/${id}`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function deleteSavedSearch(id: string, token: string) {
+  return fetchWithAuth(`/saved-searches/${id}`, { method: 'DELETE' }, token);
+}
+
+export async function updateSavedSearchAlerts(
+  id: string,
+  data: { alertsEnabled: boolean; frequency?: string },
+  token: string,
+) {
+  return fetchWithAuth(
+    `/saved-searches/${id}/alerts`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function getNotificationPreferences(token: string) {
+  return fetchWithAuth('/notification-preferences', { method: 'GET' }, token);
+}
+
+export async function updateNotificationPreferences(data: any, token: string) {
+  return fetchWithAuth(
+    '/notification-preferences',
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function getForYouRecommendations(query?: Record<string, any>, token?: string) {
+  const qs = query ? `?${new URLSearchParams(query).toString()}` : '';
+  return fetchWithAuth(`/recommendations/for-you${qs}`, { method: 'GET' }, token);
+}
+
+export async function getSimilarProperties(propertyId: string, limit = 6, token?: string) {
+  return fetchWithAuth(
+    `/recommendations/similar/${propertyId}?limit=${limit}`,
+    { method: 'GET' },
+    token,
+  );
+}
+
+export async function getNearbyProperties(query?: Record<string, any>, token?: string) {
+  const qs = query ? `?${new URLSearchParams(query).toString()}` : '';
+  return fetchWithAuth(`/recommendations/nearby${qs}`, { method: 'GET' }, token);
+}
+
+export async function getTrendingProperties(query?: Record<string, any>, token?: string) {
+  const qs = query ? `?${new URLSearchParams(query).toString()}` : '';
+  return fetchWithAuth(`/recommendations/trending${qs}`, { method: 'GET' }, token);
+}
+
+export async function getRecentlyViewedProperties(sessionId?: string, limit = 10, token?: string) {
+  const qs = new URLSearchParams();
+  if (sessionId) qs.append('sessionId', sessionId);
+  if (limit) qs.append('limit', limit.toString());
+  return fetchWithAuth(
+    `/recommendations/recently-viewed?${qs.toString()}`,
+    { method: 'GET' },
+    token,
+  );
+}
+
+export async function recordPropertyImpression(
+  data: {
+    propertyId: string;
+    surface: string;
+    position?: number;
+    sessionId?: string;
+    metadata?: any;
+  },
+  token?: string,
+) {
+  return fetchWithAuth(
+    '/events/property-impression',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function recordPropertyClick(
+  data: {
+    propertyId: string;
+    surface: string;
+    position?: number;
+    sessionId?: string;
+    metadata?: any;
+  },
+  token?: string,
+) {
+  return fetchWithAuth(
+    '/events/property-click',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function recordSearchQueryEvent(
+  data: {
+    queryText?: string;
+    filters: Record<string, any>;
+    localityId?: string;
+    resultsCount?: number;
+    executionTimeMs?: number;
+    sessionId?: string;
+  },
+  token?: string,
+) {
+  return fetchWithAuth(
+    '/events/search-query',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}

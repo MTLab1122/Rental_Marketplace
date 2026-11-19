@@ -108,6 +108,65 @@ enum NotificationType {
   LISTING_SUSPENDED
   MESSAGE_RECEIVED
   SYSTEM
+  NEW_LISTING_ALERT
+}
+
+enum ReviewStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  HIDDEN
+  REMOVED
+}
+
+enum ReviewReportReason {
+  SPAM
+  PROFANITY
+  HARASSMENT
+  DEFAMATION
+  CONFLICT_OF_INTEREST
+  OTHER
+}
+
+enum ReviewModerationAction {
+  APPROVE
+  REJECT
+  HIDE
+  RESTORE
+  REMOVE
+}
+
+enum TrustEventType {
+  INQUIRY_ACCEPTED
+  INQUIRY_REPLIED
+  REVIEW_RECEIVED
+  REVIEW_REPORTED
+  VERIFICATION_APPROVED
+  BADGE_GRANTED
+  BADGE_REVOKED
+  COMPLAINT_UPHELD
+}
+
+enum TrustBadge {
+  VERIFIED_LANDLORD
+  FAST_RESPONDER
+  HIGHLY_RATED
+  TOP_LISTING
+  NEW_LISTING
+  PREMIUM_LISTING
+}
+
+enum AlertFrequency {
+  INSTANT
+  DAILY
+  WEEKLY
+}
+
+enum AlertDeliveryStatus {
+  PENDING
+  DELIVERED
+  FAILED
+  SKIPPED
 }
 
 // ==========================================
@@ -158,6 +217,25 @@ model User {
   reportsResolved     Report[]          @relation("ReportsResolved")
   verificationRecords VerificationRecord[]
   verifiedRecords     VerificationRecord[] @relation("AdminVerifiedRecords")
+
+  // Reviews, Reputation & Trust Relations
+  reviewsWritten              Review[]                   @relation("TenantReviews")
+  reviewsReceived             Review[]                   @relation("LandlordReviews")
+  reviewReplies               ReviewReply[]
+  reviewReportsFiled          ReviewReport[]             @relation("ReviewReportsFiled")
+  reviewReportsResolved       ReviewReport[]             @relation("ReviewReportsResolved")
+  reviewModerations           ReviewModeration[]
+  landlordReputationSnapshots LandlordReputationSnapshot[]
+
+  // Saved Searches, Alerts & Personalization Relations
+  savedSearches              SavedSearch[]
+  searchAlerts               SearchAlert[]
+  recentlyViewedProperties   RecentlyViewedProperty[]
+  recommendationEvents       RecommendationEvent[]
+  propertyImpressions        PropertyImpression[]
+  propertyClicks             PropertyClick[]
+  searchQueryLogs            SearchQueryLog[]
+  notificationPreference     NotificationPreference?
 
   @@index([email])
   @@index([phoneNumber])
@@ -314,6 +392,8 @@ model Locality {
   deletedAt       DateTime? @db.Timestamptz(6)
 
   properties Property[]
+  searchQueryLogs SearchQueryLog[]
+  demandSnapshots LocalityDemandSnapshot[]
 
   @@index([slug])
   @@index([isActive])
@@ -369,6 +449,13 @@ model Property {
   inquiries     Inquiry[]
   conversations Conversation[]
   viewEvents    PropertyViewEvent[]
+  reviews       Review[]
+  qualitySnapshots PropertyQualitySnapshot[]
+  searchAlerts     SearchAlert[]
+  recentlyViewed   RecentlyViewedProperty[]
+  recommendations  RecommendationEvent[]
+  impressions      PropertyImpression[]
+  clicks           PropertyClick[]
 
   // High performance composite indexes
   @@index([status, eligibility, isAvailable, localityId])
@@ -491,6 +578,7 @@ model Inquiry {
   tenant       User          @relation("TenantInquiries", fields: [tenantId], references: [id], onDelete: Restrict)
   landlord     User          @relation("LandlordInquiries", fields: [landlordId], references: [id], onDelete: Restrict)
   conversation Conversation?
+  reviews      Review[]
 
   @@index([tenantId])
   @@index([landlordId])
@@ -683,3 +771,385 @@ model SystemSetting {
 
   @@map("system_settings")
 }
+
+// ==========================================
+// PHASE 11: REVIEWS, REPUTATION & TRUST MODELS
+// ==========================================
+
+model Review {
+  id                   String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propertyId           String       @db.Uuid
+  tenantId             String       @db.Uuid
+  landlordId           String       @db.Uuid
+  inquiryId            String       @db.Uuid
+  overallRating        Int          @db.SmallInt
+  communicationRating  Int          @db.SmallInt
+  accuracyRating       Int          @db.SmallInt
+  safetyRating         Int          @db.SmallInt
+  valueForMoneyRating  Int          @db.SmallInt
+  comment              String       @db.Text
+  images               Json?
+  status               ReviewStatus @default(APPROVED)
+  ipAddress            String?      @db.VarChar(45)
+  userAgent            String?      @db.VarChar(255)
+  isEdited             Boolean      @default(false)
+  editedAt             DateTime?    @db.Timestamptz(6)
+  createdAt            DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime     @updatedAt @db.Timestamptz(6)
+  deletedAt            DateTime?    @db.Timestamptz(6)
+
+  property    Property           @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  tenant      User               @relation("TenantReviews", fields: [tenantId], references: [id], onDelete: Restrict)
+  landlord    User               @relation("LandlordReviews", fields: [landlordId], references: [id], onDelete: Restrict)
+  inquiry     Inquiry            @relation(fields: [inquiryId], references: [id], onDelete: Restrict)
+  reply       ReviewReply?
+  reports     ReviewReport[]
+  moderations ReviewModeration[]
+
+  @@unique([tenantId, propertyId, inquiryId])
+  @@index([propertyId, status])
+  @@index([landlordId, status])
+  @@index([tenantId])
+  @@index([status])
+  @@map("reviews")
+}
+
+model ReviewReply {
+  id         String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  reviewId   String       @unique @db.Uuid
+  landlordId String       @db.Uuid
+  content    String       @db.Text
+  status     ReviewStatus @default(APPROVED)
+  createdAt  DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime     @updatedAt @db.Timestamptz(6)
+
+  review   Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  landlord User   @relation(fields: [landlordId], references: [id], onDelete: Restrict)
+
+  @@index([landlordId])
+  @@map("review_replies")
+}
+
+model ReviewReport {
+  id              String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  reviewId        String             @db.Uuid
+  reporterId      String             @db.Uuid
+  reason          ReviewReportReason
+  details         String?            @db.Text
+  status          ReportStatus       @default(OPEN)
+  resolvedById    String?            @db.Uuid
+  resolutionNotes String?            @db.Text
+  createdAt       DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime           @updatedAt @db.Timestamptz(6)
+
+  review     Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  reporter   User   @relation("ReviewReportsFiled", fields: [reporterId], references: [id], onDelete: Restrict)
+  resolvedBy User?  @relation("ReviewReportsResolved", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([reviewId])
+  @@index([reporterId])
+  @@index([status])
+  @@map("review_reports")
+}
+
+model ReviewModeration {
+  id          String                 @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  reviewId    String                 @db.Uuid
+  moderatorId String                 @db.Uuid
+  action      ReviewModerationAction
+  reason      String?                @db.VarChar(255)
+  notes       String?                @db.Text
+  createdAt   DateTime               @default(now()) @db.Timestamptz(6)
+
+  review    Review @relation(fields: [reviewId], references: [id], onDelete: Cascade)
+  moderator User   @relation(fields: [moderatorId], references: [id], onDelete: Restrict)
+
+  @@index([reviewId])
+  @@index([moderatorId])
+  @@map("review_moderations")
+}
+
+model LandlordReputationSnapshot {
+  id                         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  landlordId                 String   @db.Uuid
+  averageRating              Decimal  @db.Decimal(3, 2)
+  totalReviews               Int      @default(0)
+  responseRatePercent        Decimal  @db.Decimal(5, 2)
+  averageResponseTimeMinutes Int      @default(0)
+  verifiedListingPercent     Decimal  @db.Decimal(5, 2)
+  inquiryAcceptanceRatePercent Decimal @db.Decimal(5, 2)
+  reviewReportRatePercent    Decimal  @db.Decimal(5, 2)
+  trustScore                 Decimal  @db.Decimal(5, 2)
+  badges                     Json?
+  snapshotDate               DateTime @db.Date
+  createdAt                  DateTime @default(now()) @db.Timestamptz(6)
+
+  landlord User @relation(fields: [landlordId], references: [id], onDelete: Cascade)
+
+  @@unique([landlordId, snapshotDate])
+  @@index([landlordId])
+  @@index([snapshotDate])
+  @@map("landlord_reputation_snapshots")
+}
+
+model PropertyQualitySnapshot {
+  id                          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propertyId                  String   @db.Uuid
+  overallQualityScore         Decimal  @db.Decimal(5, 2)
+  imageCompletenessScore      Decimal  @db.Decimal(5, 2)
+  descriptionCompletenessScore Decimal @db.Decimal(5, 2)
+  verifiedLandlordBonus       Decimal  @db.Decimal(5, 2)
+  reviewRatingScore           Decimal  @db.Decimal(5, 2)
+  responseRateScore           Decimal  @db.Decimal(5, 2)
+  complaintPenalty            Decimal  @db.Decimal(5, 2)
+  freshnessScore              Decimal  @db.Decimal(5, 2)
+  isPublishReady              Boolean  @default(true)
+  snapshotDate                DateTime @db.Date
+  createdAt                   DateTime @default(now()) @db.Timestamptz(6)
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@unique([propertyId, snapshotDate])
+  @@index([propertyId])
+  @@index([snapshotDate])
+  @@map("property_quality_snapshots")
+}
+
+model TrustEvent {
+  id          String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  entityType  String         @db.VarChar(50)
+  entityId    String         @db.Uuid
+  eventType   TrustEventType
+  impactDelta Decimal        @db.Decimal(5, 2)
+  metadata    Json?
+  createdAt   DateTime       @default(now()) @db.Timestamptz(6)
+
+  @@index([entityType, entityId])
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("trust_events")
+}
+
+model TrustScoreHistory {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  entityType   String   @db.VarChar(50)
+  entityId     String   @db.Uuid
+  scoreBefore  Decimal  @db.Decimal(5, 2)
+  scoreAfter   Decimal  @db.Decimal(5, 2)
+  reason       String   @db.VarChar(255)
+  calculatedAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([entityType, entityId])
+  @@index([calculatedAt])
+  @@map("trust_score_history")
+}
+
+// ==========================================
+// PHASE 12: SAVED SEARCHES, ALERTS, RECOMMENDATIONS & DISCOVERY
+// ==========================================
+
+model NotificationPreference {
+  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId          String   @unique @db.Uuid
+  emailAlerts     Boolean  @default(true)
+  pushAlerts      Boolean  @default(true)
+  inAppAlerts     Boolean  @default(true)
+  instantAlerts   Boolean  @default(true)
+  dailyDigest     Boolean  @default(true)
+  weeklyDigest    Boolean  @default(true)
+  recommendations Boolean  @default(true)
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime @updatedAt @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notification_preferences")
+}
+
+model SavedSearch {
+  id              String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId          String               @db.Uuid
+  name            String               @db.VarChar(150)
+  filters         Json
+  filterSignature String               @db.VarChar(64)
+  eligibility     PropertyEligibility?
+  localityId      String?              @db.Uuid
+  propertyType    PropertyType?
+  minPrice        Decimal?             @db.Decimal(12, 2)
+  maxPrice        Decimal?             @db.Decimal(12, 2)
+  bedrooms        Int?
+  bathrooms       Int?
+  furnishing      String?              @db.VarChar(50)
+  sortPreference  String?              @db.VarChar(50)
+  alertsEnabled   Boolean              @default(true)
+  frequency       AlertFrequency       @default(INSTANT)
+  lastNotifiedAt  DateTime?            @db.Timestamptz(6)
+  createdAt       DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime             @updatedAt @db.Timestamptz(6)
+
+  user   User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  alerts SearchAlert[]
+
+  @@index([userId])
+  @@index([filterSignature])
+  @@index([alertsEnabled, frequency])
+  @@index([eligibility, localityId])
+  @@map("saved_searches")
+}
+
+model SearchAlert {
+  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  savedSearchId String   @db.Uuid
+  userId        String   @db.Uuid
+  propertyId    String   @db.Uuid
+  isRead        Boolean  @default(false)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+
+  savedSearch SavedSearch           @relation(fields: [savedSearchId], references: [id], onDelete: Cascade)
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property    Property              @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  deliveries  SearchAlertDelivery[]
+
+  @@unique([savedSearchId, propertyId])
+  @@index([userId, isRead])
+  @@index([propertyId])
+  @@map("search_alerts")
+}
+
+model SearchAlertDelivery {
+  id            String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  searchAlertId String              @db.Uuid
+  channel       String              @db.VarChar(30)
+  status        AlertDeliveryStatus @default(PENDING)
+  failureReason String?             @db.Text
+  deliveredAt   DateTime?           @db.Timestamptz(6)
+  createdAt     DateTime            @default(now()) @db.Timestamptz(6)
+
+  searchAlert SearchAlert @relation(fields: [searchAlertId], references: [id], onDelete: Cascade)
+
+  @@index([searchAlertId, channel])
+  @@index([status])
+  @@map("search_alert_deliveries")
+}
+
+model RecentlyViewedProperty {
+  id               String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId           String?  @db.Uuid
+  sessionId        String?  @db.VarChar(100)
+  propertyId       String   @db.Uuid
+  viewedAt         DateTime @default(now()) @db.Timestamptz(6)
+  dwellTimeSeconds Int      @default(0)
+  source           String?  @db.VarChar(50)
+
+  user     User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([userId, viewedAt])
+  @@index([sessionId, viewedAt])
+  @@index([propertyId])
+  @@map("recently_viewed_properties")
+}
+
+model RecommendationEvent {
+  id                 String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId             String?  @db.Uuid
+  sessionId          String?  @db.VarChar(100)
+  propertyId         String   @db.Uuid
+  recommendationType String   @db.VarChar(50)
+  reason             String   @db.VarChar(100)
+  score              Decimal? @db.Decimal(5, 2)
+  action             String?  @db.VarChar(50)
+  metadata           Json?
+  createdAt          DateTime @default(now()) @db.Timestamptz(6)
+
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([userId, recommendationType])
+  @@index([propertyId])
+  @@index([createdAt])
+  @@map("recommendation_events")
+}
+
+model PropertyImpression {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propertyId String   @db.Uuid
+  userId     String?  @db.Uuid
+  sessionId  String?  @db.VarChar(100)
+  surface    String   @db.VarChar(50)
+  position   Int?
+  metadata   Json?
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([propertyId, createdAt])
+  @@index([userId])
+  @@index([surface])
+  @@map("property_impressions")
+}
+
+model PropertyClick {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  propertyId String   @db.Uuid
+  userId     String?  @db.Uuid
+  sessionId  String?  @db.VarChar(100)
+  surface    String   @db.VarChar(50)
+  position   Int?
+  metadata   Json?
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([propertyId, createdAt])
+  @@index([userId])
+  @@index([surface])
+  @@map("property_clicks")
+}
+
+model SearchQueryLog {
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId          String?   @db.Uuid
+  sessionId       String?   @db.VarChar(100)
+  queryText       String?   @db.VarChar(255)
+  filters         Json
+  localityId      String?   @db.Uuid
+  resultsCount    Int       @default(0)
+  executionTimeMs Int?
+  createdAt       DateTime  @default(now()) @db.Timestamptz(6)
+
+  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  locality Locality? @relation(fields: [localityId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([localityId])
+  @@index([createdAt])
+  @@map("search_query_logs")
+}
+
+model LocalityDemandSnapshot {
+  id                 String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  localityId         String        @db.Uuid
+  period             String        @db.VarChar(20)
+  snapshotDate       DateTime      @db.Date
+  searchCount        Int           @default(0)
+  impressionCount    Int           @default(0)
+  clickCount         Int           @default(0)
+  inquiryCount       Int           @default(0)
+  savedSearchCount   Int           @default(0)
+  averageRentDemand  Decimal?      @db.Decimal(12, 2)
+  topPropertyType    PropertyType?
+  studentDemandRatio Float         @default(0.5)
+  metadata           Json?
+  createdAt          DateTime      @default(now()) @db.Timestamptz(6)
+
+  locality Locality @relation(fields: [localityId], references: [id], onDelete: Cascade)
+
+  @@unique([localityId, period, snapshotDate])
+  @@index([localityId])
+  @@index([snapshotDate])
+  @@map("locality_demand_snapshots")
+}
+

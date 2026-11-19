@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { label: 'Localities', href: '/localities', icon: '📍' },
   { label: 'Audit Logs', href: '/audit-logs', icon: '📜' },
   { label: 'Analytics', href: '/analytics', icon: '📈' },
+  { label: 'Discovery & Alerts', href: '/discovery', icon: '🔔' },
   { label: 'Settings', href: '/settings', icon: '⚙️' },
   { label: 'Feature Flags', href: '/feature-flags', icon: '🚩' },
 ];

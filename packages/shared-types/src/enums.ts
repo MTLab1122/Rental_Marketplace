@@ -284,3 +284,82 @@ export enum MonetizationFeature {
   LOCALITY_SPONSORSHIP = 'LOCALITY_SPONSORSHIP',
   HOSTEL_SAAS = 'HOSTEL_SAAS',
 }
+
+/**
+ * Review, Reputation & Trust Enums
+ */
+export enum ReviewStatus {
+  PENDING = 'PENDING',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+  HIDDEN = 'HIDDEN',
+  REMOVED = 'REMOVED',
+}
+
+export enum ReviewReportReason {
+  SPAM = 'SPAM',
+  PROFANITY = 'PROFANITY',
+  HARASSMENT = 'HARASSMENT',
+  DEFAMATION = 'DEFAMATION',
+  CONFLICT_OF_INTEREST = 'CONFLICT_OF_INTEREST',
+  OTHER = 'OTHER',
+}
+
+export enum ReviewModerationAction {
+  APPROVE = 'APPROVE',
+  REJECT = 'REJECT',
+  HIDE = 'HIDE',
+  RESTORE = 'RESTORE',
+  REMOVE = 'REMOVE',
+}
+
+export enum TrustEventType {
+  INQUIRY_ACCEPTED = 'INQUIRY_ACCEPTED',
+  INQUIRY_REPLIED = 'INQUIRY_REPLIED',
+  REVIEW_RECEIVED = 'REVIEW_RECEIVED',
+  REVIEW_REPORTED = 'REVIEW_REPORTED',
+  VERIFICATION_APPROVED = 'VERIFICATION_APPROVED',
+  BADGE_GRANTED = 'BADGE_GRANTED',
+  BADGE_REVOKED = 'BADGE_REVOKED',
+  COMPLAINT_UPHELD = 'COMPLAINT_UPHELD',
+}
+
+export enum TrustBadge {
+  VERIFIED_LANDLORD = 'VERIFIED_LANDLORD',
+  FAST_RESPONDER = 'FAST_RESPONDER',
+  HIGHLY_RATED = 'HIGHLY_RATED',
+  TOP_LISTING = 'TOP_LISTING',
+  NEW_LISTING = 'NEW_LISTING',
+  PREMIUM_LISTING = 'PREMIUM_LISTING',
+}
+
+/**
+ * Phase 12: Saved Searches, Alerts, Recommendations & Discovery Enums
+ */
+export enum AlertFrequency {
+  INSTANT = 'INSTANT',
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+}
+
+export enum AlertDeliveryStatus {
+  PENDING = 'PENDING',
+  DELIVERED = 'DELIVERED',
+  FAILED = 'FAILED',
+  SKIPPED = 'SKIPPED',
+}
+
+export enum RecommendationReason {
+  BECAUSE_YOU_VIEWED = 'because_you_viewed',
+  SIMILAR_TO_FAVORITES = 'similar_to_favorites',
+  POPULAR_IN_LOCALITY = 'popular_in_locality',
+  NEW_IN_AREA = 'new_in_area',
+  WITHIN_BUDGET = 'within_budget',
+}
+
+export enum RecommendationType {
+  FOR_YOU = 'FOR_YOU',
+  SIMILAR = 'SIMILAR',
+  NEARBY = 'NEARBY',
+  TRENDING = 'TRENDING',
+}

@@ -3,11 +3,20 @@
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
-import { getProperties, getLocalities, getFavoriteIds, PropertyFilterParams } from '../../lib/api';
+import {
+  getProperties,
+  getLocalities,
+  getFavoriteIds,
+  PropertyFilterParams,
+  recordSearchQueryEvent,
+} from '../../lib/api';
 import PropertyCard from '../../components/PropertyCard';
 import PropertyFilterBar from '../../components/PropertyFilterBar';
 import EmptyState from '../../components/EmptyState';
 import { PropertyGridSkeleton } from '../../components/SkeletonLoader';
+import SaveSearchModal from '../../components/SaveSearchModal';
+import RecommendationFeed from '../../components/RecommendationFeed';
+import TrendingSection from '../../components/TrendingSection';
 import { PropertySummaryDto, LocalityDto, TenantType } from '@rental-peshawar/shared-types';
 
 function PropertiesContent() {
@@ -21,6 +30,7 @@ function PropertiesContent() {
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [saveModalOpen, setSaveModalOpen] = useState(false);
 
   // Initialize filters from URL parameters or defaults
   const [filters, setFilters] = useState<PropertyFilterParams>({
@@ -62,6 +72,17 @@ function PropertiesContent() {
       setNextCursor(res?.nextCursor || null);
       setHasMore(res?.hasMore || false);
       setFavoriteIds(favs || []);
+
+      // Log search query event asynchronously
+      recordSearchQueryEvent(
+        {
+          queryText: filters.search,
+          filters: filters as any,
+          localityId: filters.localityId,
+          resultsCount: res?.items?.length || 0,
+        },
+        token || undefined,
+      ).catch(() => {});
     } catch (err) {
       console.error('Failed to fetch properties', err);
       setProperties([]);
@@ -137,19 +158,32 @@ function PropertiesContent() {
         onReset={handleResetFilters}
       />
 
-      {/* Results Count & Active Filters Summary */}
-      <div className="flex items-center justify-between text-xs text-navy-600 font-semibold">
-        <span>
-          {loading
-            ? 'Searching...'
-            : `Found ${properties.length} available listing${properties.length === 1 ? '' : 's'}`}
-        </span>
-        {filters.localityId && (
-          <span className="text-peshawar-700 bg-peshawar-50 px-2.5 py-1 rounded-m3-sm border border-peshawar-200">
-            Sector Filter Applied
+      {/* Results Count & Save Search Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-navy-600 font-semibold bg-white p-3 rounded-m3-sm border border-navy-100">
+        <div className="flex items-center gap-2">
+          <span>
+            {loading
+              ? 'Searching verified listings...'
+              : `Found ${properties.length} available listing${properties.length === 1 ? '' : 's'}`}
           </span>
-        )}
+          {filters.localityId && (
+            <span className="text-peshawar-700 bg-peshawar-50 px-2.5 py-0.5 rounded-m3-sm border border-peshawar-200">
+              Sector Filter Applied
+            </span>
+          )}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setSaveModalOpen(true)}
+          className="px-3 py-1.5 bg-peshawar-600 hover:bg-peshawar-700 text-white font-bold text-xs rounded-m3-sm transition shadow-2xs flex items-center gap-1.5"
+        >
+          <span>🔔</span> Save Search & Get Alerts
+        </button>
       </div>
+
+      {/* Personalized Recommendation Feed */}
+      <RecommendationFeed />
 
       {/* Listing Cards Grid */}
       {loading ? (
@@ -189,6 +223,16 @@ function PropertiesContent() {
           actionHref="/properties"
         />
       )}
+
+      {/* Trending in Peshawar */}
+      <TrendingSection />
+
+      {/* Save Search Modal */}
+      <SaveSearchModal
+        isOpen={saveModalOpen}
+        onClose={() => setSaveModalOpen(false)}
+        filters={filters as any}
+      />
     </div>
   );
 }

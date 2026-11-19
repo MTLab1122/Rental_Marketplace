@@ -6,6 +6,10 @@ import {
   PropertyType,
   ReportReason,
   NotificationType,
+  AlertFrequency,
+  AlertDeliveryStatus,
+  RecommendationReason,
+  RecommendationType,
 } from './enums.js';
 
 export interface HealthStatusDto {
@@ -216,6 +220,16 @@ export interface PropertySummaryDto {
   images: PropertyImageDto[];
   amenities: AmenityDto[];
   createdAt?: string;
+  landlordId?: string;
+  landlord?: {
+    id: string;
+    name?: string;
+    firstName?: string;
+    lastName?: string;
+    isVerified?: boolean;
+    profileImage?: string | null;
+    createdAt?: string;
+  };
 }
 
 export interface CreatePropertyDto {
@@ -747,4 +761,149 @@ export interface MfaSetupResponseDto {
   secret: string;
   qrCodeUrl: string;
   otpauthUrl: string;
+}
+
+// ==========================================
+// PHASE 12: SAVED SEARCHES, ALERTS & RECOMMENDATIONS
+// ==========================================
+
+export interface SavedSearchFiltersDto {
+  eligibility?: PropertyEligibility;
+  localityId?: string;
+  localitySlug?: string;
+  propertyType?: PropertyType;
+  minPrice?: number;
+  maxPrice?: number;
+  bedrooms?: number;
+  bathrooms?: number;
+  furnishing?: string;
+  amenities?: string[];
+  radiusKm?: number;
+  latitude?: number;
+  longitude?: number;
+  northEastLat?: number;
+  northEastLng?: number;
+  southWestLat?: number;
+  southWestLng?: number;
+  sortPreference?: string;
+  query?: string;
+}
+
+export interface CreateSavedSearchDto {
+  name: string;
+  filters: SavedSearchFiltersDto;
+  sortPreference?: string;
+  alertsEnabled?: boolean;
+  frequency?: AlertFrequency;
+}
+
+export interface UpdateSavedSearchDto {
+  name?: string;
+  filters?: SavedSearchFiltersDto;
+  sortPreference?: string;
+  alertsEnabled?: boolean;
+  frequency?: AlertFrequency;
+}
+
+export interface UpdateSavedSearchAlertsDto {
+  alertsEnabled: boolean;
+  frequency?: AlertFrequency;
+}
+
+export interface SavedSearchDto {
+  id: string;
+  userId: string;
+  name: string;
+  filters: SavedSearchFiltersDto;
+  filterSignature: string;
+  sortPreference?: string | null;
+  alertsEnabled: boolean;
+  frequency: AlertFrequency;
+  lastNotifiedAt?: string | null;
+  matchCount?: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SearchAlertDto {
+  id: string;
+  savedSearchId: string;
+  savedSearchName?: string;
+  userId: string;
+  propertyId: string;
+  property?: PropertySummaryDto;
+  isRead: boolean;
+  createdAt: string;
+  deliveries?: SearchAlertDeliveryDto[];
+}
+
+export interface SearchAlertDeliveryDto {
+  id: string;
+  channel: string;
+  status: AlertDeliveryStatus;
+  failureReason?: string | null;
+  deliveredAt?: string | null;
+  createdAt: string;
+}
+
+export interface RecommendationItemDto {
+  property: PropertySummaryDto;
+  type?: RecommendationType;
+  reason: RecommendationReason | string;
+  reasonLabel: string;
+  score: number;
+  metadata?: Record<string, any>;
+}
+
+export interface PropertyImpressionEventDto {
+  propertyId: string;
+  surface: string;
+  position?: number;
+  sessionId?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface PropertyClickEventDto {
+  propertyId: string;
+  surface: string;
+  position?: number;
+  sessionId?: string;
+  metadata?: Record<string, any>;
+}
+
+export interface SearchQueryEventDto {
+  queryText?: string;
+  filters: Record<string, any>;
+  localityId?: string;
+  resultsCount?: number;
+  executionTimeMs?: number;
+  sessionId?: string;
+}
+
+export interface LocalityDemandSnapshotDto {
+  id: string;
+  localityId: string;
+  localityName?: string;
+  period: string;
+  snapshotDate: string;
+  searchCount: number;
+  impressionCount: number;
+  clickCount: number;
+  inquiryCount: number;
+  savedSearchCount: number;
+  averageRentDemand?: number | null;
+  topPropertyType?: PropertyType | null;
+  studentDemandRatio: number;
+  metadata?: Record<string, any>;
+}
+
+export interface NotificationPreferenceDto {
+  id?: string;
+  emailAlerts: boolean;
+  pushAlerts: boolean;
+  inAppAlerts: boolean;
+  instantAlerts: boolean;
+  dailyDigest: boolean;
+  weeklyDigest: boolean;
+  recommendations: boolean;
 }

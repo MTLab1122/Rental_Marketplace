@@ -42,3 +42,4 @@ HEALTHCHECK --interval=20s --timeout=5s --retries=3 \
   CMD curl -f http://localhost:3002 || exit 1
 
 CMD ["node_modules/.bin/next", "start", "apps/admin", "-p", "3002"]
+
