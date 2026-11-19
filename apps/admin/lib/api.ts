@@ -664,3 +664,25 @@ export async function createPromoCodeAdmin(payload: any) {
     body: JSON.stringify(payload),
   });
 }
+
+// ==========================================
+// PHASE 21: GO-LIVE COMMAND CENTER & CERTIFICATION
+// ==========================================
+
+export async function getCommandCenterMetricsAdmin() {
+  return request<any>('/admin/command-center/metrics');
+}
+
+export async function setCanaryTrafficAdmin(percentage: number) {
+  return request<any>('/admin/command-center/canary', {
+    method: 'POST',
+    body: JSON.stringify({ percentage }),
+  });
+}
+
+export async function triggerEmergencyRollbackAdmin(reason: string) {
+  return request<any>('/admin/command-center/rollback', {
+    method: 'POST',
+    body: JSON.stringify({ reason }),
+  });
+}

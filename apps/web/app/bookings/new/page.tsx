@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createBookingRequest, getPropertyBySlugOrId } from '../../../lib/api';
 
-export default function NewBookingPage() {
+function NewBookingContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const inquiryId = searchParams.get('inquiryId') || '';
@@ -175,5 +175,19 @@ export default function NewBookingPage() {
         </button>
       </form>
     </div>
+  );
+}
+
+export default function NewBookingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-2xl mx-auto p-8 text-center text-slate-500">
+          Loading booking form...
+        </div>
+      }
+    >
+      <NewBookingContent />
+    </Suspense>
   );
 }

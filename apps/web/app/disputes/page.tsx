@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getMyDisputes, createDispute, sendDisputeMessage, getDisputeById } from '../../lib/api';
 
-export default function DisputesPage() {
+function DisputesContent() {
   const searchParams = useSearchParams();
   const initialBookingId = searchParams.get('bookingId') || '';
 
@@ -320,5 +320,17 @@ export default function DisputesPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function DisputesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-6xl mx-auto p-8 text-center text-slate-500">Loading disputes...</div>
+      }
+    >
+      <DisputesContent />
+    </Suspense>
   );
 }
