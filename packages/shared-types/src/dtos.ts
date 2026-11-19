@@ -10,6 +10,13 @@ import {
   AlertDeliveryStatus,
   RecommendationReason,
   RecommendationType,
+  BookingStatus,
+  PaymentStatus,
+  PaymentMethodType,
+  AgreementStatus,
+  LedgerEntryType,
+  DisputeCategory,
+  DisputeStatus,
 } from './enums.js';
 
 export interface HealthStatusDto {
@@ -906,4 +913,195 @@ export interface NotificationPreferenceDto {
   dailyDigest: boolean;
   weeklyDigest: boolean;
   recommendations: boolean;
+}
+
+// ==========================================
+// PHASE 13: BOOKINGS, PAYMENTS, AGREEMENTS & DISPUTES
+// ==========================================
+
+export interface CreateBookingDto {
+  inquiryId: string;
+  propertyId: string;
+  startDate: string;
+  endDate: string;
+  tenantCount?: number;
+  notes?: string;
+}
+
+export interface UpdateBookingStatusDto {
+  status: BookingStatus;
+  rejectionReason?: string;
+  landlordNotes?: string;
+  notes?: string;
+}
+
+export interface CancelBookingDto {
+  reason?: string;
+  cancellationReason?: string;
+}
+
+export interface BookingDto {
+  id: string;
+  inquiryId: string;
+  propertyId: string;
+  tenantId: string;
+  landlordId: string;
+  status: BookingStatus;
+  startDate: string;
+  endDate: string;
+  monthlyRentPkr: number;
+  securityDepositPkr: number;
+  totalInitialAmountPkr: number;
+  currency: string;
+  lockExpiresAt?: string | null;
+  confirmedAt?: string | null;
+  cancelledAt?: string | null;
+  cancellationReason?: string | null;
+  notes?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  property?: PropertySummaryDto;
+  tenant?: { id: string; fullName: string; email: string; phoneNumber?: string };
+  landlord?: { id: string; fullName: string; email: string; phoneNumber?: string };
+  payments?: PaymentDto[];
+  agreement?: RentalAgreementDto | null;
+}
+
+export interface CreatePaymentIntentDto {
+  bookingId: string;
+  amount?: number;
+  amountPkr?: number;
+  currency?: string;
+  paymentMethodType: PaymentMethodType;
+  metadata?: Record<string, any>;
+  idempotencyKey?: string;
+}
+
+export interface ManualPaymentVerificationDto {
+  approved?: boolean;
+  rejectionReason?: string;
+  bankName?: string;
+  referenceNumber?: string;
+  receiptUrl?: string;
+  notes?: string;
+}
+
+export interface PaymentDto {
+  id: string;
+  bookingId: string;
+  payerId: string;
+  recipientId: string;
+  amountPkr: number;
+  currency: string;
+  status: PaymentStatus;
+  paymentMethodType: PaymentMethodType;
+  provider: string;
+  providerTransactionId?: string | null;
+  idempotencyKey?: string | null;
+  receiptUrl?: string | null;
+  metadata?: Record<string, any> | null;
+  createdAt: string;
+  updatedAt: string;
+  refunds?: RefundDto[];
+}
+
+export interface RefundDto {
+  id: string;
+  paymentId: string;
+  amountPkr: number;
+  reason: string;
+  status: string;
+  adminId?: string | null;
+  createdAt: string;
+}
+
+export interface RentalAgreementDto {
+  id: string;
+  bookingId: string;
+  templateId?: string | null;
+  title: string;
+  termsHtml: string;
+  version: number;
+  status: AgreementStatus;
+  signedByTenantAt?: string | null;
+  signedByLandlordAt?: string | null;
+  pdfUrl?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  signatures?: AgreementSignatureDto[];
+}
+
+export interface AgreementSignatureDto {
+  id: string;
+  agreementId: string;
+  signerId: string;
+  signerRole: 'TENANT' | 'LANDLORD';
+  signerName: string;
+  ipAddress?: string | null;
+  userAgent?: string | null;
+  signatureHash: string;
+  signedAt: string;
+}
+
+export interface SignAgreementDto {
+  role?: 'TENANT' | 'LANDLORD';
+  signatureData?: string;
+}
+
+export interface CreateDisputeDto {
+  bookingId: string;
+  category: DisputeCategory;
+  description: string;
+  amountDisputed?: number;
+  amountDisputedPkr?: number;
+  evidenceUrls?: string[];
+}
+
+export interface DisputeDto {
+  id: string;
+  bookingId: string;
+  initiatorId: string;
+  respondentId: string;
+  category: DisputeCategory;
+  status: DisputeStatus;
+  description: string;
+  amountDisputedPkr?: number | null;
+  resolution?: string | null;
+  resolvedAt?: string | null;
+  resolvedById?: string | null;
+  createdAt: string;
+  updatedAt: string;
+  messages?: DisputeMessageDto[];
+  evidenceUrls?: string[];
+}
+
+export interface DisputeMessageDto {
+  id: string;
+  disputeId: string;
+  senderId: string;
+  senderRole: string;
+  message: string;
+  attachmentUrls?: string[];
+  createdAt: string;
+}
+
+export interface ResolveDisputeDto {
+  status: DisputeStatus;
+  resolution: string;
+  refundAmountPkr?: number;
+  action?: 'REFUND' | 'REJECT' | 'PARTIAL_REFUND' | 'CLOSE';
+}
+
+export interface LedgerEntryDto {
+  id: string;
+  bookingId?: string | null;
+  paymentId?: string | null;
+  type: LedgerEntryType;
+  debitAccount: string;
+  creditAccount: string;
+  amountPkr: number;
+  description: string;
+  isImmutable: boolean;
+  metadata?: Record<string, any> | null;
+  createdAt: string;
 }

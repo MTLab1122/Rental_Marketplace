@@ -109,6 +109,10 @@ enum NotificationType {
   MESSAGE_RECEIVED
   SYSTEM
   NEW_LISTING_ALERT
+  BOOKING_STATUS_CHANGED
+  PAYMENT_RECEIVED
+  AGREEMENT_READY
+  DISPUTE_OPENED
 }
 
 enum ReviewStatus {
@@ -167,6 +171,76 @@ enum AlertDeliveryStatus {
   DELIVERED
   FAILED
   SKIPPED
+}
+
+enum BookingStatus {
+  REQUESTED
+  LANDLORD_REVIEWING
+  AWAITING_PAYMENT
+  PAYMENT_PENDING
+  CONFIRMED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+  EXPIRED
+  DISPUTED
+  REFUNDED
+}
+
+enum PaymentStatus {
+  CREATED
+  PENDING
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+  CANCELLED
+}
+
+enum PaymentMethodType {
+  MANUAL_BANK_TRANSFER
+  JAZZCASH
+  EASYPAISA
+  STRIPE
+}
+
+enum AgreementStatus {
+  DRAFT
+  SENT
+  SIGNED_BY_TENANT
+  SIGNED_BY_LANDLORD
+  ACTIVE
+  EXPIRED
+  TERMINATED
+}
+
+enum LedgerEntryType {
+  DEPOSIT_HOLD
+  DEPOSIT_RELEASE
+  RENT_CHARGE
+  RENT_PAYMENT
+  REFUND
+  PLATFORM_FEE
+  ADJUSTMENT
+  DISPUTE_HOLD
+}
+
+enum DisputeCategory {
+  PAYMENT_ISSUE
+  PROPERTY_NOT_AS_DESCRIBED
+  DEPOSIT_ISSUE
+  EARLY_TERMINATION
+  SAFETY_ISSUE
+  OTHER
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  REJECTED
+  ESCALATED
 }
 
 // ==========================================
@@ -236,6 +310,21 @@ model User {
   propertyClicks             PropertyClick[]
   searchQueryLogs            SearchQueryLog[]
   notificationPreference     NotificationPreference?
+
+  // Phase 13: Booking, Payment, Agreement & Dispute Relations
+  tenantBookingRequests      BookingRequest[]           @relation("TenantBookingRequests")
+  landlordBookingRequests    BookingRequest[]           @relation("LandlordBookingRequests")
+  tenantBookings             Booking[]                  @relation("TenantBookings")
+  landlordBookings           Booking[]                  @relation("LandlordBookings")
+  paymentsMade               Payment[]                  @relation("PayerPayments")
+  paymentsReceived           Payment[]                  @relation("RecipientPayments")
+  paymentMethods             PaymentMethod[]
+  paymentIntents             PaymentIntent[]
+  disputesInitiated          Dispute[]                  @relation("DisputesInitiated")
+  disputesReceived           Dispute[]                  @relation("DisputesReceived")
+  disputesResolved           Dispute[]                  @relation("DisputesResolved")
+  disputeMessages            DisputeMessage[]
+  agreementSignatures        AgreementSignature[]
 
   @@index([email])
   @@index([phoneNumber])
@@ -456,6 +545,8 @@ model Property {
   recommendations  RecommendationEvent[]
   impressions      PropertyImpression[]
   clicks           PropertyClick[]
+  bookingRequests  BookingRequest[]
+  bookings         Booking[]
 
   // High performance composite indexes
   @@index([status, eligibility, isAvailable, localityId])
@@ -579,6 +670,8 @@ model Inquiry {
   landlord     User          @relation("LandlordInquiries", fields: [landlordId], references: [id], onDelete: Restrict)
   conversation Conversation?
   reviews      Review[]
+  bookingRequests BookingRequest[]
+  bookings     Booking[]
 
   @@index([tenantId])
   @@index([landlordId])
@@ -1152,4 +1245,321 @@ model LocalityDemandSnapshot {
   @@index([snapshotDate])
   @@map("locality_demand_snapshots")
 }
+
+// ==========================================
+// PHASE 13: BOOKINGS, PAYMENTS, AGREEMENTS, ESCROW & DISPUTES
+// ==========================================
+
+model BookingRequest {
+  id                 String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  inquiryId          String    @db.Uuid
+  propertyId         String    @db.Uuid
+  tenantId           String    @db.Uuid
+  landlordId         String    @db.Uuid
+  startDate          DateTime  @db.Date
+  endDate            DateTime  @db.Date
+  tenantCount        Int       @default(1)
+  proposedRentPkr    Decimal   @db.Decimal(12, 2)
+  proposedDepositPkr Decimal   @db.Decimal(12, 2)
+  notes              String?   @db.Text
+  status             String    @default("REQUESTED") @db.VarChar(30)
+  createdAt          DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @db.Timestamptz(6)
+
+  inquiry  Inquiry   @relation(fields: [inquiryId], references: [id], onDelete: Restrict)
+  property Property  @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  tenant   User      @relation("TenantBookingRequests", fields: [tenantId], references: [id], onDelete: Restrict)
+  landlord User      @relation("LandlordBookingRequests", fields: [landlordId], references: [id], onDelete: Restrict)
+  booking  Booking?
+
+  @@index([tenantId])
+  @@index([landlordId])
+  @@index([propertyId])
+  @@index([status])
+  @@map("booking_requests")
+}
+
+model Booking {
+  id                    String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  bookingRequestId      String?       @unique @db.Uuid
+  inquiryId             String        @db.Uuid
+  propertyId            String        @db.Uuid
+  tenantId              String        @db.Uuid
+  landlordId            String        @db.Uuid
+  status                BookingStatus @default(REQUESTED)
+  startDate             DateTime      @db.Date
+  endDate               DateTime      @db.Date
+  monthlyRentPkr        Decimal       @db.Decimal(12, 2)
+  securityDepositPkr    Decimal       @db.Decimal(12, 2)
+  totalInitialAmountPkr Decimal       @db.Decimal(12, 2)
+  currency              String        @default("PKR") @db.VarChar(10)
+  lockExpiresAt         DateTime?     @db.Timestamptz(6)
+  confirmedAt           DateTime?     @db.Timestamptz(6)
+  cancelledAt           DateTime?     @db.Timestamptz(6)
+  cancellationReason    String?       @db.Text
+  notes                 String?       @db.Text
+  createdAt             DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime      @updatedAt @db.Timestamptz(6)
+
+  bookingRequest BookingRequest?   @relation(fields: [bookingRequestId], references: [id], onDelete: SetNull)
+  inquiry        Inquiry          @relation(fields: [inquiryId], references: [id], onDelete: Restrict)
+  property       Property         @relation(fields: [propertyId], references: [id], onDelete: Restrict)
+  tenant         User             @relation("TenantBookings", fields: [tenantId], references: [id], onDelete: Restrict)
+  landlord       User             @relation("LandlordBookings", fields: [landlordId], references: [id], onDelete: Restrict)
+  payments       Payment[]
+  paymentIntents PaymentIntent[]
+  agreement      RentalAgreement?
+  disputes       Dispute[]
+  ledgerEntries  LedgerEntry[]
+  refunds        Refund[]
+
+  @@index([propertyId, status])
+  @@index([tenantId])
+  @@index([landlordId])
+  @@index([lockExpiresAt])
+  @@map("bookings")
+}
+
+model PaymentMethod {
+  id             String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId         String            @db.Uuid
+  type           PaymentMethodType
+  title          String            @db.VarChar(100)
+  accountDetails Json?
+  isDefault      Boolean           @default(false)
+  isActive       Boolean           @default(true)
+  createdAt      DateTime          @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isActive])
+  @@map("payment_methods")
+}
+
+model PaymentIntent {
+  id                String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  bookingId         String            @db.Uuid
+  userId            String            @db.Uuid
+  amountPkr         Decimal           @db.Decimal(12, 2)
+  currency          String            @default("PKR") @db.VarChar(10)
+  paymentMethodType PaymentMethodType
+  idempotencyKey    String            @unique @db.VarChar(128)
+  clientSecret      String?           @db.VarChar(255)
+  status            PaymentStatus     @default(CREATED)
+  expiresAt         DateTime          @db.Timestamptz(6)
+  metadata          Json?
+  createdAt         DateTime          @default(now()) @db.Timestamptz(6)
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([userId])
+  @@map("payment_intents")
+}
+
+model Payment {
+  id                    String            @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  bookingId             String            @db.Uuid
+  payerId               String            @db.Uuid
+  recipientId           String            @db.Uuid
+  amountPkr             Decimal           @db.Decimal(12, 2)
+  currency              String            @default("PKR") @db.VarChar(10)
+  status                PaymentStatus     @default(PENDING)
+  paymentMethodType     PaymentMethodType
+  provider              String            @db.VarChar(50)
+  providerTransactionId String?           @unique @db.VarChar(150)
+  idempotencyKey        String?           @unique @db.VarChar(128)
+  receiptUrl            String?           @db.VarChar(500)
+  metadata              Json?
+  createdAt             DateTime          @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime          @updatedAt @db.Timestamptz(6)
+
+  booking       Booking       @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  payer         User          @relation("PayerPayments", fields: [payerId], references: [id], onDelete: Restrict)
+  recipient     User          @relation("RecipientPayments", fields: [recipientId], references: [id], onDelete: Restrict)
+  transactions  Transaction[]
+  refunds       Refund[]
+  receipt       Receipt?
+  ledgerEntries LedgerEntry[]
+
+  @@index([bookingId])
+  @@index([payerId])
+  @@index([recipientId])
+  @@index([status])
+  @@map("payments")
+}
+
+model Transaction {
+  id                   String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  paymentId            String    @db.Uuid
+  provider             String    @db.VarChar(50)
+  transactionReference String    @unique @db.VarChar(150)
+  amountPkr            Decimal   @db.Decimal(12, 2)
+  status               String    @db.VarChar(50)
+  rawPayload           Json?
+  verifiedAt           DateTime? @db.Timestamptz(6)
+  createdAt            DateTime  @default(now()) @db.Timestamptz(6)
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
+  @@map("transactions")
+}
+
+model Refund {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  paymentId String   @db.Uuid
+  bookingId String   @db.Uuid
+  amountPkr Decimal  @db.Decimal(12, 2)
+  reason    String   @db.VarChar(255)
+  status    String   @default("PROCESSED") @db.VarChar(50)
+  adminId   String?  @db.Uuid
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+  @@index([paymentId])
+  @@index([bookingId])
+  @@map("refunds")
+}
+
+model Receipt {
+  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  paymentId     String   @unique @db.Uuid
+  receiptNumber String   @unique @db.VarChar(50)
+  pdfUrl        String?  @db.VarChar(500)
+  issuedAt      DateTime @default(now()) @db.Timestamptz(6)
+  metadata      Json?
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@map("receipts")
+}
+
+model AgreementTemplate {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  title       String   @db.VarChar(150)
+  version     Int      @default(1)
+  contentHtml String   @db.Text
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+
+  agreements RentalAgreement[]
+
+  @@map("agreement_templates")
+}
+
+model RentalAgreement {
+  id                 String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  bookingId          String          @unique @db.Uuid
+  templateId         String?         @db.Uuid
+  title              String          @db.VarChar(150)
+  termsHtml          String          @db.Text
+  version            Int             @default(1)
+  status             AgreementStatus @default(DRAFT)
+  signedByTenantAt   DateTime?       @db.Timestamptz(6)
+  signedByLandlordAt DateTime?       @db.Timestamptz(6)
+  pdfUrl             String?         @db.VarChar(500)
+  createdAt          DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime        @updatedAt @db.Timestamptz(6)
+
+  booking    Booking             @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  template   AgreementTemplate?  @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  signatures AgreementSignature[]
+
+  @@index([bookingId])
+  @@index([status])
+  @@map("rental_agreements")
+}
+
+model AgreementSignature {
+  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  agreementId   String   @db.Uuid
+  signerId      String   @db.Uuid
+  signerRole    String   @db.VarChar(20)
+  signerName    String   @db.VarChar(150)
+  ipAddress     String?  @db.VarChar(50)
+  userAgent     String?  @db.VarChar(255)
+  signatureHash String   @db.VarChar(64)
+  signatureData String?  @db.Text
+  signedAt      DateTime @default(now()) @db.Timestamptz(6)
+
+  agreement RentalAgreement @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  signer    User            @relation(fields: [signerId], references: [id], onDelete: Restrict)
+
+  @@index([agreementId])
+  @@index([signerId])
+  @@map("agreement_signatures")
+}
+
+model Dispute {
+  id                String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  bookingId         String          @db.Uuid
+  initiatorId       String          @db.Uuid
+  respondentId      String          @db.Uuid
+  category          DisputeCategory
+  status            DisputeStatus   @default(OPEN)
+  description       String          @db.Text
+  amountDisputedPkr Decimal?        @db.Decimal(12, 2)
+  resolution        String?         @db.Text
+  resolvedById      String?         @db.Uuid
+  resolvedAt        DateTime?       @db.Timestamptz(6)
+  evidenceUrls      Json?
+  createdAt         DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime        @updatedAt @db.Timestamptz(6)
+
+  booking    Booking          @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  initiator  User             @relation("DisputesInitiated", fields: [initiatorId], references: [id], onDelete: Restrict)
+  respondent User             @relation("DisputesReceived", fields: [respondentId], references: [id], onDelete: Restrict)
+  resolvedBy User?            @relation("DisputesResolved", fields: [resolvedById], references: [id], onDelete: SetNull)
+  messages   DisputeMessage[]
+
+  @@index([bookingId])
+  @@index([initiatorId])
+  @@index([status])
+  @@map("disputes")
+}
+
+model DisputeMessage {
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  disputeId      String   @db.Uuid
+  senderId       String   @db.Uuid
+  senderRole     String   @db.VarChar(30)
+  message        String   @db.Text
+  attachmentUrls Json?
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+
+  dispute Dispute @relation(fields: [disputeId], references: [id], onDelete: Cascade)
+  sender  User    @relation(fields: [senderId], references: [id], onDelete: Restrict)
+
+  @@index([disputeId])
+  @@map("dispute_messages")
+}
+
+model LedgerEntry {
+  id           String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  bookingId    String?         @db.Uuid
+  paymentId    String?         @db.Uuid
+  type         LedgerEntryType
+  debitAccount String          @db.VarChar(50)
+  creditAccount String         @db.VarChar(50)
+  amountPkr    Decimal         @db.Decimal(12, 2)
+  description  String          @db.VarChar(255)
+  isImmutable  Boolean         @default(true)
+  metadata     Json?
+  createdAt    DateTime        @default(now()) @db.Timestamptz(6)
+
+  booking Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  payment Payment? @relation(fields: [paymentId], references: [id], onDelete: SetNull)
+
+  @@index([bookingId])
+  @@index([paymentId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("ledger_entries")
+}
+
 

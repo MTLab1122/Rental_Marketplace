@@ -346,3 +346,66 @@ export async function getLocalityDemand(localityId?: string, period = 'DAILY') {
   if (period) qs.append('period', period);
   return request<any[]>(`/admin/discovery/locality-demand?${qs.toString()}`);
 }
+
+// ==========================================
+// PHASE 13: BOOKINGS, ESCROW LEDGER & DISPUTES
+// ==========================================
+
+export async function getAllBookingsAdmin(status?: string, propertyId?: string) {
+  const qs = new URLSearchParams();
+  if (status) qs.append('status', status);
+  if (propertyId) qs.append('propertyId', propertyId);
+  return request<any[]>(`/admin/bookings?${qs.toString()}`);
+}
+
+export async function getLedgerReconciliationAdmin(
+  bookingId?: string,
+  startDate?: string,
+  endDate?: string,
+) {
+  const qs = new URLSearchParams();
+  if (bookingId) qs.append('bookingId', bookingId);
+  if (startDate) qs.append('startDate', startDate);
+  if (endDate) qs.append('endDate', endDate);
+  return request<any>(`/admin/ledger?${qs.toString()}`);
+}
+
+export async function postLedgerAdjustmentAdmin(data: {
+  bookingId?: string;
+  paymentId?: string;
+  amountPkr: number;
+  description: string;
+  reason: string;
+}) {
+  return request<any>('/admin/ledger/adjust', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function getAllDisputesAdmin(status?: string, category?: string) {
+  const qs = new URLSearchParams();
+  if (status) qs.append('status', status);
+  if (category) qs.append('category', category);
+  return request<any[]>(`/admin/disputes?${qs.toString()}`);
+}
+
+export async function resolveDisputeAdmin(
+  disputeId: string,
+  data: { status: string; resolution: string },
+) {
+  return request<any>(`/disputes/${disputeId}/resolve`, {
+    method: 'PATCH',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function refundPaymentAdmin(
+  paymentId: string,
+  data: { amountPkr: number; reason: string },
+) {
+  return request<any>(`/payments/${paymentId}/refund`, {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}

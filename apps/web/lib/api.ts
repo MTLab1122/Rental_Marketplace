@@ -713,3 +713,197 @@ export async function recordSearchQueryEvent(
     token,
   );
 }
+
+// ==========================================
+// PHASE 13: BOOKINGS, PAYMENTS, AGREEMENTS & DISPUTES
+// ==========================================
+
+export async function createBookingRequest(
+  data: {
+    inquiryId: string;
+    propertyId: string;
+    startDate: string;
+    endDate: string;
+    tenantCount?: number;
+    notes?: string;
+  },
+  token: string,
+) {
+  return fetchWithAuth(
+    '/bookings',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function getMyBookings(role?: 'TENANT' | 'LANDLORD', token?: string) {
+  const qs = role ? `?role=${role}` : '';
+  return fetchWithAuth(`/bookings/my${qs}`, { method: 'GET' }, token);
+}
+
+export async function getBookingById(bookingId: string, token: string) {
+  return fetchWithAuth(`/bookings/${bookingId}`, { method: 'GET' }, token);
+}
+
+export async function updateBookingStatus(
+  bookingId: string,
+  data: { status: string; notes?: string },
+  token: string,
+) {
+  return fetchWithAuth(
+    `/bookings/${bookingId}/status`,
+    {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function cancelBooking(
+  bookingId: string,
+  data: { cancellationReason: string },
+  token: string,
+) {
+  return fetchWithAuth(
+    `/bookings/${bookingId}/cancel`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function createPaymentIntent(
+  data: {
+    bookingId: string;
+    amountPkr?: number;
+    paymentMethodType: string;
+    idempotencyKey?: string;
+    metadata?: any;
+  },
+  token: string,
+) {
+  return fetchWithAuth(
+    '/payments/intent',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function submitManualPaymentSlip(
+  data: {
+    bookingId: string;
+    bankName: string;
+    transactionReference: string;
+    slipUrl: string;
+    amountPkr: number;
+    accountTitle?: string;
+  },
+  token: string,
+) {
+  return fetchWithAuth(
+    '/payments/manual-slip',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function verifyManualPayment(
+  paymentId: string,
+  data: { approved: boolean; rejectionReason?: string },
+  token: string,
+) {
+  return fetchWithAuth(
+    `/payments/${paymentId}/verify-manual`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function getReceiptByNumber(receiptNumber: string) {
+  return fetchWithAuth(`/payments/receipts/${receiptNumber}`, { method: 'GET' });
+}
+
+export async function getReceiptByPaymentId(paymentId: string, token: string) {
+  return fetchWithAuth(`/payments/${paymentId}/receipt`, { method: 'GET' }, token);
+}
+
+export async function getAgreementForBooking(bookingId: string, token: string) {
+  return fetchWithAuth(`/agreements/booking/${bookingId}`, { method: 'GET' }, token);
+}
+
+export async function getAgreementById(agreementId: string, token: string) {
+  return fetchWithAuth(`/agreements/${agreementId}`, { method: 'GET' }, token);
+}
+
+export async function signAgreement(
+  agreementId: string,
+  data: { signatureData?: string },
+  token: string,
+) {
+  return fetchWithAuth(
+    `/agreements/${agreementId}/sign`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function createDispute(
+  data: {
+    bookingId: string;
+    category: string;
+    description: string;
+    amountDisputedPkr?: number;
+    evidenceUrls?: string[];
+  },
+  token: string,
+) {
+  return fetchWithAuth(
+    '/disputes',
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}
+
+export async function getMyDisputes(token: string) {
+  return fetchWithAuth('/disputes/my', { method: 'GET' }, token);
+}
+
+export async function getDisputeById(disputeId: string, token: string) {
+  return fetchWithAuth(`/disputes/${disputeId}`, { method: 'GET' }, token);
+}
+
+export async function sendDisputeMessage(
+  disputeId: string,
+  data: { message: string; attachmentUrls?: string[] },
+  token: string,
+) {
+  return fetchWithAuth(
+    `/disputes/${disputeId}/messages`,
+    {
+      method: 'POST',
+      body: JSON.stringify(data),
+    },
+    token,
+  );
+}

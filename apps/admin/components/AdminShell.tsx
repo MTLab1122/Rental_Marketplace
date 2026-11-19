@@ -18,6 +18,9 @@ const NAV_ITEMS = [
   { label: 'Audit Logs', href: '/audit-logs', icon: '📜' },
   { label: 'Analytics', href: '/analytics', icon: '📈' },
   { label: 'Discovery & Alerts', href: '/discovery', icon: '🔔' },
+  { label: 'Bookings & Leases', href: '/bookings', icon: '📝' },
+  { label: 'Escrow Ledger', href: '/ledger', icon: '💰' },
+  { label: 'Disputes Console', href: '/disputes', icon: '⚖️' },
   { label: 'Settings', href: '/settings', icon: '⚙️' },
   { label: 'Feature Flags', href: '/feature-flags', icon: '🚩' },
 ];

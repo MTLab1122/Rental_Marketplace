@@ -20,6 +20,8 @@ import { MonetizationModule } from './modules/monetization/monetization.module';
 import { SupportModule } from './modules/support/support.module';
 import { ReviewModule } from './modules/review/review.module';
 import { DiscoveryModule } from './modules/discovery/discovery.module';
+import { BookingModule } from './modules/booking/booking.module';
+import { PaymentModule } from './modules/payment/payment.module';
 import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/request-id.middleware';
 
 @Module({
@@ -63,6 +65,8 @@ import { RequestIdMiddleware, REQUEST_ID_HEADER } from './common/middleware/requ
     SupportModule,
     ReviewModule,
     DiscoveryModule,
+    BookingModule,
+    PaymentModule,
   ],
 })
 export class AppModule implements NestModule {
