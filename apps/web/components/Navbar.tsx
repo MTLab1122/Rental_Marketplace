@@ -65,6 +65,18 @@ export default function Navbar() {
               Explore Listings
             </Link>
             <Link
+              href="/for-landlords"
+              className="text-sm font-semibold text-peshawar-600 hover:text-peshawar-700 transition"
+            >
+              For Landlords
+            </Link>
+            <Link
+              href="/pricing"
+              className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
+            >
+              Pricing
+            </Link>
+            <Link
               href="/favorites"
               className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
             >

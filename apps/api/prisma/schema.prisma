@@ -224,6 +224,9 @@ enum LedgerEntryType {
   PLATFORM_FEE
   ADJUSTMENT
   DISPUTE_HOLD
+  SUBSCRIPTION_CHARGE
+  PROMOTION_CHARGE
+  CREDIT
 }
 
 enum DisputeCategory {
@@ -325,6 +328,17 @@ model User {
   disputesResolved           Dispute[]                  @relation("DisputesResolved")
   disputeMessages            DisputeMessage[]
   agreementSignatures        AgreementSignature[]
+
+  // Phase 20: Commercialization, CRM & Subscriptions Relations
+  leadsAssigned              Lead[]                     @relation("AssignedLeads")
+  leadsCreated               Lead[]                     @relation("CreatedLeads")
+  contactAttempts            ContactAttempt[]           @relation("AgentContactAttempts")
+  leadNotes                  LeadNote[]                 @relation("AgentLeadNotes")
+  subscriptions              Subscription[]             @relation("UserSubscriptions")
+  invoices                   Invoice[]                  @relation("UserInvoices")
+  referralsGiven             Referral[]                 @relation("ReferrerUser")
+  referralsReceived          Referral[]                 @relation("ReferredUser")
+  payouts                    Payout[]                   @relation("UserPayouts")
 
   @@index([email])
   @@index([phoneNumber])
@@ -484,6 +498,9 @@ model Locality {
   searchQueryLogs SearchQueryLog[]
   demandSnapshots LocalityDemandSnapshot[]
   pricingInsights LocalityPricingInsight[]
+  leads           Lead[]
+  promotions      PromotionAssignment[]
+  revenueEvents   RevenueEvent[]
 
   @@index([slug])
   @@index([isActive])
@@ -550,6 +567,7 @@ model Property {
   bookings         Booking[]
   qualitySuggestions ListingQualitySuggestion[]
   embedding        PropertyEmbedding?
+  promotions       PromotionAssignment[]
 
   // High performance composite indexes
   @@index([status, eligibility, isAvailable, localityId])
@@ -1777,6 +1795,495 @@ model MarketplaceIntelligenceSnapshot {
   @@index([localityId])
   @@map("marketplace_intelligence_snapshots")
 }
+
+// ==========================================
+// PHASE 20: COMMERCIALIZATION, CRM, PROMOTIONS & REVENUE
+// ==========================================
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  NURTURE
+  CONVERTED
+  LOST
+  INVALID
+  DUPLICATE
+}
+
+enum LeadSource {
+  ORGANIC_SEARCH
+  DIRECT
+  REFERRAL
+  GOOGLE_ADS
+  META_ADS
+  TIKTOK_ADS
+  WHATSAPP
+  FACEBOOK_GROUP
+  UNIVERSITY_PARTNER
+  LANDLORD_REFERRAL
+  OFFLINE
+  OTHER
+}
+
+enum LeadType {
+  LANDLORD
+  TENANT
+  AGENCY_HOSTEL
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ARCHIVED
+}
+
+enum PromotionType {
+  FEATURED_LISTING
+  TOP_SEARCH_PLACEMENT
+  LOCALITY_SPONSORSHIP
+  VERIFIED_LANDLORD_BADGE
+  LEAD_BOOST
+  DISCOUNT
+}
+
+enum PromotionStatus {
+  DRAFT
+  ACTIVE
+  EXPIRED
+  CANCELLED
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  VOID
+  REFUNDED
+}
+
+enum ReferralRewardStatus {
+  PENDING
+  APPROVED
+  PAID
+  CANCELLED
+  CLAWED_BACK
+}
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum RevenueEventType {
+  SUBSCRIPTION_CHARGE
+  PROMOTION_CHARGE
+  REFUND
+  CREDIT
+  PLATFORM_FEE
+  ADJUSTMENT
+}
+
+model Lead {
+  id              String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  fullName        String          @db.VarChar(150)
+  email           String?         @db.VarChar(255)
+  phoneNumber     String          @db.VarChar(20)
+  normalizedPhone String          @db.VarChar(20)
+  leadType        LeadType        @default(LANDLORD)
+  status          LeadStatus      @default(NEW)
+  source          LeadSource      @default(DIRECT)
+  localityId      String?         @db.Uuid
+  propertyCount   Int?            @default(1)
+  assignedToId    String?         @db.Uuid
+  createdById     String?         @db.Uuid
+  campaignId      String?         @db.Uuid
+  utmSource       String?         @db.VarChar(100)
+  utmMedium       String?         @db.VarChar(100)
+  utmCampaign     String?         @db.VarChar(150)
+  utmContent      String?         @db.VarChar(150)
+  notesSummary    String?         @db.Text
+  duplicateOfId   String?         @db.Uuid
+  convertedUserId String?         @db.Uuid
+  createdAt       DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime        @updatedAt @db.Timestamptz(6)
+
+  assignedTo      User?           @relation("AssignedLeads", fields: [assignedToId], references: [id], onDelete: SetNull)
+  createdBy       User?           @relation("CreatedLeads", fields: [createdById], references: [id], onDelete: SetNull)
+  campaign        Campaign?       @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  locality        Locality?       @relation(fields: [localityId], references: [id], onDelete: SetNull)
+  contactAttempts ContactAttempt[]
+  notes           LeadNote[]
+  statusHistory   LeadStatusHistory[]
+
+  @@index([normalizedPhone])
+  @@index([email])
+  @@index([status])
+  @@index([source])
+  @@index([assignedToId])
+  @@index([campaignId])
+  @@map("leads")
+}
+
+model ContactAttempt {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  leadId      String   @db.Uuid
+  agentId     String   @db.Uuid
+  channel     String   @db.VarChar(50)
+  outcome     String   @db.VarChar(100)
+  notes       String?  @db.Text
+  attemptedAt DateTime @default(now()) @db.Timestamptz(6)
+
+  lead  Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  agent User @relation("AgentContactAttempts", fields: [agentId], references: [id], onDelete: Restrict)
+
+  @@index([leadId])
+  @@index([agentId])
+  @@map("contact_attempts")
+}
+
+model LeadNote {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  leadId    String   @db.Uuid
+  authorId  String   @db.Uuid
+  content   String   @db.Text
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  lead   Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  author User @relation("AgentLeadNotes", fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([leadId])
+  @@map("lead_notes")
+}
+
+model LeadStatusHistory {
+  id          String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  leadId      String     @db.Uuid
+  oldStatus   LeadStatus
+  newStatus   LeadStatus
+  changedById String?    @db.Uuid
+  reason      String?    @db.VarChar(255)
+  createdAt   DateTime   @default(now()) @db.Timestamptz(6)
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@map("lead_status_history")
+}
+
+model Campaign {
+  id             String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name           String         @db.VarChar(150)
+  slug           String         @unique @db.VarChar(100)
+  channel        String         @db.VarChar(50)
+  status         CampaignStatus @default(DRAFT)
+  budgetPkr      Decimal?       @db.Decimal(12, 2)
+  spentPkr       Decimal?       @default(0) @db.Decimal(12, 2)
+  targetAudience String?        @db.VarChar(100)
+  utmSource      String         @db.VarChar(100)
+  utmMedium      String         @db.VarChar(100)
+  utmCampaign    String         @db.VarChar(150)
+  startDate      DateTime?      @db.Date
+  endDate        DateTime?      @db.Date
+  createdAt      DateTime       @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime       @updatedAt @db.Timestamptz(6)
+
+  variants       CampaignVariant[]
+  assignments    CampaignAssignment[]
+  leads          Lead[]
+
+  @@index([slug])
+  @@index([status])
+  @@map("campaigns")
+}
+
+model CampaignVariant {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  campaignId  String   @db.Uuid
+  name        String   @db.VarChar(100)
+  utmContent  String   @db.VarChar(150)
+  targetUrl   String   @db.VarChar(255)
+  weight      Int      @default(50)
+  impressions Int      @default(0)
+  clicks      Int      @default(0)
+  conversions Int      @default(0)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@map("campaign_variants")
+}
+
+model CampaignAssignment {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  campaignId  String   @db.Uuid
+  userId      String?  @db.Uuid
+  sessionId   String?  @db.VarChar(100)
+  utmSource   String?  @db.VarChar(100)
+  utmMedium   String?  @db.VarChar(100)
+  utmCampaign String?  @db.VarChar(150)
+  utmContent  String?  @db.VarChar(150)
+  touchType   String   @default("LAST_TOUCH") @db.VarChar(20)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  campaign Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@index([userId])
+  @@index([sessionId])
+  @@map("campaign_assignments")
+}
+
+model PromoCode {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  code           String    @unique @db.VarChar(50)
+  description    String?   @db.VarChar(255)
+  discountPct    Decimal?  @db.Decimal(5, 2)
+  discountPkr    Decimal?  @db.Decimal(10, 2)
+  maxRedemptions Int?
+  timesRedeemed  Int       @default(0)
+  validFrom      DateTime  @default(now()) @db.Timestamptz(6)
+  validUntil     DateTime? @db.Timestamptz(6)
+  isActive       Boolean   @default(true)
+  applicableType String?   @db.VarChar(50)
+  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@index([code])
+  @@map("promo_codes")
+}
+
+model Promotion {
+  id                 String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name               String          @db.VarChar(150)
+  slug               String          @unique @db.VarChar(100)
+  type               PromotionType
+  pricePkr           Decimal         @db.Decimal(10, 2)
+  durationDays       Int             @default(30)
+  eligibleLocalities Json?
+  eligibleCategory   String?         @db.VarChar(50)
+  propertyTypes      Json?
+  inventoryLimit     Int?
+  activeCount        Int             @default(0)
+  status             PromotionStatus @default(ACTIVE)
+  startDate          DateTime?       @db.Date
+  endDate            DateTime?       @db.Date
+  createdAt          DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime        @updatedAt @db.Timestamptz(6)
+
+  assignments PromotionAssignment[]
+
+  @@index([slug])
+  @@index([type])
+  @@map("promotions")
+}
+
+model PromotionAssignment {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  promotionId String   @db.Uuid
+  propertyId  String?  @db.Uuid
+  localityId  String?  @db.Uuid
+  landlordId  String   @db.Uuid
+  startsAt    DateTime @default(now()) @db.Timestamptz(6)
+  expiresAt   DateTime @db.Timestamptz(6)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  promotion Promotion @relation(fields: [promotionId], references: [id], onDelete: Cascade)
+  property  Property? @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  locality  Locality? @relation(fields: [localityId], references: [id], onDelete: Cascade)
+
+  @@index([promotionId])
+  @@index([propertyId])
+  @@index([landlordId])
+  @@index([isActive, expiresAt])
+  @@map("promotion_assignments")
+}
+
+model SubscriptionPlan {
+  id                  String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name                String       @unique @db.VarChar(100)
+  slug                String       @unique @db.VarChar(100)
+  description         String?      @db.Text
+  priceMonthlyPkr     Decimal      @db.Decimal(10, 2)
+  priceQuarterlyPkr   Decimal      @db.Decimal(10, 2)
+  priceYearlyPkr      Decimal      @db.Decimal(10, 2)
+  maxActiveListings   Int          @default(3)
+  features            Json
+  isPublic            Boolean      @default(true)
+  createdAt           DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime     @updatedAt @db.Timestamptz(6)
+
+  subscriptions Subscription[]
+
+  @@index([slug])
+  @@map("subscription_plans")
+}
+
+model Subscription {
+  id                    String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId                String             @db.Uuid
+  planId                String             @db.Uuid
+  status                SubscriptionStatus @default(ACTIVE)
+  billingCycle          BillingCycle       @default(MONTHLY)
+  currentPeriodStartsAt DateTime           @default(now()) @db.Timestamptz(6)
+  currentPeriodEndsAt   DateTime           @db.Timestamptz(6)
+  cancelledAt           DateTime?          @db.Timestamptz(6)
+  cancellationReason    String?            @db.VarChar(255)
+  renewalAlertSent      Boolean            @default(false)
+  createdAt             DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime           @updatedAt @db.Timestamptz(6)
+
+  user     User             @relation("UserSubscriptions", fields: [userId], references: [id], onDelete: Cascade)
+  plan     SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Restrict)
+  invoices Invoice[]
+
+  @@index([userId])
+  @@index([planId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model Invoice {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  invoiceNumber   String        @unique @db.VarChar(50)
+  userId          String        @db.Uuid
+  subscriptionId  String?       @db.Uuid
+  amountPkr       Decimal       @db.Decimal(12, 2)
+  taxPkr          Decimal       @default(0) @db.Decimal(12, 2)
+  totalPkr        Decimal       @db.Decimal(12, 2)
+  status          InvoiceStatus @default(ISSUED)
+  dueDate         DateTime      @db.Date
+  paidAt          DateTime?     @db.Timestamptz(6)
+  itemDescription String        @db.VarChar(255)
+  paymentMethod   String?       @db.VarChar(50)
+  createdAt       DateTime      @default(now()) @db.Timestamptz(6)
+
+  user         User          @relation("UserInvoices", fields: [userId], references: [id], onDelete: Restrict)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  creditNotes  CreditNote[]
+
+  @@index([userId])
+  @@index([invoiceNumber])
+  @@index([status])
+  @@map("invoices")
+}
+
+model CreditNote {
+  id               String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  creditNoteNumber String   @unique @db.VarChar(50)
+  invoiceId        String   @db.Uuid
+  amountPkr        Decimal  @db.Decimal(12, 2)
+  reason           String   @db.VarChar(255)
+  issuedAt         DateTime @default(now()) @db.Timestamptz(6)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Restrict)
+
+  @@index([invoiceId])
+  @@map("credit_notes")
+}
+
+model Referral {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  referrerUserId String    @db.Uuid
+  referredUserId String?   @db.Uuid
+  referralCode   String    @db.VarChar(50)
+  referralType   String    @default("TENANT") @db.VarChar(20)
+  ipAddress      String?   @db.VarChar(45)
+  userAgent      String?   @db.VarChar(255)
+  isFraudFlagged Boolean   @default(false)
+  fraudReason    String?   @db.VarChar(255)
+  isQualified    Boolean   @default(false)
+  qualifiedAt    DateTime? @db.Timestamptz(6)
+  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
+
+  referrer User            @relation("ReferrerUser", fields: [referrerUserId], references: [id], onDelete: Cascade)
+  referred User?           @relation("ReferredUser", fields: [referredUserId], references: [id], onDelete: SetNull)
+  rewards  ReferralReward[]
+
+  @@index([referralCode])
+  @@index([referrerUserId])
+  @@index([referredUserId])
+  @@map("referrals")
+}
+
+model ReferralReward {
+  id             String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  referralId     String               @db.Uuid
+  rewardAmountPkr Decimal             @db.Decimal(10, 2)
+  rewardType     String               @default("WALLET_CREDIT") @db.VarChar(50)
+  status         ReferralRewardStatus @default(PENDING)
+  approvedAt     DateTime?            @db.Timestamptz(6)
+  paidAt         DateTime?            @db.Timestamptz(6)
+  clawbackAt     DateTime?            @db.Timestamptz(6)
+  clawbackReason String?              @db.VarChar(255)
+  createdAt      DateTime             @default(now()) @db.Timestamptz(6)
+
+  referral Referral @relation(fields: [referralId], references: [id], onDelete: Cascade)
+
+  @@index([referralId])
+  @@index([status])
+  @@map("referral_rewards")
+}
+
+model Payout {
+  id              String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId          String       @db.Uuid
+  amountPkr       Decimal      @db.Decimal(12, 2)
+  payoutMethod    String       @db.VarChar(50)
+  accountNumber   String       @db.VarChar(50)
+  accountTitle    String       @db.VarChar(100)
+  status          PayoutStatus @default(PENDING)
+  referenceNumber String?      @db.VarChar(100)
+  notes           String?      @db.Text
+  requestedAt     DateTime     @default(now()) @db.Timestamptz(6)
+  completedAt     DateTime?    @db.Timestamptz(6)
+
+  user User @relation("UserPayouts", fields: [userId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([status])
+  @@map("payouts")
+}
+
+model RevenueEvent {
+  id           String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  type         RevenueEventType
+  amountPkr    Decimal              @db.Decimal(12, 2)
+  sourceId     String?              @db.VarChar(100)
+  localityId   String?              @db.Uuid
+  propertyType PropertyType?
+  eligibility  PropertyEligibility?
+  metadata     Json?
+  recordedAt   DateTime             @default(now()) @db.Timestamptz(6)
+
+  locality Locality? @relation(fields: [localityId], references: [id], onDelete: SetNull)
+
+  @@index([type])
+  @@index([recordedAt])
+  @@index([localityId])
+  @@map("revenue_events")
+}
+
 
 
 

@@ -70,18 +70,31 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-sm text-navy-300">
               <li>
-                <Link href="/properties?tenantType=STUDENT" className="hover:text-student-text">
+                <Link
+                  href="/for-landlords"
+                  className="hover:text-peshawar-400 font-semibold text-peshawar-300"
+                >
+                  🏡 For Landlords (0% Brokerage)
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing" className="hover:text-peshawar-400">
+                  💎 Pricing & Boosts
+                </Link>
+              </li>
+              <li>
+                <Link href="/students" className="hover:text-student-text">
                   🎓 Student Hostels & Rooms
                 </Link>
               </li>
               <li>
-                <Link href="/properties?tenantType=FAMILY" className="hover:text-family-text">
-                  👨‍👩‍👧‍👦 Family Apartments & Houses
+                <Link href="/families" className="hover:text-family-text">
+                  👨‍👩‍👧‍👦 Family Portions & Houses
                 </Link>
               </li>
               <li>
-                <Link href="/favorites" className="hover:text-peshawar-400">
-                  Saved Properties
+                <Link href="/referrals" className="hover:text-emerald-400">
+                  🎁 Referral Rewards (PKR 500)
                 </Link>
               </li>
               <li>

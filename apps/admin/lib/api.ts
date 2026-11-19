@@ -567,3 +567,100 @@ export async function getSeoHealthReportAdmin() {
 export async function triggerSitemapRegenerateAdmin() {
   return request<any>('/growth/seo/sitemap.xml');
 }
+
+// ==========================================
+// PHASE 20: COMMERCIALIZATION & GROWTH ADMIN
+// ==========================================
+
+export async function getLeadsAdmin(params?: {
+  status?: string;
+  leadType?: string;
+  source?: string;
+  page?: number;
+  limit?: number;
+}) {
+  const qs = new URLSearchParams();
+  if (params?.status) qs.append('status', params.status);
+  if (params?.leadType) qs.append('leadType', params.leadType);
+  if (params?.source) qs.append('source', params.source);
+  if (params?.page) qs.append('page', String(params.page));
+  if (params?.limit) qs.append('limit', String(params.limit));
+  return request<any>(`/monetization/admin/leads?${qs.toString()}`);
+}
+
+export async function updateLeadStatusAdmin(
+  leadId: string,
+  payload: { status: string; reason?: string },
+) {
+  return request<any>(`/monetization/admin/leads/${leadId}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function logContactAttemptAdmin(
+  leadId: string,
+  payload: { channel: string; successful: boolean; notes?: string },
+) {
+  return request<any>(`/monetization/admin/leads/${leadId}/contact`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function assignLeadAdmin(leadId: string, payload: { assignedToId: string }) {
+  return request<any>(`/monetization/admin/leads/${leadId}/assign`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function addLeadNoteAdmin(leadId: string, payload: { note: string }) {
+  return request<any>(`/monetization/admin/leads/${leadId}/notes`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function getCampaignsAdmin(status?: string) {
+  const qs = status ? `?status=${status}` : '';
+  return request<any>(`/monetization/admin/campaigns${qs}`);
+}
+
+export async function createCampaignAdmin(payload: any) {
+  return request<any>('/monetization/admin/campaigns', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function getSubscriptionsAdmin(status?: string) {
+  const qs = status ? `?status=${status}` : '';
+  return request<any>(`/monetization/admin/subscriptions${qs}`);
+}
+
+export async function getAdminInvoices(status?: string) {
+  const qs = status ? `?status=${status}` : '';
+  return request<any>(`/monetization/admin/invoices${qs}`);
+}
+
+export async function refundInvoiceAdmin(
+  invoiceId: string,
+  payload: { reason: string; amount?: number },
+) {
+  return request<any>(`/monetization/admin/invoices/${invoiceId}/refund`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function getCommercialOverviewAdmin() {
+  return request<any>('/monetization/admin/overview');
+}
+
+export async function createPromoCodeAdmin(payload: any) {
+  return request<any>('/monetization/admin/promo-codes', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+}

@@ -5,6 +5,8 @@ import '../../../../core/constants/peshawar_constants.dart';
 import '../../../../core/models/user_model.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../auth/application/providers/auth_provider.dart';
+import '../../landlord/presentation/screens/landlord_subscription_screen.dart';
+import 'referral_screen.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -147,10 +149,33 @@ class ProfileScreen extends ConsumerWidget {
             subtitle: 'NADRA document upload & liveness submission',
             onTap: () => context.push('/landlord/verification'),
           ),
+          _buildListTile(
+            icon: Icons.workspace_premium_outlined,
+            title: 'Subscriptions & Listing Boosts',
+            subtitle: 'Pro Landlord tiers, offline invoices & featured badges',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LandlordSubscriptionScreen()),
+              );
+            },
+          ),
           const SizedBox(height: 24),
 
           // Settings / Navigation List
           const Text('Marketplace Information', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 8),
+          _buildListTile(
+            icon: Icons.card_giftcard,
+            title: 'Refer & Earn (PKR 500)',
+            subtitle: 'Invite students & landlords for real cash rewards',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ReferralScreen()),
+              );
+            },
+          ),
           const SizedBox(height: 8),
           _buildListTile(
             icon: Icons.map,

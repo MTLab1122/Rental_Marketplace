@@ -1316,3 +1316,138 @@ export interface FraudTrendDto {
   blockedCount: number;
   criticalRiskCount: number;
 }
+
+// ==========================================
+// PHASE 20: COMMERCIALIZATION, MONETIZATION & CRM DTOS
+// ==========================================
+
+export interface LeadDto {
+  id: string;
+  fullName: string;
+  email?: string | null;
+  phoneNumber: string;
+  normalizedPhone: string;
+  leadType: 'LANDLORD' | 'TENANT' | 'AGENCY_HOSTEL';
+  status:
+    'NEW' | 'CONTACTED' | 'QUALIFIED' | 'NURTURE' | 'CONVERTED' | 'LOST' | 'INVALID' | 'DUPLICATE';
+  source: string;
+  localityId?: string | null;
+  localityName?: string | null;
+  propertyCount?: number | null;
+  assignedToId?: string | null;
+  assignedToName?: string | null;
+  campaignId?: string | null;
+  campaignName?: string | null;
+  notesSummary?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateLeadDto {
+  fullName: string;
+  email?: string;
+  phoneNumber: string;
+  leadType?: 'LANDLORD' | 'TENANT' | 'AGENCY_HOSTEL';
+  source?: string;
+  localityId?: string;
+  propertyCount?: number;
+  utmSource?: string;
+  utmMedium?: string;
+  utmCampaign?: string;
+  utmContent?: string;
+  notes?: string;
+}
+
+export interface CampaignDto {
+  id: string;
+  name: string;
+  slug: string;
+  channel: string;
+  status: 'DRAFT' | 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'ARCHIVED';
+  budgetPkr?: number | null;
+  spentPkr?: number | null;
+  targetAudience?: string | null;
+  utmSource: string;
+  utmMedium: string;
+  utmCampaign: string;
+  startDate?: string | null;
+  endDate?: string | null;
+  impressions?: number;
+  clicks?: number;
+  conversions?: number;
+  leadsCount?: number;
+  createdAt: string;
+}
+
+export interface PromotionDto {
+  id: string;
+  name: string;
+  slug: string;
+  type:
+    | 'FEATURED_LISTING'
+    | 'TOP_SEARCH_PLACEMENT'
+    | 'LOCALITY_SPONSORSHIP'
+    | 'VERIFIED_LANDLORD_BADGE'
+    | 'LEAD_BOOST'
+    | 'DISCOUNT';
+  pricePkr: number;
+  durationDays: number;
+  status: 'DRAFT' | 'ACTIVE' | 'EXPIRED' | 'CANCELLED';
+  activeCount: number;
+  eligibleCategory?: string | null;
+  inventoryLimit?: number | null;
+  createdAt: string;
+}
+
+export interface SubscriptionPlanDto {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  priceMonthlyPkr: number;
+  priceQuarterlyPkr: number;
+  priceYearlyPkr: number;
+  maxActiveListings: number;
+  features: string[];
+  isPublic: boolean;
+}
+
+export interface SubscriptionDto {
+  id: string;
+  userId: string;
+  planId: string;
+  planName: string;
+  status: 'TRIALING' | 'ACTIVE' | 'PAST_DUE' | 'CANCELLED' | 'EXPIRED';
+  billingCycle: 'MONTHLY' | 'QUARTERLY' | 'YEARLY';
+  currentPeriodStartsAt: string;
+  currentPeriodEndsAt: string;
+  cancelledAt?: string | null;
+}
+
+export interface InvoiceDto {
+  id: string;
+  invoiceNumber: string;
+  userId: string;
+  amountPkr: number;
+  taxPkr: number;
+  totalPkr: number;
+  status: 'DRAFT' | 'ISSUED' | 'PAID' | 'VOID' | 'REFUNDED';
+  dueDate: string;
+  paidAt?: string | null;
+  itemDescription: string;
+  paymentMethod?: string | null;
+  createdAt: string;
+}
+
+export interface CommercialOverviewDto {
+  mrrPkr: number;
+  arrPkr: number;
+  totalRevenuePkr: number;
+  totalActiveSubscribers: number;
+  totalActiveLeads: number;
+  leadConversionRate: number;
+  activePromotionsCount: number;
+  totalInvoicesPaid: number;
+  recentTransactionsCount: number;
+  localityRevenueBreakdown: { localityName: string; revenuePkr: number }[];
+}
