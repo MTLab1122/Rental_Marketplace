@@ -19,6 +19,7 @@ export default tseslint.config(
     files: ['**/*.js', '**/*.cjs'],
     languageOptions: {
       globals: {
+        console: 'readonly',
         module: 'writable',
         exports: 'writable',
         require: 'readonly',
@@ -37,6 +38,12 @@ export default tseslint.config(
         { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
       ],
       'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
+    },
+  },
+  {
+    files: ['scripts/**/*.js', 'scripts/**/*.cjs', 'scripts/**/*.ts'],
+    rules: {
+      'no-console': 'off',
     },
   },
 );
