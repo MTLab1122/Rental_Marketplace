@@ -17,7 +17,8 @@ import {
 
 describe('Phase 25: Growth, Commercial, SEO/AEO/GEO & Multi-City Scale Certification', () => {
   let growthService: GrowthService;
-  let prismaService: Record<string, Record<string, jest.Mock>>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let prismaService: any;
 
   beforeEach(async () => {
     prismaService = {
@@ -212,7 +213,7 @@ describe('Phase 25: Growth, Commercial, SEO/AEO/GEO & Multi-City Scale Certifica
 
       await expect(
         growthService.claimReferral(
-          { referralCode: 'PESH-TENANT-A8F5E1', referralType: ReferralType.TENANT },
+          { referralCode: 'PESH-STUDENT-A8F5E1', referralType: ReferralType.STUDENT },
           'new-user-123',
         ),
       ).rejects.toThrow('Referral bonus already claimed for this account');
