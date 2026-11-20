@@ -68,7 +68,7 @@ export default async function PropertyDetailPage({ params }: PageProps) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-16">
         <EmptyState
-          icon="🚫"
+          icon=""
           title="Property Unavailable or Category Restricted"
           description={
             error ||
@@ -136,28 +136,27 @@ export default async function PropertyDetailPage({ params }: PageProps) {
         {/* Specifications Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-white p-4 rounded-m3-md border border-navy-100 text-center shadow-xs">
           <div className="p-2 border-r border-navy-50">
-            <div className="text-lg">🛏️</div>
+            <div className="text-lg"></div>
             <div className="text-xs text-navy-400 font-semibold mt-1">Bedrooms</div>
             <div className="text-sm font-black text-navy-900">
               {property.bedrooms || 'Studio / N/A'}
             </div>
           </div>
           <div className="p-2 border-r border-navy-50">
-            <div className="text-lg">🚿</div>
+            <div className="text-lg"></div>
             <div className="text-xs text-navy-400 font-semibold mt-1">Bathrooms</div>
             <div className="text-sm font-black text-navy-900">
               {property.bathrooms || 'Shared / N/A'}
             </div>
           </div>
           <div className="p-2 border-r border-navy-50">
-            <div className="text-lg">🛋️</div>
+            <div className="text-lg"></div>
             <div className="text-xs text-navy-400 font-semibold mt-1">Furnishing</div>
             <div className="text-sm font-black text-navy-900 capitalize">
               {property.furnishing ? property.furnishing.toLowerCase() : 'Unfurnished'}
             </div>
           </div>
           <div className="p-2">
-            <div className="text-lg">📐</div>
             <div className="text-xs text-navy-400 font-semibold mt-1">Area</div>
             <div className="text-sm font-black text-navy-900">
               {property.areaSqFt ? `${property.areaSqFt} Sq Ft` : 'Standard'}

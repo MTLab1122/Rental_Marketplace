@@ -112,19 +112,19 @@ export default async function AreaGuidePage({ params }: PageProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="bg-white p-5 rounded-m3-md border border-navy-100 space-y-2 shadow-xs">
             <h2 className="text-sm font-bold text-navy-900 flex items-center gap-2">
-              <span>🚌</span> Public Transit & BRT
+              <span></span> Public Transit & BRT
             </h2>
             <p className="text-xs text-navy-600 leading-relaxed">{locality.brtAccess}</p>
           </div>
           <div className="bg-white p-5 rounded-m3-md border border-navy-100 space-y-2 shadow-xs">
             <h2 className="text-sm font-bold text-navy-900 flex items-center gap-2">
-              <span>🏛️</span> Prominent Landmarks
+              <span></span> Prominent Landmarks
             </h2>
             <p className="text-xs text-navy-600 leading-relaxed">{locality.landmarks.join(', ')}</p>
           </div>
           <div className="bg-white p-5 rounded-m3-md border border-navy-100 space-y-2 shadow-xs">
             <h2 className="text-sm font-bold text-navy-900 flex items-center gap-2">
-              <span>🎓</span> Universities & Colleges
+              <span></span> Universities & Colleges
             </h2>
             <p className="text-xs text-navy-600 leading-relaxed">
               {locality.universitiesNear.join(', ')}
@@ -132,7 +132,7 @@ export default async function AreaGuidePage({ params }: PageProps) {
           </div>
           <div className="bg-white p-5 rounded-m3-md border border-navy-100 space-y-2 shadow-xs">
             <h2 className="text-sm font-bold text-navy-900 flex items-center gap-2">
-              <span>🏥</span> Hospitals & Medical Centers
+              <span></span> Hospitals & Medical Centers
             </h2>
             <p className="text-xs text-navy-600 leading-relaxed">
               {locality.hospitalsNear.join(', ')}

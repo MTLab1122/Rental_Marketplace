@@ -158,13 +158,13 @@ export default async function StudentCategoryPage({ params }: PageProps) {
             href={`/rentals/peshawar/${locality.slug}/students`}
             className="px-3.5 py-1.5 rounded-m3-sm bg-peshawar-600 text-white text-xs font-bold shadow-xs"
           >
-            🎓 Student Hostels ({properties.length})
+            Student Hostels ({properties.length})
           </Link>
           <Link
             href={`/rentals/peshawar/${locality.slug}/families`}
             className="px-3.5 py-1.5 rounded-m3-sm bg-navy-100 hover:bg-navy-200 text-navy-800 text-xs font-semibold transition"
           >
-            👨‍👩‍👧 Family Portions & Houses
+            Family Portions & Houses
           </Link>
         </div>
       </section>
@@ -183,7 +183,7 @@ export default async function StudentCategoryPage({ params }: PageProps) {
         {properties.length === 0 ? (
           <div className="bg-white rounded-m3-lg border border-navy-100 p-8">
             <EmptyState
-              icon="🎓"
+              icon=""
               title={`No Student Listings in ${locality.name} Right Now`}
               description={`Explore student hostels in neighboring sectors or check all available properties in ${locality.name}.`}
               actionText={`View All ${locality.name} Rentals`}

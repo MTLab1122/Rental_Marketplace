@@ -52,7 +52,7 @@ export default function BookingsPage() {
       case 'EXPIRED':
         return 'bg-rose-100 text-rose-800 border-rose-300';
       case 'DISPUTED':
-        return 'bg-purple-100 text-purple-800 border-purple-300';
+        return 'bg-terracotta-100 text-terracotta-800 border-terracotta-300';
       default:
         return 'bg-slate-100 text-slate-800 border-slate-300';
     }
@@ -114,7 +114,7 @@ export default function BookingsPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <span
-                    className={`px-2.5 py-1 text-xs font-semibold rounded-full border ${getStatusColor(booking.status)}`}
+                    className={`px-2.5 py-1 text-xs font-semibold rounded-md border ${getStatusColor(booking.status)}`}
                   >
                     {booking.status}
                   </span>

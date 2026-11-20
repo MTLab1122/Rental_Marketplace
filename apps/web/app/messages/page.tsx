@@ -290,7 +290,7 @@ function MessagesContent() {
     return (
       <main className="max-w-4xl mx-auto px-4 py-16">
         <EmptyState
-          icon="🔒"
+          icon=""
           title="Sign in to View Messages"
           description="Access your direct communications with verified Peshawar landlords."
           actionText="Sign In"
@@ -355,7 +355,7 @@ function MessagesContent() {
                       isSelected ? 'bg-peshawar-50/80 border-l-4 border-peshawar-600' : ''
                     }`}
                   >
-                    <div className="w-10 h-10 rounded-full bg-peshawar-100 text-peshawar-800 font-black text-sm flex items-center justify-center shrink-0 border border-peshawar-200">
+                    <div className="w-10 h-10 rounded-md bg-peshawar-100 text-peshawar-800 font-black text-sm flex items-center justify-center shrink-0 border border-peshawar-200">
                       {recipientName.charAt(0).toUpperCase()}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -384,7 +384,7 @@ function MessagesContent() {
                           )}
                         </p>
                         {!!conv.unreadCount && conv.unreadCount > 0 && (
-                          <span className="px-1.5 py-0.5 rounded-full bg-peshawar-600 text-white font-extrabold text-[10px]">
+                          <span className="px-1.5 py-0.5 rounded-md bg-peshawar-600 text-white font-extrabold text-[10px]">
                             {conv.unreadCount}
                           </span>
                         )}
@@ -408,7 +408,7 @@ function MessagesContent() {
               {/* Thread Header */}
               <div className="p-3.5 border-b border-navy-100 flex flex-wrap items-center justify-between gap-2 bg-white">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full bg-peshawar-100 text-peshawar-800 font-extrabold text-xs flex items-center justify-center border border-peshawar-200">
+                  <div className="w-9 h-9 rounded-md bg-peshawar-100 text-peshawar-800 font-extrabold text-xs flex items-center justify-center border border-peshawar-200">
                     {getRecipient(selectedConversation).charAt(0).toUpperCase()}
                   </div>
                   <div>
@@ -435,7 +435,7 @@ function MessagesContent() {
                       rel="noopener noreferrer"
                       className="px-2.5 py-1 bg-peshawar-600 text-white rounded-m3-sm text-[11px] font-extrabold hover:bg-peshawar-700 transition flex items-center gap-1 shadow-xs"
                     >
-                      <span>💬</span> WhatsApp
+                      WhatsApp
                     </a>
                   )}
 
@@ -463,7 +463,7 @@ function MessagesContent() {
               {/* Blocked Alert Banner */}
               {selectedConversation.isBlocked && (
                 <div className="bg-red-50 border-b border-red-100 px-4 py-2 text-xs text-red-800 font-bold flex items-center gap-2">
-                  <span>🚫</span> This conversation is blocked. Neither participant can send new
+                  <span></span> This conversation is blocked. Neither participant can send new
                   messages.
                 </div>
               )}
@@ -551,7 +551,7 @@ function MessagesContent() {
           ) : (
             <div className="flex-1 flex items-center justify-center p-8">
               <EmptyState
-                icon="💬"
+                icon=""
                 title="Select a Conversation"
                 description="Pick a chat thread from the left to view message history and discuss rental details safely."
               />

@@ -123,7 +123,7 @@ export default function BookingPaymentPage() {
             PKR {initialAmount.toLocaleString()}
           </div>
         </div>
-        <span className="px-3 py-1 bg-emerald-200 text-emerald-900 font-bold text-xs rounded-full">
+        <span className="px-3 py-1 bg-emerald-200 text-emerald-900 font-bold text-xs rounded-md">
           Secure Escrow Trust
         </span>
       </div>

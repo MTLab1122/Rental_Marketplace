@@ -70,7 +70,7 @@ export default function SaveSearchModal({
       <div className="bg-white rounded-m3-lg border border-navy-100 p-6 max-w-md w-full shadow-xl space-y-4">
         <div className="flex items-center justify-between border-b border-navy-100 pb-3">
           <div className="flex items-center gap-2">
-            <span className="text-xl">🔔</span>
+            <span className="text-xl"></span>
             <h3 className="font-extrabold text-navy-950 text-base">Save Search & Get Alerts</h3>
           </div>
           <button
@@ -157,7 +157,7 @@ export default function SaveSearchModal({
                 onChange={(e) => setAlertsEnabled(e.target.checked)}
                 className="sr-only peer"
               />
-              <div className="w-10 h-5 bg-navy-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-peshawar-600"></div>
+              <div className="w-10 h-5 bg-navy-200 peer-focus:outline-none rounded-md peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-md after:h-4 after:w-4 after:transition-all peer-checked:bg-peshawar-600"></div>
             </label>
           </div>
 
@@ -168,7 +168,7 @@ export default function SaveSearchModal({
               </label>
               <div className="grid grid-cols-3 gap-2">
                 {[
-                  { id: AlertFrequency.INSTANT, label: 'Instant ⚡' },
+                  { id: AlertFrequency.INSTANT, label: 'Instant ' },
                   { id: AlertFrequency.DAILY, label: 'Daily Digest' },
                   { id: AlertFrequency.WEEKLY, label: 'Weekly' },
                 ].map((f) => (

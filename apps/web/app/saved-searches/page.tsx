@@ -7,6 +7,7 @@ import { useAuth } from '../../lib/auth-context';
 import { getMySavedSearches, deleteSavedSearch, updateSavedSearchAlerts } from '../../lib/api';
 import { SavedSearchDto, AlertFrequency } from '@rental-peshawar/shared-types';
 import EmptyState from '../../components/EmptyState';
+import { SearchIcon } from '../../components/Icons';
 
 export default function SavedSearchesPage() {
   const router = useRouter();
@@ -94,7 +95,7 @@ export default function SavedSearchesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-navy-100 pb-4">
         <div>
           <h1 className="text-2xl font-black text-navy-950 flex items-center gap-2">
-            <span>🔔</span> My Saved Searches & Alerts
+            My Saved Searches & Alerts
           </h1>
           <p className="text-xs text-navy-500 mt-1">
             Get instant or daily notifications whenever a new matching property is verified in
@@ -117,7 +118,7 @@ export default function SavedSearchesPage() {
 
       {searches.length === 0 ? (
         <EmptyState
-          icon="🔍"
+          icon=""
           title="No Saved Searches Yet"
           description="When browsing properties in Peshawar, click 'Save Search' to receive automatic alerts when new listings are posted."
           actionText="Browse Available Listings"
@@ -147,7 +148,7 @@ export default function SavedSearchesPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <h2 className="text-sm font-black text-navy-950 flex items-center gap-2">
-                      <span>📌</span> {search.name}
+                      <span></span> {search.name}
                     </h2>
                     <div className="text-[11px] text-navy-400 mt-0.5">
                       Created on {new Date(search.createdAt).toLocaleDateString()}
@@ -159,7 +160,7 @@ export default function SavedSearchesPage() {
                       href={`/properties?${searchParams.toString()}`}
                       className="px-3 py-1.5 bg-navy-50 hover:bg-navy-100 text-navy-800 text-xs font-bold rounded-m3-sm border border-navy-200 transition flex items-center gap-1"
                     >
-                      <span>🔍</span> Run Search
+                      <SearchIcon className="w-4 h-4 text-navy-400" /> Run Search
                     </Link>
                     <button
                       type="button"
@@ -175,27 +176,27 @@ export default function SavedSearchesPage() {
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   {filters.localityId && (
                     <span className="text-[11px] font-semibold bg-navy-50 text-navy-700 px-2 py-0.5 rounded border border-navy-100">
-                      📍 Locality Selected
+                      Locality Selected
                     </span>
                   )}
                   {filters.propertyType && (
                     <span className="text-[11px] font-semibold bg-navy-50 text-navy-700 px-2 py-0.5 rounded border border-navy-100">
-                      🏢 {filters.propertyType}
+                      {filters.propertyType}
                     </span>
                   )}
                   {filters.bedrooms && (
                     <span className="text-[11px] font-semibold bg-navy-50 text-navy-700 px-2 py-0.5 rounded border border-navy-100">
-                      🛏️ {filters.bedrooms}+ Beds
+                      {filters.bedrooms}+ Beds
                     </span>
                   )}
                   {filters.maxPrice && (
                     <span className="text-[11px] font-semibold bg-navy-50 text-navy-700 px-2 py-0.5 rounded border border-navy-100">
-                      💰 ≤ PKR {Number(filters.maxPrice).toLocaleString('en-PK')}
+                      ≤ PKR {Number(filters.maxPrice).toLocaleString('en-PK')}
                     </span>
                   )}
                   {filters.eligibility && (
                     <span className="text-[11px] font-semibold bg-navy-50 text-navy-700 px-2 py-0.5 rounded border border-navy-100">
-                      👥 {filters.eligibility}
+                      {filters.eligibility}
                     </span>
                   )}
                 </div>
@@ -212,7 +213,7 @@ export default function SavedSearchesPage() {
                         }
                         className="sr-only peer"
                       />
-                      <div className="w-8 h-4 bg-navy-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-peshawar-600"></div>
+                      <div className="w-8 h-4 bg-navy-200 peer-focus:outline-none rounded-md peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-md after:h-3 after:w-3 after:transition-all peer-checked:bg-peshawar-600"></div>
                     </label>
                     <span className="text-xs font-bold text-navy-800">
                       {search.alertsEnabled ? 'Alerts Active' : 'Alerts Paused'}
@@ -233,7 +234,7 @@ export default function SavedSearchesPage() {
                         }
                         className="text-xs font-bold bg-navy-50 border border-navy-200 rounded-m3-sm px-2 py-1 text-navy-900 focus:outline-none focus:border-peshawar-600"
                       >
-                        <option value={AlertFrequency.INSTANT}>Instant ⚡</option>
+                        <option value={AlertFrequency.INSTANT}>Instant </option>
                         <option value={AlertFrequency.DAILY}>Daily Digest</option>
                         <option value={AlertFrequency.WEEKLY}>Weekly</option>
                       </select>

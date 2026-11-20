@@ -7,6 +7,19 @@ const nextConfig: NextConfig = {
     '@rental-peshawar/shared-types',
     '@rental-peshawar/config',
   ],
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+    ],
+  },
   async rewrites() {
     return [
       {

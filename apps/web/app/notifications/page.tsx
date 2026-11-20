@@ -64,7 +64,7 @@ export default function NotificationsPage() {
     return (
       <main className="max-w-4xl mx-auto px-4 py-16">
         <EmptyState
-          icon="🔒"
+          icon=""
           title="Sign in to View Notifications"
           description="Stay updated with rental application statuses, new direct messages, and verification updates."
           actionText="Sign In"
@@ -78,15 +78,15 @@ export default function NotificationsPage() {
     switch (type) {
       case 'INQUIRY_RECEIVED':
       case 'INQUIRY_REPLIED':
-        return '📬';
+        return '';
       case 'MESSAGE_NEW':
-        return '💬';
+        return '';
       case 'PROPERTY_APPROVED':
-        return '✅';
+        return '';
       case 'PROPERTY_REJECTED':
-        return '⚠️';
+        return '';
       default:
-        return '🔔';
+        return '';
     }
   };
 
@@ -186,7 +186,7 @@ export default function NotificationsPage() {
                 </div>
 
                 {!notif.isRead && (
-                  <span className="w-2.5 h-2.5 rounded-full bg-peshawar-600 shrink-0 mt-1" />
+                  <span className="w-2.5 h-2.5 rounded-md bg-peshawar-600 shrink-0 mt-1" />
                 )}
               </div>
             );
@@ -194,7 +194,7 @@ export default function NotificationsPage() {
         </div>
       ) : (
         <EmptyState
-          icon="🔔"
+          icon=""
           title="No Notifications Yet"
           description="You will receive alerts here when landlords reply to your applications or send messages."
           actionText="Browse Listings"

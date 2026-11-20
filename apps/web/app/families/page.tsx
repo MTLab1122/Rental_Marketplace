@@ -41,25 +41,25 @@ export default function FamiliesPage() {
       title: 'Separate Sub-Meter or Independent Wapda Meter',
       description:
         'Never argue over split electricity bills. We verify meter independence for every listed upper and lower portion.',
-      icon: '⚡',
+      icon: '',
     },
     {
       title: 'Verified Water Supply & Dedicated Tank',
       description:
         'Confirmed tube-well schedule, overhead water storage tank capacity, and municipal supply reliability.',
-      icon: '💧',
+      icon: '',
     },
     {
       title: 'Strict Family-Only Buildings',
       description:
         'No commercial disruption or mixed bachelor tenancies in the same staircase without your advance agreement.',
-      icon: '🏡',
+      icon: '',
     },
     {
       title: 'Legally Valid KP Tenancy Leases',
       description:
         'Police registration paperwork support and legally vetted tenancy contracts to protect your family security.',
-      icon: '📜',
+      icon: '',
     },
   ];
 
@@ -69,8 +69,8 @@ export default function FamiliesPage() {
       <div className="bg-gradient-to-br from-family-bg via-rose-50 to-slate-50 py-16 px-4 sm:px-6 lg:px-8 border-b border-family-border">
         <div className="max-w-7xl mx-auto">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-100 text-rose-900 text-xs font-extrabold uppercase tracking-wider mb-4 border border-rose-200">
-              👨‍👩‍👧‍👦 Peshawar Family Residential Portal
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-rose-100 text-rose-900 text-xs font-extrabold uppercase tracking-wider mb-4 border border-rose-200">
+              Peshawar Family Residential Portal
             </span>
             <h1 className="text-4xl sm:text-5xl font-extrabold text-navy-950 tracking-tight leading-tight">
               Rent Verified Family Portions & Houses Across Peshawar
@@ -117,7 +117,7 @@ export default function FamiliesPage() {
               className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-peshawar-400 transition group flex flex-col justify-between"
             >
               <div>
-                <span className="inline-block px-2.5 py-0.5 rounded-full bg-rose-50 text-rose-800 text-[11px] font-bold uppercase mb-3">
+                <span className="inline-block px-2.5 py-0.5 rounded-md bg-rose-50 text-rose-800 text-[11px] font-bold uppercase mb-3">
                   {loc.tag}
                 </span>
                 <h3 className="font-bold text-navy-950 text-lg group-hover:text-peshawar-600 transition">

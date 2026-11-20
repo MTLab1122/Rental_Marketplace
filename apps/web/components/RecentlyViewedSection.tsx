@@ -42,7 +42,7 @@ export default function RecentlyViewedSection({ limit = 6 }: RecentlyViewedSecti
     <section className="py-6 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-extrabold text-navy-950 text-base flex items-center gap-2">
-          <span>🕒</span> Recently Viewed Properties
+          Recently Viewed Properties
         </h3>
         <span className="text-xs text-navy-500 font-medium">{properties.length} items</span>
       </div>
@@ -73,7 +73,7 @@ export default function RecentlyViewedSection({ limit = 6 }: RecentlyViewedSecti
                     {prop.title}
                   </Link>
                   <div className="text-[11px] text-navy-500">
-                    🛏️ {prop.bedrooms} Bed • 🚿 {prop.bathrooms} Bath
+                    {prop.bedrooms} Bed • {prop.bathrooms} Bath
                   </div>
                 </div>
               </div>

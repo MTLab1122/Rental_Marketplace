@@ -63,7 +63,7 @@ export default function ForLandlordsPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
             <div className="lg:col-span-7">
-              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-peshawar-500/20 text-peshawar-300 text-xs font-bold uppercase tracking-wider mb-4 border border-peshawar-500/30">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-peshawar-500/20 text-peshawar-300 text-xs font-bold uppercase tracking-wider mb-4 border border-peshawar-500/30">
                 Peshawar Landlord Partner Program
               </span>
               <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
@@ -119,7 +119,7 @@ export default function ForLandlordsPage() {
               <div className="bg-white rounded-2xl p-8 shadow-2xl text-navy-950 border border-slate-200">
                 {submitted ? (
                   <div className="text-center py-8">
-                    <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                    <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-md flex items-center justify-center mx-auto mb-4 text-3xl">
                       ✓
                     </div>
                     <h3 className="text-2xl font-bold text-navy-950">Thank You, Landlord!</h3>
@@ -247,8 +247,7 @@ export default function ForLandlordsPage() {
                       {loading ? 'Submitting...' : 'Request Free Callback & Verification'}
                     </button>
                     <p className="text-[11px] text-slate-400 text-center">
-                      🔒 Your phone number is strictly used for onboarding and never shared
-                      publicly.
+                      Your phone number is strictly used for onboarding and never shared publicly.
                     </p>
                   </form>
                 )}
@@ -269,7 +268,7 @@ export default function ForLandlordsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-            <div className="w-12 h-12 bg-peshawar-100 text-peshawar-700 font-extrabold rounded-full flex items-center justify-center mx-auto mb-4 text-lg">
+            <div className="w-12 h-12 bg-peshawar-100 text-peshawar-700 font-extrabold rounded-md flex items-center justify-center mx-auto mb-4 text-lg">
               1
             </div>
             <h4 className="font-bold text-navy-950 text-base mb-2">Create Listing in 3 Mins</h4>
@@ -280,7 +279,7 @@ export default function ForLandlordsPage() {
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-            <div className="w-12 h-12 bg-peshawar-100 text-peshawar-700 font-extrabold rounded-full flex items-center justify-center mx-auto mb-4 text-lg">
+            <div className="w-12 h-12 bg-peshawar-100 text-peshawar-700 font-extrabold rounded-md flex items-center justify-center mx-auto mb-4 text-lg">
               2
             </div>
             <h4 className="font-bold text-navy-950 text-base mb-2">Peshawar Fast Moderation</h4>
@@ -291,7 +290,7 @@ export default function ForLandlordsPage() {
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-            <div className="w-12 h-12 bg-peshawar-100 text-peshawar-700 font-extrabold rounded-full flex items-center justify-center mx-auto mb-4 text-lg">
+            <div className="w-12 h-12 bg-peshawar-100 text-peshawar-700 font-extrabold rounded-md flex items-center justify-center mx-auto mb-4 text-lg">
               3
             </div>
             <h4 className="font-bold text-navy-950 text-base mb-2">Chat with Verified Tenants</h4>
@@ -302,7 +301,7 @@ export default function ForLandlordsPage() {
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm text-center">
-            <div className="w-12 h-12 bg-peshawar-100 text-peshawar-700 font-extrabold rounded-full flex items-center justify-center mx-auto mb-4 text-lg">
+            <div className="w-12 h-12 bg-peshawar-100 text-peshawar-700 font-extrabold rounded-md flex items-center justify-center mx-auto mb-4 text-lg">
               4
             </div>
             <h4 className="font-bold text-navy-950 text-base mb-2">Digital Lease & Escrow</h4>

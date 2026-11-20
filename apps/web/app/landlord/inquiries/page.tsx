@@ -120,7 +120,7 @@ export default function LandlordInquiriesInboxPage() {
                       {inq.tenant?.fullName || 'Prospective Tenant'}
                     </span>
                     <span
-                      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                      className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold ${
                         inq.status === 'SUBMITTED'
                           ? 'bg-amber-100 text-amber-800'
                           : inq.status === 'ACCEPTED'
@@ -207,7 +207,7 @@ export default function LandlordInquiriesInboxPage() {
                           href={`/messages?conversationId=${inq.conversationId}`}
                           className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
                         >
-                          💬 Open Chat
+                          Open Chat
                         </Link>
                       )}
 

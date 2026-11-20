@@ -239,7 +239,7 @@ function DisputesContent() {
                       {selectedDispute.booking?.property?.title || selectedDispute.bookingId}
                     </p>
                   </div>
-                  <span className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-full">
+                  <span className="px-3 py-1 bg-amber-100 text-amber-800 text-xs font-bold rounded-md">
                     {selectedDispute.status}
                   </span>
                 </div>

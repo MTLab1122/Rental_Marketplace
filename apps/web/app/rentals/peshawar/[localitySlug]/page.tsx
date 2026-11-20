@@ -128,15 +128,15 @@ export default async function LocalityHubPage({ params }: PageProps) {
         {/* Transit & Landmark Highlights */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-4 border-t border-navy-100 text-xs">
           <div className="bg-navy-50 p-3 rounded-m3-md">
-            <span className="font-bold text-navy-900 block mb-1">🚌 BRT Connectivity</span>
+            <span className="font-bold text-navy-900 block mb-1">BRT Connectivity</span>
             <p className="text-navy-600">{locality.brtAccess}</p>
           </div>
           <div className="bg-navy-50 p-3 rounded-m3-md">
-            <span className="font-bold text-navy-900 block mb-1">🎓 Academic Hubs</span>
+            <span className="font-bold text-navy-900 block mb-1">Academic Hubs</span>
             <p className="text-navy-600">{locality.universitiesNear.join(', ')}</p>
           </div>
           <div className="bg-navy-50 p-3 rounded-m3-md">
-            <span className="font-bold text-navy-900 block mb-1">🏥 Healthcare Centers</span>
+            <span className="font-bold text-navy-900 block mb-1">Healthcare Centers</span>
             <p className="text-navy-600">{locality.hospitalsNear.join(', ')}</p>
           </div>
         </div>
@@ -153,19 +153,19 @@ export default async function LocalityHubPage({ params }: PageProps) {
             href={`/rentals/peshawar/${locality.slug}/students`}
             className="px-3.5 py-1.5 rounded-m3-sm bg-navy-100 hover:bg-navy-200 text-navy-800 text-xs font-semibold transition"
           >
-            🎓 Student Hostels & Rooms
+            Student Hostels & Rooms
           </Link>
           <Link
             href={`/rentals/peshawar/${locality.slug}/families`}
             className="px-3.5 py-1.5 rounded-m3-sm bg-navy-100 hover:bg-navy-200 text-navy-800 text-xs font-semibold transition"
           >
-            👨‍👩‍👧 Family Portions & Houses
+            Family Portions & Houses
           </Link>
           <Link
             href={`/areas/${locality.slug}`}
             className="px-3.5 py-1.5 rounded-m3-sm bg-navy-100 hover:bg-navy-200 text-navy-800 text-xs font-semibold transition"
           >
-            📖 {locality.name} Living Guide
+            {locality.name} Living Guide
           </Link>
         </div>
       </section>
@@ -227,7 +227,7 @@ export default async function LocalityHubPage({ params }: PageProps) {
         {properties.length === 0 ? (
           <div className="bg-white rounded-m3-lg border border-navy-100 p-8">
             <EmptyState
-              icon="🏠"
+              icon="home"
               title={`No Active Listings in ${locality.name} Right Now`}
               description={`New rentals are added daily. Explore nearby areas or set an alert for ${locality.name}.`}
               actionText="View All Peshawar Listings"

@@ -91,7 +91,7 @@ export default function InquiryModal({
 
         {success ? (
           <div className="bg-peshawar-50 border border-peshawar-200 text-peshawar-800 p-4 rounded-m3-md text-sm text-center">
-            <span className="text-xl block mb-1">🎉</span>
+            <span className="text-xl block mb-1"></span>
             <strong>Inquiry Submitted!</strong>
             <p className="text-xs text-peshawar-600 mt-1">
               The verified landlord has been notified and will review your request.

@@ -15,7 +15,7 @@ export default function ProfilePage() {
     return (
       <main className="max-w-4xl mx-auto px-4 py-16">
         <EmptyState
-          icon="🔒"
+          icon=""
           title="Sign in to View Your Profile"
           description="Access your account details, discovery preferences, and verification status."
           actionText="Sign In"
@@ -44,7 +44,7 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* User Card */}
         <div className="bg-white p-6 rounded-m3-lg border border-navy-100 shadow-sm space-y-4">
-          <div className="w-16 h-16 rounded-full bg-peshawar-600 text-white font-black text-2xl flex items-center justify-center">
+          <div className="w-16 h-16 rounded-md bg-peshawar-600 text-white font-black text-2xl flex items-center justify-center">
             {user.fullName ? user.fullName[0]?.toUpperCase() : 'U'}
           </div>
           <div>
@@ -88,7 +88,7 @@ export default function ProfilePage() {
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold text-navy-900">🎓 Student Portal</span>
+                <span className="text-sm font-bold text-navy-900">Student Portal</span>
                 {tenantType === TenantType.STUDENT && (
                   <span className="text-student-text text-xs font-black">✓ Active</span>
                 )}
@@ -108,7 +108,7 @@ export default function ProfilePage() {
               }`}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-bold text-navy-900">👨‍👩‍👧‍👦 Family Portal</span>
+                <span className="text-sm font-bold text-navy-900">Family Portal</span>
                 {tenantType === TenantType.FAMILY && (
                   <span className="text-family-text text-xs font-black">✓ Active</span>
                 )}
@@ -125,13 +125,13 @@ export default function ProfilePage() {
               href="/favorites"
               className="px-3 py-2 bg-navy-50 rounded-m3-sm border border-navy-200 hover:bg-navy-100"
             >
-              ❤️ Saved Favorites
+              Saved Favorites
             </Link>
             <Link
               href="/inquiries"
               className="px-3 py-2 bg-navy-50 rounded-m3-sm border border-navy-200 hover:bg-navy-100"
             >
-              📬 Submitted Inquiries
+              Submitted Inquiries
             </Link>
           </div>
         </div>

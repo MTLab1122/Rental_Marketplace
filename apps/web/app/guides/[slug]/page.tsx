@@ -127,7 +127,7 @@ export default async function EditorialGuideDetailPage({ params }: PageProps) {
         className="bg-peshawar-50 border-l-4 border-peshawar-600 p-6 rounded-r-m3-lg space-y-2 shadow-xs"
       >
         <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider text-peshawar-900">
-          <span>⚡</span> Quick Answer (AEO Summary)
+          <span></span> Quick Answer (AEO Summary)
         </div>
         <p className="text-sm sm:text-base text-navy-900 leading-relaxed font-semibold">
           {guide.directAnswer}

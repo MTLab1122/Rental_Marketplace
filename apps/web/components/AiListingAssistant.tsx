@@ -50,7 +50,7 @@ export default function AiListingAssistant({ propertyId, token }: Props) {
     <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xl">✨</span>
+          <span className="text-xl"></span>
           <div>
             <h3 className="font-bold text-slate-900 text-sm">AI Listing Quality Assistant</h3>
             <p className="text-xs text-slate-500">
@@ -70,7 +70,7 @@ export default function AiListingAssistant({ propertyId, token }: Props) {
 
       {error && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-xs text-red-700">
-          ⚠️ {error}
+          {error}
         </div>
       )}
 
@@ -82,7 +82,7 @@ export default function AiListingAssistant({ propertyId, token }: Props) {
               Locality Pricing Benchmark
             </span>
             <span
-              className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+              className={`text-xs px-2 py-0.5 rounded-md font-bold ${
                 priceInsights.priceContext === 'AROUND_MARKET'
                   ? 'bg-emerald-100 text-emerald-800'
                   : priceInsights.priceContext === 'BELOW_MARKET'
@@ -123,7 +123,7 @@ export default function AiListingAssistant({ propertyId, token }: Props) {
       {/* Suggestions List */}
       {evaluated && suggestions.length === 0 && (
         <div className="p-4 bg-emerald-50 border border-emerald-100 rounded-lg text-emerald-800 text-xs text-center font-medium">
-          🎉 Excellent! Your listing meets all quality, amenity, and pricing standards for Peshawar.
+          Excellent! Your listing meets all quality, amenity, and pricing standards for Peshawar.
         </div>
       )}
 
@@ -151,7 +151,7 @@ export default function AiListingAssistant({ propertyId, token }: Props) {
                       <div className="text-slate-600 mt-0.5">{s.message}</div>
                       {s.actionableStep && (
                         <div className="text-sky-700 font-medium mt-1">
-                          👉 Action: {s.actionableStep}
+                          Action: {s.actionableStep}
                         </div>
                       )}
                     </div>

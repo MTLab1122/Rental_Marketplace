@@ -62,7 +62,7 @@ export default function GuidesIndexPage() {
         return (
           <section key={category} className="space-y-4">
             <h2 className="text-xl font-bold text-navy-900 border-b border-navy-100 pb-2 flex items-center gap-2">
-              <span>📌</span> {category} Guides
+              <span></span> {category} Guides
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {guides.map((guide) => (

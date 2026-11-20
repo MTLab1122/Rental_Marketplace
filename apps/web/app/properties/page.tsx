@@ -191,7 +191,7 @@ function PropertiesContent() {
                 : 'bg-family-bg text-family-text border-family-border'
             }`}
           >
-            {isStudent ? '🎓 Students Only Feed' : '👨‍👩‍👧‍👦 Families Only Feed'}
+            {isStudent ? 'Students Only Feed' : 'Families Only Feed'}
           </span>
         </div>
       </div>
@@ -203,7 +203,6 @@ function PropertiesContent() {
       <div className="bg-white p-4 rounded-xl border border-navy-100 shadow-sm space-y-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 text-xs font-bold text-navy-800">
-            <span>✨</span>
             <span>AI Semantic Property Search</span>
           </div>
           {isAiMode && (
@@ -229,7 +228,6 @@ function PropertiesContent() {
             disabled={loading || !aiQuery.trim()}
             className="px-4 py-2 bg-navy-900 hover:bg-navy-800 text-white rounded-lg text-xs font-semibold transition disabled:opacity-50 flex items-center gap-1.5"
           >
-            <span>✨</span>
             <span>Search with AI</span>
           </button>
         </form>
@@ -263,7 +261,7 @@ function PropertiesContent() {
           onClick={() => setSaveModalOpen(true)}
           className="px-3 py-1.5 bg-peshawar-600 hover:bg-peshawar-700 text-white font-bold text-xs rounded-m3-sm transition shadow-2xs flex items-center gap-1.5"
         >
-          <span>🔔</span> Save Search & Get Alerts
+          Save Search & Get Alerts
         </button>
       </div>
 
@@ -284,7 +282,6 @@ function PropertiesContent() {
                 />
                 {isAiMode && semanticExplanations[prop.id] && (
                   <div className="mt-1 px-3 py-1.5 bg-sky-50 border border-sky-100 rounded-lg text-[11px] text-sky-800 flex items-center gap-1.5">
-                    <span>💡</span>
                     <span>{semanticExplanations[prop.id]}</span>
                   </div>
                 )}
@@ -308,7 +305,7 @@ function PropertiesContent() {
         </div>
       ) : (
         <EmptyState
-          icon="🏘️"
+          icon=""
           title={`No ${isStudent ? 'Student' : 'Family'} Properties Found`}
           description="We couldn't find any listings matching your specific filter criteria in Peshawar. Try loosening price bounds or selecting all localities."
           actionText="Reset All Filters"

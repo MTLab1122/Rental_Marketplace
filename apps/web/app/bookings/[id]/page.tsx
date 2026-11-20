@@ -92,7 +92,7 @@ export default function BookingDetailPage() {
             <h1 className="text-2xl font-bold text-slate-900">
               Booking #{booking.id.substring(0, 8)}
             </h1>
-            <span className="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">
+            <span className="px-3 py-1 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-md">
               {booking.status}
             </span>
           </div>

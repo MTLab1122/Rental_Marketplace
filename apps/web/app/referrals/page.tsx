@@ -29,8 +29,8 @@ export default function ReferralsPage() {
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="text-center mb-10">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-3">
-            🎁 Peshawar Community Referral Program
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-emerald-100 text-emerald-800 text-xs font-bold uppercase tracking-wider mb-3">
+            Peshawar Community Referral Program
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-navy-950">
             Invite Friends & Landlords, Earn Real Rewards
@@ -58,7 +58,7 @@ export default function ReferralsPage() {
                 onClick={handleCopy}
                 className="flex-1 sm:flex-none px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-navy-800 font-bold text-xs rounded-xl transition"
               >
-                {copied ? '✓ Link Copied!' : '📋 Copy Link'}
+                {copied ? '✓ Link Copied!' : 'Copy Link'}
               </button>
               <a
                 href={`https://wa.me/?text=${shareText}`}
@@ -86,9 +86,7 @@ export default function ReferralsPage() {
         {/* Reward Tiers Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
-              🎓
-            </div>
+            <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center text-xl font-bold mb-4"></div>
             <h3 className="font-bold text-navy-950 text-base mb-1">
               Refer a Student or Family Tenant
             </h3>
@@ -102,9 +100,7 @@ export default function ReferralsPage() {
           </div>
 
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm">
-            <div className="w-10 h-10 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center text-xl font-bold mb-4">
-              🏡
-            </div>
+            <div className="w-10 h-10 bg-amber-100 text-amber-700 rounded-xl flex items-center justify-center text-xl font-bold mb-4"></div>
             <h3 className="font-bold text-navy-950 text-base mb-1">Refer a Property Landlord</h3>
             <p className="text-xs text-navy-600 mb-4">
               When a Peshawar landlord signs up with your link and their first listing is verified
@@ -158,7 +154,7 @@ export default function ReferralsPage() {
 
         {/* Anti-Fraud Disclaimer */}
         <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900">
-          <p className="font-bold mb-1">⚖️ Referral Terms & Anti-Abuse Integrity</p>
+          <p className="font-bold mb-1">Referral Terms & Anti-Abuse Integrity</p>
           <p>
             Self-referrals, duplicate accounts on the same device or IP subnet, and artificial
             listings are flagged automatically by our fraud detection engine. Rewards are

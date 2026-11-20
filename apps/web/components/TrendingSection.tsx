@@ -53,7 +53,7 @@ export default function TrendingSection({ limit = 4 }: TrendingSectionProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-black text-navy-950 flex items-center gap-2">
-            <span>🔥</span> Trending in Peshawar
+            <span></span> Trending in Peshawar
           </h2>
           <p className="text-xs text-navy-500">
             Listings with the highest tenant interest, inquiries, and view velocity.
@@ -76,10 +76,10 @@ export default function TrendingSection({ limit = 4 }: TrendingSectionProps) {
                 <div className="relative aspect-[16/10] bg-navy-100">
                   <img src={imageUrl} alt={prop.title} className="w-full h-full object-cover" />
                   <div className="absolute top-1.5 left-1.5 bg-rose-600 text-white text-[9px] font-extrabold px-1.5 py-0.5 rounded shadow-xs">
-                    🔥 HOT
+                    HOT
                   </div>
                   <div className="absolute bottom-1.5 right-1.5 bg-navy-950/80 backdrop-blur-xs text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                    📍 {prop.locality?.name || 'Peshawar'}
+                    {prop.locality?.name || 'Peshawar'}
                   </div>
                 </div>
 
@@ -102,7 +102,7 @@ export default function TrendingSection({ limit = 4 }: TrendingSectionProps) {
                   </Link>
 
                   <div className="text-[11px] text-navy-600">
-                    🛏️ {prop.bedrooms} Bed • 🚿 {prop.bathrooms} Bath • {prop.propertyType}
+                    {prop.bedrooms} Bed • {prop.bathrooms} Bath • {prop.propertyType}
                   </div>
                 </div>
               </div>

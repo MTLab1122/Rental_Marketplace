@@ -46,7 +46,7 @@ export default function FavoritesPage() {
     return (
       <main className="max-w-4xl mx-auto px-4 py-16">
         <EmptyState
-          icon="🔒"
+          icon=""
           title="Sign in to View Saved Properties"
           description="Log in with your tenant account to access your saved Peshawar rental accommodations."
           actionText="Sign In"
@@ -87,7 +87,7 @@ export default function FavoritesPage() {
         </div>
       ) : (
         <EmptyState
-          icon="❤️"
+          icon="heart"
           title="No Saved Properties Yet"
           description="Click the heart icon on any Peshawar property card to save it for quick review and comparison."
           actionText="Browse Properties"

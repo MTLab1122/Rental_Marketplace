@@ -72,7 +72,7 @@ export default function SimilarPropertiesCarousel({
     <div className="py-6 space-y-4">
       <div className="flex items-center justify-between">
         <h3 className="font-extrabold text-navy-950 text-base flex items-center gap-2">
-          <span>🏘️</span> Similar Properties You Might Like
+          Similar Properties You Might Like
         </h3>
         <span className="text-xs text-navy-500 font-medium">Scroll to explore</span>
       </div>
@@ -98,7 +98,7 @@ export default function SimilarPropertiesCarousel({
 
                 <div className="p-3 space-y-1.5">
                   <div className="text-[11px] text-navy-500 font-medium">
-                    📍 {prop.locality?.name || 'Peshawar'}
+                    {prop.locality?.name || 'Peshawar'}
                   </div>
 
                   <Link
@@ -120,7 +120,7 @@ export default function SimilarPropertiesCarousel({
                   </Link>
 
                   <div className="text-[11px] text-navy-600">
-                    🛏️ {prop.bedrooms} Bed • 🚿 {prop.bathrooms} Bath
+                    {prop.bedrooms} Bed • {prop.bathrooms} Bath
                   </div>
                 </div>
               </div>

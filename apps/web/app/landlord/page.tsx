@@ -82,7 +82,7 @@ export default function LandlordDashboardPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-amber-200 text-amber-800 text-xs font-bold">
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-amber-200 text-amber-800 text-xs font-bold">
                     !
                   </span>
                   <h3 className="font-bold text-amber-900">
@@ -199,23 +199,21 @@ export default function LandlordDashboardPage() {
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <span className="text-xs font-semibold uppercase tracking-wider text-indigo-600">
+            <span className="text-xs font-semibold uppercase tracking-wider text-navy-700">
               Total Listing Views
             </span>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-indigo-700">
-                {data?.totalViews ?? 0}
-              </span>
+              <span className="text-3xl font-extrabold text-navy-900">{data?.totalViews ?? 0}</span>
               <span className="text-xs text-slate-500">verified impressions</span>
             </div>
           </div>
 
           <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <span className="text-xs font-semibold uppercase tracking-wider text-purple-600">
+            <span className="text-xs font-semibold uppercase tracking-wider text-peshawar-700">
               Inquiry Response Rate
             </span>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-3xl font-extrabold text-purple-700">
+              <span className="text-3xl font-extrabold text-peshawar-800">
                 {data?.responseRatePercent !== null ? `${data.responseRatePercent}%` : 'N/A'}
               </span>
               <span className="text-xs text-slate-500">responsiveness</span>
@@ -269,7 +267,7 @@ export default function LandlordDashboardPage() {
                         {inq.tenant?.fullName || 'Tenant'}
                       </span>
                       <span
-                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+                        className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium ${
                           inq.status === 'SUBMITTED'
                             ? 'bg-amber-100 text-amber-800'
                             : inq.status === 'ACCEPTED'

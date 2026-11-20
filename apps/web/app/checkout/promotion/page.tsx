@@ -105,7 +105,7 @@ export default function PromotionCheckoutPage() {
 
         {submitted ? (
           <div className="bg-white rounded-2xl p-8 border border-emerald-200 shadow-md text-center">
-            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-bold">
+            <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-md flex items-center justify-center mx-auto mb-4 text-3xl font-bold">
               ✓
             </div>
             <h2 className="text-2xl font-bold text-navy-950">Boost Request Submitted!</h2>
@@ -190,7 +190,7 @@ export default function PromotionCheckoutPage() {
                     className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-peshawar-500 text-sm font-mono"
                   />
                   <p className="text-[11px] text-amber-700 mt-2 font-medium">
-                    ⚠️ Rules: Only listings approved by Peshawar moderation with active availability
+                    Rules: Only listings approved by Peshawar moderation with active availability
                     can be promoted.
                   </p>
                 </div>
@@ -348,7 +348,7 @@ export default function PromotionCheckoutPage() {
                 </button>
 
                 <p className="text-[11px] text-slate-400 text-center mt-3">
-                  🔒 Transactions are audited and backed by our Peshawar dispute escrow protocol.
+                  Transactions are audited and backed by our Peshawar dispute escrow protocol.
                 </p>
               </div>
             </div>

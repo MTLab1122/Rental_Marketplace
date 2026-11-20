@@ -44,25 +44,25 @@ export default function StudentsPage() {
       title: 'Solar & Generator Backup',
       description:
         'Exam season requires uninterrupted study. Filter hostels guaranteed with solar inverters or 24/7 generator backup.',
-      icon: '⚡',
+      icon: '',
     },
     {
       title: 'Hygienic Mess & Meal Plans',
       description:
         'See whether 3-time hot meals (Nashta, Lunch, Dinner) are included in rent, with verified hygiene reviews from fellow students.',
-      icon: '🍲',
+      icon: '',
     },
     {
       title: 'Fast Fiber Wi-Fi',
       description:
         'High-speed internet in every room, tested by verified student residents for lag-free research and online lectures.',
-      icon: '📶',
+      icon: '',
     },
     {
       title: 'Transparent Curfew & Security',
       description:
         'Clear gate timings, CCTV surveillance, biometric check-in, and verified hostel warden details upfront.',
-      icon: '🛡️',
+      icon: '',
     },
   ];
 
@@ -72,8 +72,8 @@ export default function StudentsPage() {
       <div className="bg-gradient-to-br from-student-bg via-blue-50 to-slate-50 py-16 px-4 sm:px-6 lg:px-8 border-b border-student-border">
         <div className="max-w-7xl mx-auto">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-900 text-xs font-extrabold uppercase tracking-wider mb-4 border border-blue-200">
-              🎓 Peshawar Verified Student Housing Portal
+            <span className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-blue-100 text-blue-900 text-xs font-extrabold uppercase tracking-wider mb-4 border border-blue-200">
+              Peshawar Verified Student Housing Portal
             </span>
             <h1 className="text-4xl sm:text-5xl font-extrabold text-navy-950 tracking-tight leading-tight">
               Find Verified Student Hostels & Rooms Near Your Campus
@@ -120,7 +120,7 @@ export default function StudentsPage() {
               className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:border-peshawar-400 transition group flex flex-col justify-between"
             >
               <div>
-                <span className="inline-block px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-800 text-[11px] font-bold uppercase mb-3">
+                <span className="inline-block px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-800 text-[11px] font-bold uppercase mb-3">
                   {cluster.tag}
                 </span>
                 <h3 className="font-bold text-navy-950 text-lg group-hover:text-peshawar-600 transition">

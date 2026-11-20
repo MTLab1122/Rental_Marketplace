@@ -123,7 +123,7 @@ export default function LandlordVerificationPage() {
               <span className="text-xs uppercase font-bold text-slate-400">Current Status</span>
               <div className="flex items-center gap-2 mt-1">
                 <span
-                  className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold ${
+                  className={`inline-flex items-center rounded-md px-3 py-1 text-xs font-bold ${
                     isVerified
                       ? 'bg-emerald-100 text-emerald-800'
                       : isPending
@@ -143,11 +143,7 @@ export default function LandlordVerificationPage() {
               </div>
             </div>
 
-            {isVerified && (
-              <span className="text-3xl" title="Verified Badge">
-                🛡️
-              </span>
-            )}
+            {isVerified && <span className="text-3xl" title="Verified Badge"></span>}
           </div>
 
           {isVerified && (
@@ -250,7 +246,7 @@ export default function LandlordVerificationPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
               <div className="rounded-xl border border-dashed border-slate-300 p-4 text-center">
-                <span className="text-2xl">📄</span>
+                <span className="text-2xl"></span>
                 <p className="mt-2 text-xs font-bold text-slate-700">CNIC Front Image</p>
                 <input
                   type="text"
@@ -262,7 +258,7 @@ export default function LandlordVerificationPage() {
               </div>
 
               <div className="rounded-xl border border-dashed border-slate-300 p-4 text-center">
-                <span className="text-2xl">📄</span>
+                <span className="text-2xl"></span>
                 <p className="mt-2 text-xs font-bold text-slate-700">CNIC Back Image</p>
                 <input
                   type="text"
@@ -275,7 +271,7 @@ export default function LandlordVerificationPage() {
             </div>
 
             <div className="rounded-xl border border-dashed border-slate-300 p-4 text-center">
-              <span className="text-2xl">🤳</span>
+              <span className="text-2xl"></span>
               <p className="mt-2 text-xs font-bold text-slate-700">Landlord Selfie with CNIC</p>
               <input
                 type="text"

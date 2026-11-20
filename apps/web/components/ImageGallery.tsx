@@ -47,7 +47,7 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
             <button
               type="button"
               onClick={handlePrev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white text-navy-800 flex items-center justify-center shadow-md transition opacity-0 group-hover:opacity-100"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-md bg-white/80 hover:bg-white text-navy-800 flex items-center justify-center shadow-md transition opacity-0 group-hover:opacity-100"
               aria-label="Previous photo"
             >
               ‹
@@ -55,7 +55,7 @@ export default function ImageGallery({ images, title }: ImageGalleryProps) {
             <button
               type="button"
               onClick={handleNext}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-white/80 hover:bg-white text-navy-800 flex items-center justify-center shadow-md transition opacity-0 group-hover:opacity-100"
+              className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-md bg-white/80 hover:bg-white text-navy-800 flex items-center justify-center shadow-md transition opacity-0 group-hover:opacity-100"
               aria-label="Next photo"
             >
               ›

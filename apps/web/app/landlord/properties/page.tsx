@@ -160,7 +160,7 @@ export default function LandlordPropertiesPage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <h2 className="text-lg font-bold text-slate-900">{property.title}</h2>
                       <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        className={`inline-flex items-center rounded-md px-2.5 py-0.5 text-xs font-semibold ${
                           property.status === 'APPROVED' && property.isAvailable
                             ? 'bg-emerald-100 text-emerald-800'
                             : property.status === 'PENDING_REVIEW'
@@ -178,8 +178,8 @@ export default function LandlordPropertiesPage() {
                       </span>
                       <span className="inline-flex items-center rounded bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
                         {property.eligibility === 'STUDENTS_ONLY'
-                          ? '🎓 Students Only'
-                          : '👨‍👩‍👧 Families Only'}
+                          ? 'Students Only'
+                          : 'Families Only'}
                       </span>
                     </div>
 
@@ -207,7 +207,7 @@ export default function LandlordPropertiesPage() {
 
                     {property.isDuplicateWarning && (
                       <p className="mt-2 text-xs font-semibold text-amber-700 bg-amber-50 rounded px-2 py-1 inline-block">
-                        ⚠️ Near-duplicate listing warning recorded
+                        Near-duplicate listing warning recorded
                       </p>
                     )}
 
@@ -268,7 +268,7 @@ export default function LandlordPropertiesPage() {
                     href={`/landlord/properties/${property.id}/analytics`}
                     className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition"
                   >
-                    📊 Analytics
+                    Analytics
                   </Link>
 
                   {/* Edit link */}

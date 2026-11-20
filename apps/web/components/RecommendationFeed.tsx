@@ -92,9 +92,7 @@ export default function RecommendationFeed({
     <section className="py-6 space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-black text-navy-950 flex items-center gap-2">
-            <span>✨</span> {title}
-          </h2>
+          <h2 className="text-lg font-black text-navy-950 flex items-center gap-2">{title}</h2>
           <p className="text-xs text-navy-500">
             Personalized matching algorithms based on your searches, favorites, and target budget.
           </p>
@@ -116,17 +114,17 @@ export default function RecommendationFeed({
                 {/* Image & Reason Pill */}
                 <div className="relative aspect-[16/10] bg-navy-100 overflow-hidden">
                   <img src={imageUrl} alt={prop.title} className="w-full h-full object-cover" />
-                  <div className="absolute top-2 left-2 bg-navy-950/80 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-full border border-white/20">
-                    🎯 {item.reasonLabel}
+                  <div className="absolute top-2 left-2 bg-navy-950/80 backdrop-blur-xs text-white text-[10px] font-bold px-2 py-0.5 rounded-md border border-white/20">
+                    {item.reasonLabel}
                   </div>
-                  <div className="absolute bottom-2 right-2 bg-peshawar-700 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full shadow-xs">
+                  <div className="absolute bottom-2 right-2 bg-peshawar-700 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-md shadow-xs">
                     {item.score}% Match
                   </div>
                 </div>
 
                 <div className="p-4 space-y-2">
                   <div className="flex items-center justify-between text-xs text-navy-500">
-                    <span>📍 {prop.locality?.name || 'Peshawar'}</span>
+                    <span>{prop.locality?.name || 'Peshawar'}</span>
                     <span className="font-semibold text-navy-700">{prop.propertyType}</span>
                   </div>
 
@@ -139,9 +137,9 @@ export default function RecommendationFeed({
                   </Link>
 
                   <div className="text-xs text-navy-600 flex items-center gap-2">
-                    <span>🛏️ {prop.bedrooms} Bed</span>
+                    <span>{prop.bedrooms} Bed</span>
                     <span>•</span>
-                    <span>🚿 {prop.bathrooms} Bath</span>
+                    <span>{prop.bathrooms} Bath</span>
                     {prop.furnishing && (
                       <>
                         <span>•</span>

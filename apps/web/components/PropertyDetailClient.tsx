@@ -10,6 +10,7 @@ import ReportModal from './ReportModal';
 import SimilarPropertiesCarousel from './SimilarPropertiesCarousel';
 import RecentlyViewedSection from './RecentlyViewedSection';
 import { PropertySummaryDto, PropertyEligibility } from '@rental-peshawar/shared-types';
+import { MapPinIcon } from './Icons';
 
 interface PropertyDetailClientProps {
   property: PropertySummaryDto;
@@ -73,7 +74,7 @@ export default function PropertyDetailClient({ property }: PropertyDetailClientP
           onClick={() => setReportModalOpen(true)}
           className="text-xs text-red-600 hover:text-red-700 font-semibold flex items-center gap-1"
         >
-          🚩 Report Listing
+          Report Listing
         </button>
       </div>
 
@@ -112,11 +113,11 @@ export default function PropertyDetailClient({ property }: PropertyDetailClientP
 
             <div className="space-y-2 mb-6">
               <div className="flex items-center gap-2 text-xs font-semibold text-peshawar-700 bg-peshawar-50 px-3 py-2 rounded-m3-sm border border-peshawar-200">
-                <span className="w-2 h-2 rounded-full bg-peshawar-500"></span>
+                <span className="w-2 h-2 rounded-md bg-peshawar-500"></span>
                 <span>Active & Verified by Peshawar Admin</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-navy-600 px-1">
-                <span>📍</span>
+                <MapPinIcon className="w-3.5 h-3.5 text-navy-400" />
                 <span>{property.locality?.name || 'Peshawar, KP'}</span>
               </div>
             </div>
@@ -128,7 +129,7 @@ export default function PropertyDetailClient({ property }: PropertyDetailClientP
               onClick={() => setInquiryModalOpen(true)}
               className="w-full py-3 bg-peshawar-600 hover:bg-peshawar-700 text-white font-bold text-sm rounded-m3-md transition shadow-md flex items-center justify-center gap-2"
             >
-              <span>💬</span> Contact Landlord & Inquire
+              Contact Landlord & Inquire
             </button>
 
             <button
@@ -140,7 +141,7 @@ export default function PropertyDetailClient({ property }: PropertyDetailClientP
                   : 'bg-white text-navy-700 border-navy-200 hover:bg-navy-50'
               }`}
             >
-              <span>{isFavorited ? '❤️' : '🤍'}</span>
+              <span>{isFavorited ? '' : ''}</span>
               <span>{isFavorited ? 'Saved in Favorites' : 'Save to Favorites'}</span>
             </button>
           </div>

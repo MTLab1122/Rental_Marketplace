@@ -31,7 +31,7 @@ export default function ResetPasswordPage() {
     <main className="max-w-md mx-auto px-4 py-16">
       <div className="bg-white rounded-m3-lg border border-navy-100 p-8 shadow-md space-y-6">
         <div className="text-center space-y-1">
-          <div className="text-3xl mb-1">🔒</div>
+          <div className="text-3xl mb-1"></div>
           <h1 className="text-2xl font-black text-navy-950 tracking-tight">Set New Password</h1>
           <p className="text-xs text-navy-500">
             Create a secure password with at least 8 characters.
@@ -46,7 +46,7 @@ export default function ResetPasswordPage() {
 
         {success ? (
           <div className="bg-peshawar-50 border border-peshawar-200 text-peshawar-800 p-4 rounded-m3-md text-sm text-center">
-            <span className="text-2xl block mb-1">🎉</span>
+            <span className="text-2xl block mb-1"></span>
             <strong>Password Reset Successful!</strong>
             <p className="text-xs text-peshawar-600 mt-1">Redirecting you to sign in...</p>
           </div>

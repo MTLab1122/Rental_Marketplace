@@ -80,7 +80,7 @@ export default function ReportModal({
 
         {success ? (
           <div className="bg-peshawar-50 border border-peshawar-200 text-peshawar-800 p-4 rounded-m3-md text-sm text-center">
-            <span className="text-xl block mb-1">🛡️</span>
+            <span className="text-xl block mb-1"></span>
             <strong>Report Received</strong>
             <p className="text-xs text-peshawar-600 mt-1">
               Our moderation team will investigate this listing according to platform rules.

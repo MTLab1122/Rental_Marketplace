@@ -301,7 +301,7 @@ export default function CreatePropertyWizardPage() {
         </div>
 
         {/* Wizard Progress Bar */}
-        <div className="mb-8 overflow-hidden rounded-full bg-slate-200">
+        <div className="mb-8 overflow-hidden rounded-md bg-slate-200">
           <div
             className="h-2.5 bg-emerald-600 transition-all duration-300"
             style={{ width: `${(step / 7) * 100}%` }}
@@ -335,7 +335,7 @@ export default function CreatePropertyWizardPage() {
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <div className="text-3xl">🎓</div>
+                  <div className="text-3xl"></div>
                   <h3 className="mt-3 font-bold text-slate-900 text-lg">Students Only</h3>
                   <p className="mt-1 text-xs text-slate-600">
                     Hostels, shared rooms, single rooms, or portions near University of Peshawar,
@@ -351,7 +351,7 @@ export default function CreatePropertyWizardPage() {
                       : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
-                  <div className="text-3xl">👨‍👩‍👧</div>
+                  <div className="text-3xl"></div>
                   <h3 className="mt-3 font-bold text-slate-900 text-lg">Families Only</h3>
                   <p className="mt-1 text-xs text-slate-600">
                     Independent houses, portions, family apartments, and residential units in
@@ -656,7 +656,7 @@ export default function CreatePropertyWizardPage() {
                         key={am.id}
                         type="button"
                         onClick={() => toggleAmenity(am.id)}
-                        className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
+                        className={`rounded-md px-3 py-1.5 text-xs font-semibold transition ${
                           formData.amenityIds.includes(am.id)
                             ? 'bg-emerald-600 text-white shadow-sm'
                             : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
@@ -761,7 +761,7 @@ export default function CreatePropertyWizardPage() {
               {duplicateWarning && (
                 <div className="mt-6 rounded-xl border border-amber-300 bg-amber-50 p-5">
                   <div className="flex items-start gap-3">
-                    <span className="text-xl">⚠️</span>
+                    <span className="text-xl"></span>
                     <div>
                       <h4 className="font-bold text-amber-900">Near-Duplicate Listing Notice</h4>
                       <p className="mt-1 text-sm text-amber-800">{duplicateWarning}</p>
@@ -789,9 +789,7 @@ export default function CreatePropertyWizardPage() {
                 <div className="flex justify-between border-b border-slate-200 pb-2">
                   <span className="text-slate-500">Eligibility:</span>
                   <span className="font-semibold text-slate-900">
-                    {formData.eligibility === 'STUDENTS_ONLY'
-                      ? '🎓 Students Only'
-                      : '👨‍👩‍👧 Families Only'}
+                    {formData.eligibility === 'STUDENTS_ONLY' ? 'Students Only' : 'Families Only'}
                   </span>
                 </div>
                 <div className="flex justify-between border-b border-slate-200 pb-2">

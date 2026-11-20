@@ -87,7 +87,7 @@ export default function NotificationPreferencesPage() {
       <div className="flex items-center justify-between border-b border-navy-100 pb-4">
         <div>
           <h1 className="text-2xl font-black text-navy-950 flex items-center gap-2">
-            <span>⚙️</span> Notification Preferences
+            <span></span> Notification Preferences
           </h1>
           <p className="text-xs text-navy-500 mt-1">
             Choose how and when you receive listing alerts, inquiries, and recommendations.

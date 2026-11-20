@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { ShieldCheckIcon } from '../../components/Icons';
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'MONTHLY' | 'ANNUAL'>('MONTHLY');
@@ -62,7 +63,7 @@ export default function PricingPage() {
       id: 'AGENCY',
       name: 'Hostel & Agency Suite',
       badge: 'Commercial Scale',
-      badgeColor: 'bg-purple-50 text-purple-700 border-purple-200',
+      badgeColor: 'bg-navy-100 text-navy-800 border-navy-200',
       description:
         'Designed for private student hostel operators, estate consultants, and property management firms.',
       monthlyPrice: 9500,
@@ -89,7 +90,7 @@ export default function PricingPage() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-peshawar-100 text-peshawar-800 text-xs font-bold uppercase tracking-wider mb-4 border border-peshawar-200">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-peshawar-100 text-peshawar-800 text-xs font-bold uppercase tracking-wider mb-4 border border-peshawar-200">
             Transparent PKR Pricing • No Hidden Broker Cuts
           </div>
           <h1 className="text-4xl font-extrabold text-navy-950 sm:text-5xl tracking-tight">
@@ -101,9 +102,10 @@ export default function PricingPage() {
           </p>
 
           {/* Tenant Guarantee Banner */}
-          <div className="mt-6 inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-2 rounded-xl text-sm font-semibold">
+          <div className="mt-6 inline-flex items-center gap-2 bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-2 rounded-md text-sm font-semibold">
+            <ShieldCheckIcon className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>
-              🛡️ <strong>100% Free for Tenants:</strong> Zero search charges, zero contact fees, and
+              <strong>100% Free for Tenants:</strong> Zero search charges, zero contact fees, and
               zero commission on any booking.
             </span>
           </div>
@@ -118,12 +120,12 @@ export default function PricingPage() {
             <button
               type="button"
               onClick={() => setBillingCycle(billingCycle === 'MONTHLY' ? 'ANNUAL' : 'MONTHLY')}
-              className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+              className={`relative inline-flex h-7 w-14 shrink-0 cursor-pointer rounded-md border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                 billingCycle === 'ANNUAL' ? 'bg-peshawar-600' : 'bg-slate-300'
               }`}
             >
               <span
-                className={`pointer-events-none inline-block h-6 w-6 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                className={`pointer-events-none inline-block h-6 w-6 transform rounded-md bg-white shadow ring-0 transition duration-200 ease-in-out ${
                   billingCycle === 'ANNUAL' ? 'translate-x-7' : 'translate-x-0'
                 }`}
               />
@@ -132,7 +134,7 @@ export default function PricingPage() {
               className={`text-sm font-semibold flex items-center gap-1.5 ${billingCycle === 'ANNUAL' ? 'text-navy-900' : 'text-navy-500'}`}
             >
               Annual
-              <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full">
+              <span className="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md">
                 Save 17%
               </span>
             </span>
@@ -155,7 +157,7 @@ export default function PricingPage() {
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-peshawar-600 text-white text-xs font-bold uppercase tracking-wider py-1 px-4 rounded-full shadow-md">
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-peshawar-600 text-white text-xs font-bold uppercase tracking-wider py-1 px-4 rounded-md shadow-md">
                     Recommended for Landlords
                   </div>
                 )}
@@ -164,7 +166,7 @@ export default function PricingPage() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-xl font-bold text-navy-950">{plan.name}</h3>
                     <span
-                      className={`text-xs font-bold px-2.5 py-1 rounded-full border ${plan.badgeColor}`}
+                      className={`text-xs font-bold px-2.5 py-1 rounded-md border ${plan.badgeColor}`}
                     >
                       {plan.badge}
                     </span>

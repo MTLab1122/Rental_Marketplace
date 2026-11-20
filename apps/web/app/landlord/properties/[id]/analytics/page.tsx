@@ -137,9 +137,9 @@ export default function PropertyAnalyticsPage() {
               </span>
               <span className="text-sm text-slate-400">/ 100</span>
             </div>
-            <div className="mt-3 overflow-hidden rounded-full bg-slate-100">
+            <div className="mt-3 overflow-hidden rounded-sm bg-slate-100">
               <div
-                className="h-2 bg-emerald-500 rounded-full"
+                className="h-2 bg-emerald-500 rounded-sm"
                 style={{ width: `${Math.min(data?.qualityScore ?? 0, 100)}%` }}
               ></div>
             </div>
@@ -154,13 +154,13 @@ export default function PropertyAnalyticsPage() {
               Inquiry Response Rate
             </h3>
             <div className="mt-4 flex items-baseline gap-2">
-              <span className="text-4xl font-extrabold text-indigo-600">
+              <span className="text-4xl font-extrabold text-navy-800">
                 {data?.responseRatePercent !== null ? `${data.responseRatePercent}%` : 'N/A'}
               </span>
             </div>
-            <div className="mt-3 overflow-hidden rounded-full bg-slate-100">
+            <div className="mt-3 overflow-hidden rounded-sm bg-slate-100">
               <div
-                className="h-2 bg-indigo-500 rounded-full"
+                className="h-2 bg-navy-700 rounded-sm"
                 style={{ width: `${Math.min(data?.responseRatePercent ?? 0, 100)}%` }}
               ></div>
             </div>
@@ -200,7 +200,7 @@ export default function PropertyAnalyticsPage() {
                     {s.web} views ({Math.round(((s.web || 0) / totalSrc) * 100)}%)
                   </span>
                 </div>
-                <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-2 rounded-sm bg-slate-100 overflow-hidden">
                   <div
                     className="h-full bg-emerald-500"
                     style={{ width: `${((s.web || 0) / totalSrc) * 100}%` }}
@@ -215,9 +215,9 @@ export default function PropertyAnalyticsPage() {
                     {s.mobile} views ({Math.round(((s.mobile || 0) / totalSrc) * 100)}%)
                   </span>
                 </div>
-                <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-2 rounded-sm bg-slate-100 overflow-hidden">
                   <div
-                    className="h-full bg-blue-500"
+                    className="h-full bg-navy-600"
                     style={{ width: `${((s.mobile || 0) / totalSrc) * 100}%` }}
                   ></div>
                 </div>
@@ -231,9 +231,9 @@ export default function PropertyAnalyticsPage() {
                     %)
                   </span>
                 </div>
-                <div className="h-2 rounded-full bg-slate-100 overflow-hidden">
+                <div className="h-2 rounded-sm bg-slate-100 overflow-hidden">
                   <div
-                    className="h-full bg-purple-500"
+                    className="h-full bg-peshawar-600"
                     style={{ width: `${((s.adminReferral || 0) / totalSrc) * 100}%` }}
                   ></div>
                 </div>

@@ -85,7 +85,7 @@ export default function SignAgreementPage() {
             Governed by Khyber Pakhtunkhwa Tenancy Regulations • Version {agreement.version}
           </p>
         </div>
-        <span className="px-3 py-1 bg-indigo-100 text-indigo-800 font-bold text-xs rounded-full self-start">
+        <span className="px-3 py-1 bg-indigo-100 text-indigo-800 font-bold text-xs rounded-md self-start">
           {agreement.status}
         </span>
       </div>

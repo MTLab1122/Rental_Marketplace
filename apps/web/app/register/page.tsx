@@ -83,7 +83,7 @@ export default function RegisterPage() {
                     : 'bg-navy-50 text-navy-700 border-navy-200 hover:bg-white'
                 }`}
               >
-                <div className="text-sm">🎓 Student</div>
+                <div className="text-sm">Student</div>
                 <div className="text-[10px] text-navy-500 mt-0.5">Hostels & Rooms</div>
               </button>
 
@@ -96,7 +96,7 @@ export default function RegisterPage() {
                     : 'bg-navy-50 text-navy-700 border-navy-200 hover:bg-white'
                 }`}
               >
-                <div className="text-sm">👨‍👩‍👧‍👦 Family</div>
+                <div className="text-sm">Family</div>
                 <div className="text-[10px] text-navy-500 mt-0.5">Houses & Portions</div>
               </button>
             </div>

@@ -10,7 +10,15 @@
     "lint": "eslint \"{app,components,lib}/**/*.{ts,tsx}\"",
     "lint:fix": "eslint \"{app,components,lib}/**/*.{ts,tsx}\" --fix",
     "typecheck": "tsc --noEmit",
-    "test": "node --test tests/**/*.test.js"
+    "test": "node --test tests/**/*.test.js",
+    "audit:links": "node scripts/audits/audit-links.mjs",
+    "audit:a11y": "node scripts/audits/audit-a11y.mjs",
+    "audit:performance": "node scripts/audits/audit-performance.mjs",
+    "audit:seo": "node scripts/audits/audit-seo.mjs",
+    "audit:images": "node scripts/audits/audit-images.mjs",
+    "audit:forms": "node scripts/audits/audit-forms.mjs",
+    "audit:cookies": "node scripts/audits/audit-cookies.mjs",
+    "audit:mobile": "node scripts/audits/audit-mobile.mjs"
   },
   "dependencies": {
     "@rental-peshawar/config": "workspace:*",

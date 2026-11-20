@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { LocalityDto } from '@rental-peshawar/shared-types';
+import { MapPinIcon } from './Icons';
 
 interface MapPreviewProps {
   localities: LocalityDto[];
@@ -18,7 +19,7 @@ export default function MapPreview({
     <div className="bg-white rounded-m3-lg border border-navy-100 p-4 shadow-sm space-y-3">
       <div className="flex items-center justify-between">
         <h3 className="font-bold text-navy-900 text-sm flex items-center gap-1.5">
-          <span>📍</span> Peshawar Municipal Locality Map
+          <MapPinIcon className="w-3.5 h-3.5 text-navy-400" /> Peshawar Municipal Locality Map
         </h3>
         <span className="text-[11px] font-mono text-navy-400 bg-navy-50 px-2 py-0.5 rounded border border-navy-200">
           Geo-Fenced: Peshawar, KP
