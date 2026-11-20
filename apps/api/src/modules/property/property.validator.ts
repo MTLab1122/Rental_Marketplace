@@ -6,7 +6,7 @@ import {
   FAMILY_PROPERTY_TYPES,
   ErrorCode,
 } from '@rental-peshawar/shared-types';
-import { isCoordinateWithinPeshawarBoundary } from '@rental-peshawar/config';
+import { isCoordinateWithinCityBoundary } from '@rental-peshawar/config';
 
 export function validateEligibilityAndPropertyType(
   eligibility: PropertyEligibility,
@@ -31,17 +31,31 @@ export function validateEligibilityAndPropertyType(
   }
 }
 
-export function validatePeshawarCoordinates(latitude: number, longitude: number): void {
-  const isInside = isCoordinateWithinPeshawarBoundary(latitude, longitude);
+/**
+ * Validates coordinates against a municipal service boundary (defaults to PESHAWAR)
+ */
+export function validateCityCoordinates(
+  latitude: number,
+  longitude: number,
+  cityCode = 'PESHAWAR',
+): void {
+  const isInside = isCoordinateWithinCityBoundary(latitude, longitude, cityCode);
   if (!isInside) {
     throw new HttpException(
       {
         code: ErrorCode.LOCATION_OUTSIDE_PESHAWAR,
-        message: `Location constraint violation: Coordinates (${latitude}, ${longitude}) are outside the verified Peshawar metropolitan service boundary.`,
+        message: `Location constraint violation: Coordinates (${latitude}, ${longitude}) are outside the verified ${cityCode} metropolitan service boundary.`,
       },
       HttpStatus.UNPROCESSABLE_ENTITY, // 422
     );
   }
+}
+
+/**
+ * Validates whether GPS coordinates fall strictly inside Peshawar's metropolitan boundary.
+ */
+export function validatePeshawarCoordinates(latitude: number, longitude: number): void {
+  validateCityCoordinates(latitude, longitude, 'PESHAWAR');
 }
 
 /**
@@ -53,7 +67,7 @@ export function isCoordinateWithinGeoJsonPolygon(
   geoJson: Record<string, unknown>,
 ): boolean {
   if (!geoJson || typeof geoJson !== 'object') {
-    return true; // No boundary polygon defined, defer to Peshawar boundary
+    return true; // No boundary polygon defined, defer to city boundary
   }
 
   const type = geoJson['type'] as string | undefined;
