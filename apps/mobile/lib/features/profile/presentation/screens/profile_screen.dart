@@ -35,8 +35,10 @@ class ProfileScreen extends ConsumerWidget {
               children: [
                 CircleAvatar(
                   radius: 30,
-                  backgroundColor: AppTheme.primaryEmerald.withOpacity(0.1),
-                  child: const Icon(Icons.person, size: 36, color: AppTheme.primaryEmerald),
+                  backgroundColor:
+                      AppTheme.primaryEmerald.withValues(alpha: 0.1),
+                  child: const Icon(Icons.person,
+                      size: 36, color: AppTheme.primaryEmerald),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -47,14 +49,16 @@ class ProfileScreen extends ConsumerWidget {
                         authState.isAuthenticated && authState.user != null
                             ? authState.user!.fullName
                             : 'Guest Tenant',
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         authState.isAuthenticated && authState.user != null
                             ? authState.user!.email
                             : 'Sign in to access inquiries & favorites',
-                        style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                        style: TextStyle(
+                            fontSize: 13, color: Colors.grey.shade600),
                       ),
                     ],
                   ),
@@ -74,15 +78,20 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // Active Mode Selector Box
-          const Text('Search Mode Preference', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text('Search Mode Preference',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: isStudent ? AppTheme.studentsOnlyBg.withOpacity(0.4) : AppTheme.familiesOnlyBg.withOpacity(0.4),
+              color: isStudent
+                  ? AppTheme.studentsOnlyBg.withValues(alpha: 0.4)
+                  : AppTheme.familiesOnlyBg.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                color: isStudent ? AppTheme.studentsOnlyText.withOpacity(0.3) : AppTheme.familiesOnlyText.withOpacity(0.3),
+                color: isStudent
+                    ? AppTheme.studentsOnlyText.withValues(alpha: 0.3)
+                    : AppTheme.familiesOnlyText.withValues(alpha: 0.3),
               ),
             ),
             child: Column(
@@ -92,20 +101,23 @@ class ProfileScreen extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      isStudent ? '🎓 Student Mode Active' : '👨‍👩‍👧 Family Mode Active',
+                      isStudent
+                          ? '🎓 Student Mode Active'
+                          : '👨‍👩‍👧 Family Mode Active',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
-                        color: isStudent ? AppTheme.studentsOnlyText : AppTheme.familiesOnlyText,
+                        color: isStudent
+                            ? AppTheme.studentsOnlyText
+                            : AppTheme.familiesOnlyText,
                       ),
                     ),
                     Switch(
                       value: !isStudent,
-                      activeColor: AppTheme.familiesOnlyText,
+                      activeThumbColor: AppTheme.familiesOnlyText,
                       onChanged: (isFamily) {
-                        ref
-                            .read(authProvider.notifier)
-                            .switchTenantType(isFamily ? TenantType.family : TenantType.student);
+                        ref.read(authProvider.notifier).switchTenantType(
+                            isFamily ? TenantType.family : TenantType.student);
                       },
                     ),
                   ],
@@ -123,7 +135,8 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 24),
 
           // Landlord Section
-          const Text('Landlord & Property Manager', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text('Landlord & Property Manager',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
           _buildListTile(
             icon: Icons.dashboard_outlined,
@@ -134,7 +147,8 @@ class ProfileScreen extends ConsumerWidget {
           _buildListTile(
             icon: Icons.add_home_outlined,
             title: 'Post New Property',
-            subtitle: '7-step wizard with duplicate protection & boundary check',
+            subtitle:
+                '7-step wizard with duplicate protection & boundary check',
             onTap: () => context.push('/landlord/properties/new'),
           ),
           _buildListTile(
@@ -156,14 +170,16 @@ class ProfileScreen extends ConsumerWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const LandlordSubscriptionScreen()),
+                MaterialPageRoute(
+                    builder: (_) => const LandlordSubscriptionScreen()),
               );
             },
           ),
           const SizedBox(height: 24),
 
           // Settings / Navigation List
-          const Text('Marketplace Information', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const Text('Marketplace Information',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
           _buildListTile(
             icon: Icons.card_giftcard,
@@ -192,13 +208,16 @@ class ProfileScreen extends ConsumerWidget {
                       shrinkWrap: true,
                       itemCount: PeshawarConstants.localities.length,
                       itemBuilder: (context, idx) => ListTile(
-                        leading: const Icon(Icons.location_on, color: AppTheme.primaryEmerald),
+                        leading: const Icon(Icons.location_on,
+                            color: AppTheme.primaryEmerald),
                         title: Text(PeshawarConstants.localities[idx]),
                       ),
                     ),
                   ),
                   actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
+                    TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: const Text('Close')),
                   ],
                 ),
               );
@@ -221,7 +240,8 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: 24),
             OutlinedButton.icon(
               icon: const Icon(Icons.logout, color: Colors.red),
-              label: const Text('Sign Out', style: TextStyle(color: Colors.red)),
+              label:
+                  const Text('Sign Out', style: TextStyle(color: Colors.red)),
               style: OutlinedButton.styleFrom(
                 side: const BorderSide(color: Colors.red),
                 padding: const EdgeInsets.symmetric(vertical: 14),
@@ -249,12 +269,13 @@ class ProfileScreen extends ConsumerWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: ListTile(
         leading: Icon(icon, color: AppTheme.primaryEmerald),
-        title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-        subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+        title: Text(title,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+        subtitle: Text(subtitle,
+            style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
         trailing: const Icon(Icons.chevron_right, size: 20),
         onTap: onTap,
       ),
     );
   }
 }
-

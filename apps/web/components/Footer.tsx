@@ -97,8 +97,23 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/services" className="hover:text-peshawar-400 transition">
+                  Platform Services
+                </Link>
+              </li>
+              <li>
                 <Link href="/pricing" className="hover:text-peshawar-400 transition">
                   Pricing & Listing Boosts
+                </Link>
+              </li>
+              <li>
+                <Link href="/about" className="hover:text-peshawar-400 transition">
+                  About Peshawar Rentals
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="hover:text-peshawar-400 transition">
+                  Contact Support Desk
                 </Link>
               </li>
               <li>

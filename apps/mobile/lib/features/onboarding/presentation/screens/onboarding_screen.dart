@@ -35,7 +35,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                     color: AppTheme.primaryEmerald,
                     borderRadius: BorderRadius.circular(16),
                   ),
-                  child: const Icon(Icons.location_city, color: Colors.white, size: 36),
+                  child: const Icon(Icons.location_city,
+                      color: Colors.white, size: 36),
                 ),
               ),
               const SizedBox(height: 16),
@@ -78,7 +79,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               _buildModeOption(
                 type: TenantType.student,
                 title: 'Student Mode',
-                subtitle: 'Hostels, shared flats, and single rooms near University Town, UOP, and medical colleges.',
+                subtitle:
+                    'Hostels, shared flats, and single rooms near University Town, UOP, and medical colleges.',
                 icon: Icons.school,
                 isSelected: _selectedType == TenantType.student,
                 accentColor: AppTheme.studentsOnlyText,
@@ -91,7 +93,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               _buildModeOption(
                 type: TenantType.family,
                 title: 'Family Mode',
-                subtitle: 'Full houses, portions, and residential apartments in Hayatabad, Cantt, and gated communities.',
+                subtitle:
+                    'Full houses, portions, and residential apartments in Hayatabad, Cantt, and gated communities.',
                 icon: Icons.family_restroom,
                 isSelected: _selectedType == TenantType.family,
                 accentColor: AppTheme.familiesOnlyText,
@@ -102,19 +105,22 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
               // Locality Highlight Strip
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
                   color: Colors.grey.shade100,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.verified, size: 18, color: AppTheme.primaryEmerald),
+                    const Icon(Icons.verified,
+                        size: 18, color: AppTheme.primaryEmerald),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         '15 Peshawar municipal localities geo-fenced & verified.',
-                        style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
+                        style: TextStyle(
+                            fontSize: 12, color: Colors.grey.shade700),
                       ),
                     ),
                   ],
@@ -125,7 +131,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               // Continue Button
               ElevatedButton(
                 onPressed: () async {
-                  await ref.read(authProvider.notifier).switchTenantType(_selectedType);
+                  await ref
+                      .read(authProvider.notifier)
+                      .switchTenantType(_selectedType);
                   final storage = ref.read(secureStorageProvider);
                   await storage.setOnboardingCompleted(true);
                   if (context.mounted) {
@@ -136,7 +144,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   backgroundColor: AppTheme.primaryEmerald,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                   elevation: 0,
                 ),
                 child: const Text(
@@ -171,7 +180,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? bgColor.withOpacity(0.4) : Colors.white,
+          color: isSelected ? bgColor.withValues(alpha: 0.4) : Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected ? accentColor : Colors.grey.shade300,
@@ -205,7 +214,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   const SizedBox(height: 4),
                   Text(
                     subtitle,
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade600, height: 1.3),
+                    style: TextStyle(
+                        fontSize: 12, color: Colors.grey.shade600, height: 1.3),
                   ),
                 ],
               ),
@@ -226,4 +236,3 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     );
   }
 }
-

@@ -58,14 +58,16 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
         _title = data['title'] as String? ?? '';
         _description = data['description'] as String? ?? '';
         _monthlyRentPkr = (data['monthlyRentPkr'] as num?)?.toInt() ?? 0;
-        _securityDepositPkr = (data['securityDepositPkr'] as num?)?.toInt() ?? 0;
+        _securityDepositPkr =
+            (data['securityDepositPkr'] as num?)?.toInt() ?? 0;
         _furnishing = data['furnishing'] as String? ?? 'UNFURNISHED';
         _status = data['status'] as String? ?? 'AVAILABLE';
         _moderationStatus = data['moderationStatus'] as String? ?? 'APPROVED';
         _rejectionReason = data['rejectionReason'] as String?;
 
         final rawImgs = data['images'] as List<dynamic>? ?? [];
-        _images = rawImgs.map((e) => Map<String, dynamic>.from(e as Map)).toList();
+        _images =
+            rawImgs.map((e) => Map<String, dynamic>.from(e as Map)).toList();
         _isLoading = false;
       });
     } catch (e) {
@@ -158,15 +160,19 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
         title: const Text('Edit Listing'),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryEmerald))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.primaryEmerald))
           : _errorMessage != null && _title.isEmpty
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(_errorMessage!, style: const TextStyle(color: Colors.red)),
+                      Text(_errorMessage!,
+                          style: const TextStyle(color: Colors.red)),
                       const SizedBox(height: 12),
-                      ElevatedButton(onPressed: _fetchProperty, child: const Text('Retry')),
+                      ElevatedButton(
+                          onPressed: _fetchProperty,
+                          child: const Text('Retry')),
                     ],
                   ),
                 )
@@ -182,7 +188,9 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.red.shade200),
                         ),
-                        child: Text(_errorMessage!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+                        child: Text(_errorMessage!,
+                            style: const TextStyle(
+                                color: Colors.red, fontSize: 13)),
                       ),
 
                     if (_moderationStatus == 'REJECTED')
@@ -197,28 +205,39 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Moderation Status: REJECTED', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                            const Text('Moderation Status: REJECTED',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red)),
                             const SizedBox(height: 4),
-                            Text('Reason: ${_rejectionReason ?? 'Please review platform guidelines and update details.'}', style: const TextStyle(fontSize: 12)),
+                            Text(
+                                'Reason: ${_rejectionReason ?? 'Please review platform guidelines and update details.'}',
+                                style: const TextStyle(fontSize: 12)),
                           ],
                         ),
                       ),
 
-                    const Text('Title', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    const Text('Title',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 13)),
                     const SizedBox(height: 6),
                     TextFormField(
                       initialValue: _title,
-                      decoration: const InputDecoration(border: OutlineInputBorder()),
+                      decoration:
+                          const InputDecoration(border: OutlineInputBorder()),
                       onChanged: (v) => _title = v,
                     ),
                     const SizedBox(height: 16),
 
-                    const Text('Description', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    const Text('Description',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 13)),
                     const SizedBox(height: 6),
                     TextFormField(
                       initialValue: _description,
                       maxLines: 4,
-                      decoration: const InputDecoration(border: OutlineInputBorder()),
+                      decoration:
+                          const InputDecoration(border: OutlineInputBorder()),
                       onChanged: (v) => _description = v,
                     ),
                     const SizedBox(height: 16),
@@ -229,13 +248,18 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Monthly Rent (PKR)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                              const Text('Monthly Rent (PKR)',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13)),
                               const SizedBox(height: 6),
                               TextFormField(
                                 initialValue: _monthlyRentPkr.toString(),
                                 keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(border: OutlineInputBorder()),
-                                onChanged: (v) => _monthlyRentPkr = int.tryParse(v) ?? _monthlyRentPkr,
+                                decoration: const InputDecoration(
+                                    border: OutlineInputBorder()),
+                                onChanged: (v) => _monthlyRentPkr =
+                                    int.tryParse(v) ?? _monthlyRentPkr,
                               ),
                             ],
                           ),
@@ -245,13 +269,18 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Deposit (PKR)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                              const Text('Deposit (PKR)',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13)),
                               const SizedBox(height: 6),
                               TextFormField(
                                 initialValue: _securityDepositPkr.toString(),
                                 keyboardType: TextInputType.number,
-                                decoration: const InputDecoration(border: OutlineInputBorder()),
-                                onChanged: (v) => _securityDepositPkr = int.tryParse(v) ?? _securityDepositPkr,
+                                decoration: const InputDecoration(
+                                    border: OutlineInputBorder()),
+                                onChanged: (v) => _securityDepositPkr =
+                                    int.tryParse(v) ?? _securityDepositPkr,
                               ),
                             ],
                           ),
@@ -260,16 +289,25 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    const Text('Availability Status', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    const Text('Availability Status',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 13)),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
-                      value: _status,
+                      initialValue: _status,
                       items: const [
-                        DropdownMenuItem(value: 'AVAILABLE', child: Text('AVAILABLE (Visible in Search)')),
-                        DropdownMenuItem(value: 'RENTED', child: Text('RENTED (Hidden from Search)')),
-                        DropdownMenuItem(value: 'UNAVAILABLE', child: Text('UNAVAILABLE (Hidden from Search)')),
+                        DropdownMenuItem(
+                            value: 'AVAILABLE',
+                            child: Text('AVAILABLE (Visible in Search)')),
+                        DropdownMenuItem(
+                            value: 'RENTED',
+                            child: Text('RENTED (Hidden from Search)')),
+                        DropdownMenuItem(
+                            value: 'UNAVAILABLE',
+                            child: Text('UNAVAILABLE (Hidden from Search)')),
                       ],
-                      decoration: const InputDecoration(border: OutlineInputBorder()),
+                      decoration:
+                          const InputDecoration(border: OutlineInputBorder()),
                       onChanged: (v) {
                         if (v != null) setState(() => _status = v);
                       },
@@ -277,7 +315,9 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                     const SizedBox(height: 20),
 
                     // Media Manager Section
-                    const Text('Manage Photos (Up to 12)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    const Text('Manage Photos (Up to 12)',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
                     const SizedBox(height: 8),
                     Row(
                       children: [
@@ -287,7 +327,8 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                             decoration: const InputDecoration(
                               hintText: 'New image URL',
                               border: OutlineInputBorder(),
-                              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 12),
                             ),
                           ),
                         ),
@@ -297,7 +338,8 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                             final url = _newImageUrlCtrl.text.trim();
                             if (url.isNotEmpty && _images.length < 12) {
                               setState(() {
-                                _images.add({'url': url, 'isPrimary': _images.isEmpty});
+                                _images.add(
+                                    {'url': url, 'isPrimary': _images.isEmpty});
                                 _newImageUrlCtrl.clear();
                               });
                             }
@@ -326,7 +368,8 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                               width: 50,
                               height: 50,
                               fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
+                              errorBuilder: (_, __, ___) =>
+                                  const Icon(Icons.broken_image),
                             ),
                           ),
                           title: Text(
@@ -336,11 +379,16 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                             style: const TextStyle(fontSize: 12),
                           ),
                           subtitle: Text(
-                            isCover ? '⭐ Primary Cover Photo' : 'Secondary photo',
+                            isCover
+                                ? '⭐ Primary Cover Photo'
+                                : 'Secondary photo',
                             style: TextStyle(
                               fontSize: 11,
-                              color: isCover ? AppTheme.primaryEmeraldDark : Colors.grey,
-                              fontWeight: isCover ? FontWeight.bold : FontWeight.normal,
+                              color: isCover
+                                  ? AppTheme.primaryEmeraldDark
+                                  : Colors.grey,
+                              fontWeight:
+                                  isCover ? FontWeight.bold : FontWeight.normal,
                             ),
                           ),
                           trailing: Row(
@@ -356,10 +404,12 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                                       img['isPrimary'] = true;
                                     });
                                   },
-                                  child: const Text('Make Cover', style: TextStyle(fontSize: 11)),
+                                  child: const Text('Make Cover',
+                                      style: TextStyle(fontSize: 11)),
                                 ),
                               IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                icon: const Icon(Icons.delete_outline,
+                                    color: Colors.red, size: 20),
                                 onPressed: () {
                                   setState(() {
                                     _images.removeAt(idx);
@@ -382,19 +432,22 @@ class _EditListingScreenState extends ConsumerState<EditListingScreen> {
                         backgroundColor: AppTheme.primaryEmerald,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
                       ),
                       child: _isSaving
                           ? const SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                  color: Colors.white, strokeWidth: 2),
                             )
-                          : const Text('Save Changes', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          : const Text('Save Changes',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 16)),
                     ),
                   ],
                 ),
     );
   }
 }
-

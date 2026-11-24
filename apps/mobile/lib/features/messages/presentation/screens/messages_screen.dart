@@ -23,7 +23,8 @@ class MessagesScreen extends ConsumerWidget {
         body: EmptyView(
           icon: Icons.chat_outlined,
           title: 'Sign In to Message Landlords',
-          description: 'Communicate directly with verified landlords across Peshawar.',
+          description:
+              'Communicate directly with verified landlords across Peshawar.',
           actionText: 'Sign In',
           onAction: () => context.push('/login'),
         ),
@@ -36,7 +37,8 @@ class MessagesScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => ref.read(messagesProvider.notifier).fetchConversations(),
+            onPressed: () =>
+                ref.read(messagesProvider.notifier).fetchConversations(),
           ),
         ],
       ),
@@ -46,27 +48,35 @@ class MessagesScreen extends ConsumerWidget {
               ? EmptyView(
                   icon: Icons.chat_bubble_outline,
                   title: 'No Conversations Yet',
-                  description: 'Send an inquiry on any rental listing to start messaging the landlord.',
+                  description:
+                      'Send an inquiry on any rental listing to start messaging the landlord.',
                   actionText: 'Browse Rentals',
                   onAction: () => context.go('/'),
                 )
               : ListView.separated(
                   itemCount: messagesState.conversations.length,
-                  separatorBuilder: (context, index) => const Divider(height: 1),
+                  separatorBuilder: (context, index) =>
+                      const Divider(height: 1),
                   itemBuilder: (context, index) {
                     final conv = messagesState.conversations[index];
-                    final otherName = conv.getOtherParticipantName(currentUserId);
+                    final otherName =
+                        conv.getOtherParticipantName(currentUserId);
                     final timeStr = conv.lastMessageAt != null
-                        ? DateFormat('MMM d, h:mm a').format(conv.lastMessageAt!)
+                        ? DateFormat('MMM d, h:mm a')
+                            .format(conv.lastMessageAt!)
                         : '';
 
                     return ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       leading: CircleAvatar(
                         radius: 24,
-                        backgroundColor: AppTheme.primaryEmerald.withOpacity(0.15),
+                        backgroundColor:
+                            AppTheme.primaryEmerald.withValues(alpha: 0.15),
                         child: Text(
-                          otherName.isNotEmpty ? otherName[0].toUpperCase() : 'M',
+                          otherName.isNotEmpty
+                              ? otherName[0].toUpperCase()
+                              : 'M',
                           style: const TextStyle(
                             color: AppTheme.primaryEmerald,
                             fontWeight: FontWeight.bold,
@@ -79,7 +89,8 @@ class MessagesScreen extends ConsumerWidget {
                           Expanded(
                             child: Text(
                               otherName,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 15),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -87,7 +98,8 @@ class MessagesScreen extends ConsumerWidget {
                           if (timeStr.isNotEmpty)
                             Text(
                               timeStr,
-                              style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
+                              style: TextStyle(
+                                  fontSize: 11, color: Colors.grey.shade500),
                             ),
                         ],
                       ),
@@ -114,10 +126,13 @@ class MessagesScreen extends ConsumerWidget {
                                 child: Text(
                                   conv.isBlocked
                                       ? '[Blocked by user]'
-                                      : (conv.lastMessage?.content ?? 'Started conversation'),
+                                      : (conv.lastMessage?.content ??
+                                          'Started conversation'),
                                   style: TextStyle(
                                     fontSize: 13,
-                                    color: conv.isBlocked ? Colors.red : Colors.grey.shade700,
+                                    color: conv.isBlocked
+                                        ? Colors.red
+                                        : Colors.grey.shade700,
                                   ),
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
@@ -125,7 +140,8 @@ class MessagesScreen extends ConsumerWidget {
                               ),
                               if (conv.unreadCount > 0)
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: AppTheme.primaryEmerald,
                                     borderRadius: BorderRadius.circular(10),
@@ -147,7 +163,8 @@ class MessagesScreen extends ConsumerWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ChatScreen(conversation: conv),
+                            builder: (context) =>
+                                ChatScreen(conversation: conv),
                           ),
                         );
                       },

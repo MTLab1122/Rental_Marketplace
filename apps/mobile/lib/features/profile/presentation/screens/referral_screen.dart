@@ -18,7 +18,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
   bool _copied = false;
 
   void _copyToClipboard() {
-    final link = 'https://rentalpeshawar.pk/register?ref=${widget.referralCode}';
+    final link =
+        'https://rentalpeshawar.pk/register?ref=${widget.referralCode}';
     Clipboard.setData(ClipboardData(text: link));
     setState(() => _copied = true);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -81,7 +82,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
                 border: Border.all(color: Colors.grey.shade300),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.04),
+                    color: Colors.black.withValues(alpha: 0.04),
                     blurRadius: 10,
                     offset: const Offset(0, 4),
                   ),
@@ -115,7 +116,8 @@ class _ReferralScreenState extends State<ReferralScreen> {
                       Expanded(
                         child: OutlinedButton.icon(
                           onPressed: _copyToClipboard,
-                          icon: Icon(_copied ? Icons.check : Icons.copy, size: 18),
+                          icon: Icon(_copied ? Icons.check : Icons.copy,
+                              size: 18),
                           label: Text(_copied ? 'Copied' : 'Copy Link'),
                           style: OutlinedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -170,12 +172,14 @@ class _ReferralScreenState extends State<ReferralScreen> {
                         SizedBox(height: 8),
                         Text(
                           'Refer Tenant',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                         SizedBox(height: 4),
                         Text(
                           'Earn PKR 500 when friend moves in.',
-                          style: TextStyle(fontSize: 11, color: Colors.blueGrey),
+                          style:
+                              TextStyle(fontSize: 11, color: Colors.blueGrey),
                         ),
                       ],
                     ),
@@ -197,12 +201,14 @@ class _ReferralScreenState extends State<ReferralScreen> {
                         SizedBox(height: 8),
                         Text(
                           'Refer Landlord',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                         SizedBox(height: 4),
                         Text(
                           'Earn 1 Free Boost (Worth PKR 1,500).',
-                          style: TextStyle(fontSize: 11, color: Colors.blueGrey),
+                          style:
+                              TextStyle(fontSize: 11, color: Colors.blueGrey),
                         ),
                       ],
                     ),
@@ -224,7 +230,7 @@ class _ReferralScreenState extends State<ReferralScreen> {
               child: const Row(
                 children: [
                   Icon(Icons.shield_outlined, size: 20, color: Colors.grey),
-                  const SizedBox(width: 10),
+                  SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       'Anti-Fraud Protection: Self-referrals and duplicate device accounts are automatically filtered.',

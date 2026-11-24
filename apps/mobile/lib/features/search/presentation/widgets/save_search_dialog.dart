@@ -3,7 +3,8 @@ import 'package:rental_peshawar_mobile/core/models/saved_search_model.dart';
 
 class SaveSearchDialog extends StatefulWidget {
   final Map<String, dynamic> filters;
-  final Function(String name, bool alertsEnabled, AlertFrequency frequency) onSave;
+  final Function(String name, bool alertsEnabled, AlertFrequency frequency)
+      onSave;
 
   const SaveSearchDialog({
     super.key,
@@ -65,8 +66,10 @@ class _SaveSearchDialogState extends State<SaveSearchDialog> {
               decoration: InputDecoration(
                 labelText: 'Search Name',
                 hintText: 'e.g. 2 Bed in University Town',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               ),
             ),
             const SizedBox(height: 16),
@@ -81,7 +84,7 @@ class _SaveSearchDialogState extends State<SaveSearchDialog> {
                 style: TextStyle(fontSize: 11, color: Colors.black54),
               ),
               value: _alertsEnabled,
-              activeColor: const Color(0xFF0284C7),
+              activeThumbColor: const Color(0xFF0284C7),
               onChanged: (val) => setState(() => _alertsEnabled = val),
             ),
             if (_alertsEnabled) ...[
@@ -92,10 +95,12 @@ class _SaveSearchDialogState extends State<SaveSearchDialog> {
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<AlertFrequency>(
-                value: _frequency,
+                initialValue: _frequency,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8)),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 ),
                 items: AlertFrequency.values.map((f) {
                   return DropdownMenuItem(
@@ -121,7 +126,8 @@ class _SaveSearchDialogState extends State<SaveSearchDialog> {
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFF0284C7),
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           child: const Text('Save Search'),
         ),

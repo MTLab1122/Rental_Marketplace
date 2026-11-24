@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rental_peshawar_mobile/core/models/saved_search_model.dart';
 import 'package:rental_peshawar_mobile/core/models/property_model.dart';
-import 'package:rental_peshawar_mobile/core/models/user_model.dart';
 
 void main() {
   group('Phase 12: Mobile Saved Searches, Alerts & Discovery Tests', () {
-    test('SavedSearchModel deserializes and serializes with correct frequency', () {
+    test('SavedSearchModel deserializes and serializes with correct frequency',
+        () {
       final json = {
         'id': 'search-1',
         'userId': 'user-1',
@@ -33,7 +33,8 @@ void main() {
       expect(outJson['frequency'], 'DAILY');
     });
 
-    test('AlertFrequency extension parses all values and fallback correctly', () {
+    test('AlertFrequency extension parses all values and fallback correctly',
+        () {
       expect(AlertFrequencyExt.fromString('INSTANT'), AlertFrequency.instant);
       expect(AlertFrequencyExt.fromString('DAILY'), AlertFrequency.daily);
       expect(AlertFrequencyExt.fromString('WEEKLY'), AlertFrequency.weekly);
@@ -63,7 +64,9 @@ void main() {
       expect(customModel.weeklyDigest, isTrue);
     });
 
-    test('Strict recommendation segregation: student properties vs family properties', () {
+    test(
+        'Strict recommendation segregation: student properties vs family properties',
+        () {
       final studentProperty = PropertyModel(
         id: 'p1',
         title: 'Single Room for Student',
@@ -111,21 +114,29 @@ void main() {
 
       // Student view: filter by student eligibility
       final studentFiltered = recommendations
-          .where((r) => r.property.eligibility == PropertyEligibility.studentsOnly)
+          .where(
+              (r) => r.property.eligibility == PropertyEligibility.studentsOnly)
           .toList();
 
       expect(studentFiltered.length, 1);
       expect(studentFiltered.first.property.id, 'p1');
-      expect(studentFiltered.any((r) => r.property.eligibility == PropertyEligibility.familiesOnly), isFalse);
+      expect(
+          studentFiltered.any((r) =>
+              r.property.eligibility == PropertyEligibility.familiesOnly),
+          isFalse);
 
       // Family view: filter by family eligibility
       final familyFiltered = recommendations
-          .where((r) => r.property.eligibility == PropertyEligibility.familiesOnly)
+          .where(
+              (r) => r.property.eligibility == PropertyEligibility.familiesOnly)
           .toList();
 
       expect(familyFiltered.length, 1);
       expect(familyFiltered.first.property.id, 'p2');
-      expect(familyFiltered.any((r) => r.property.eligibility == PropertyEligibility.studentsOnly), isFalse);
+      expect(
+          familyFiltered.any((r) =>
+              r.property.eligibility == PropertyEligibility.studentsOnly),
+          isFalse);
     });
   });
 }

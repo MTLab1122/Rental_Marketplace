@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/property_card.dart';
 import '../../../../core/widgets/ui_feedback_widgets.dart';
 import '../../../auth/application/providers/auth_provider.dart';
@@ -34,7 +33,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
         body: EmptyView(
           icon: Icons.favorite_border,
           title: 'Sign In to View Saved Rentals',
-          description: 'Keep track of your favorite Peshawar properties across sessions.',
+          description:
+              'Keep track of your favorite Peshawar properties across sessions.',
           actionText: 'Sign In',
           onAction: () => context.push('/login'),
         ),
@@ -51,7 +51,8 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
               ? EmptyView(
                   icon: Icons.favorite_border,
                   title: 'No Saved Properties',
-                  description: 'Tap the heart icon on any Peshawar rental listing to save it here.',
+                  description:
+                      'Tap the heart icon on any Peshawar rental listing to save it here.',
                   actionText: 'Explore Rentals',
                   onAction: () => context.go('/'),
                 )
@@ -65,7 +66,9 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
                       isFavorited: true,
                       onTap: () => context.push('/property/${prop.slug}'),
                       onFavoriteToggle: () {
-                        ref.read(favoritesProvider.notifier).toggleFavorite(prop);
+                        ref
+                            .read(favoritesProvider.notifier)
+                            .toggleFavorite(prop);
                       },
                     );
                   },
@@ -73,4 +76,3 @@ class _FavoritesScreenState extends ConsumerState<FavoritesScreen> {
     );
   }
 }
-

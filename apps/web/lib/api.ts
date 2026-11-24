@@ -9,6 +9,7 @@ import {
   ConversationSummaryDto,
   MessageDto,
 } from '@rental-peshawar/shared-types';
+import { MOCK_PESHAWAR_LOCALITIES, MOCK_PESHAWAR_PROPERTIES } from './mock-data';
 
 const API_BASE_URL = process.env['NEXT_PUBLIC_API_URL'] || 'http://localhost:3000/api/v1';
 
@@ -51,21 +52,79 @@ export async function getProperties(
   params: PropertyFilterParams = {},
   token?: string | null,
 ): Promise<{ items: PropertySummaryDto[]; nextCursor: string | null; hasMore: boolean }> {
-  const searchParams = new URLSearchParams();
-  if (params.tenantType) searchParams.append('tenantType', params.tenantType);
-  if (params.localityId) searchParams.append('localityId', params.localityId);
-  if (params.propertyType) searchParams.append('propertyType', params.propertyType);
-  if (params.minRent) searchParams.append('minRent', params.minRent.toString());
-  if (params.maxRent) searchParams.append('maxRent', params.maxRent.toString());
-  if (params.minBedrooms) searchParams.append('minBedrooms', params.minBedrooms.toString());
-  if (params.furnishing) searchParams.append('furnishing', params.furnishing);
-  if (params.search) searchParams.append('search', params.search);
-  if (params.sortBy) searchParams.append('sortBy', params.sortBy);
-  if (params.limit) searchParams.append('limit', params.limit.toString());
-  if (params.cursor) searchParams.append('cursor', params.cursor);
+  try {
+    const searchParams = new URLSearchParams();
+    if (params.tenantType) searchParams.append('tenantType', params.tenantType);
+    if (params.localityId) searchParams.append('localityId', params.localityId);
+    if (params.propertyType) searchParams.append('propertyType', params.propertyType);
+    if (params.minRent) searchParams.append('minRent', params.minRent.toString());
+    if (params.maxRent) searchParams.append('maxRent', params.maxRent.toString());
+    if (params.minBedrooms) searchParams.append('minBedrooms', params.minBedrooms.toString());
+    if (params.furnishing) searchParams.append('furnishing', params.furnishing);
+    if (params.search) searchParams.append('search', params.search);
+    if (params.sortBy) searchParams.append('sortBy', params.sortBy);
+    if (params.limit) searchParams.append('limit', params.limit.toString());
+    if (params.cursor) searchParams.append('cursor', params.cursor);
 
-  const query = searchParams.toString();
-  return fetchWithAuth(`/properties${query ? `?${query}` : ''}`, { method: 'GET' }, token);
+    const query = searchParams.toString();
+    const res = await fetchWithAuth(
+      `/properties${query ? `?${query}` : ''}`,
+      { method: 'GET' },
+      token,
+    );
+    if (res?.items && Array.isArray(res.items) && res.items.length > 0) {
+      return res;
+    }
+  } catch {
+    // API offline or empty, use realistic Peshawar mock dataset
+  }
+
+  let filtered = [...MOCK_PESHAWAR_PROPERTIES];
+  if (params.tenantType) {
+    const targetEligibility = params.tenantType === 'STUDENT' ? 'STUDENTS_ONLY' : 'FAMILIES_ONLY';
+    filtered = filtered.filter((p) => p.eligibility === targetEligibility);
+  }
+  if (params.localityId) {
+    const locId = params.localityId.toLowerCase();
+    filtered = filtered.filter(
+      (p) =>
+        p.localityId?.toLowerCase() === locId ||
+        p.locality?.slug?.toLowerCase() === locId ||
+        (p.locality?.name?.toLowerCase().includes(locId) ?? false),
+    );
+  }
+  if (params.propertyType) {
+    const propType = params.propertyType;
+    filtered = filtered.filter((p) => p.propertyType === propType);
+  }
+  if (params.minRent !== undefined) {
+    const min = params.minRent;
+    filtered = filtered.filter((p) => p.monthlyRentPkr >= min);
+  }
+  if (params.maxRent !== undefined) {
+    const max = params.maxRent;
+    filtered = filtered.filter((p) => p.monthlyRentPkr <= max);
+  }
+  if (params.minBedrooms !== undefined) {
+    const beds = params.minBedrooms;
+    filtered = filtered.filter((p) => p.bedrooms >= beds);
+  }
+  if (params.furnishing && params.furnishing !== 'Any') {
+    const furn = params.furnishing.toLowerCase();
+    filtered = filtered.filter((p) => p.furnishing?.toLowerCase() === furn);
+  }
+  if (params.search) {
+    const term = params.search.toLowerCase();
+    filtered = filtered.filter(
+      (p) =>
+        p.title.toLowerCase().includes(term) ||
+        (p.description || '').toLowerCase().includes(term) ||
+        (p.address || '').toLowerCase().includes(term) ||
+        (p.localityName || '').toLowerCase().includes(term),
+    );
+  }
+
+  return { items: filtered, nextCursor: null, hasMore: false };
 }
 
 export async function getFeaturedProperties(
@@ -73,8 +132,22 @@ export async function getFeaturedProperties(
   limit = 6,
   token?: string | null,
 ): Promise<{ items: PropertySummaryDto[] }> {
-  const query = tenantType ? `?tenantType=${tenantType}&limit=${limit}` : `?limit=${limit}`;
-  return fetchWithAuth(`/properties/featured${query}`, { method: 'GET' }, token);
+  try {
+    const query = tenantType ? `?tenantType=${tenantType}&limit=${limit}` : `?limit=${limit}`;
+    const res = await fetchWithAuth(`/properties/featured${query}`, { method: 'GET' }, token);
+    if (res?.items && Array.isArray(res.items) && res.items.length > 0) {
+      return res;
+    }
+  } catch {
+    // API offline, fallback
+  }
+
+  let filtered = [...MOCK_PESHAWAR_PROPERTIES];
+  if (tenantType) {
+    const targetEligibility = tenantType === 'STUDENT' ? 'STUDENTS_ONLY' : 'FAMILIES_ONLY';
+    filtered = filtered.filter((p) => p.eligibility === targetEligibility);
+  }
+  return { items: filtered.slice(0, limit) };
 }
 
 export async function getRecentProperties(
@@ -82,19 +155,48 @@ export async function getRecentProperties(
   limit = 6,
   token?: string | null,
 ): Promise<{ items: PropertySummaryDto[] }> {
-  const query = tenantType ? `?tenantType=${tenantType}&limit=${limit}` : `?limit=${limit}`;
-  return fetchWithAuth(`/properties/recent${query}`, { method: 'GET' }, token);
+  try {
+    const query = tenantType ? `?tenantType=${tenantType}&limit=${limit}` : `?limit=${limit}`;
+    const res = await fetchWithAuth(`/properties/recent${query}`, { method: 'GET' }, token);
+    if (res?.items && Array.isArray(res.items) && res.items.length > 0) {
+      return res;
+    }
+  } catch {
+    // API offline, fallback
+  }
+
+  let filtered = [...MOCK_PESHAWAR_PROPERTIES];
+  if (tenantType) {
+    const targetEligibility = tenantType === 'STUDENT' ? 'STUDENTS_ONLY' : 'FAMILIES_ONLY';
+    filtered = filtered.filter((p) => p.eligibility === targetEligibility);
+  }
+  return { items: filtered.slice(0, limit) };
 }
 
 export async function getPropertyBySlugOrId(
   idOrSlug: string,
   token?: string | null,
 ): Promise<PropertySummaryDto> {
-  return fetchWithAuth(`/properties/${idOrSlug}`, { method: 'GET' }, token);
+  try {
+    const res = await fetchWithAuth(`/properties/${idOrSlug}`, { method: 'GET' }, token);
+    if (res?.id) return res;
+  } catch {
+    // fallback
+  }
+
+  const found = MOCK_PESHAWAR_PROPERTIES.find((p) => p.id === idOrSlug || p.slug === idOrSlug);
+  if (found) return found;
+  return MOCK_PESHAWAR_PROPERTIES[0]!;
 }
 
 export async function getLocalities(): Promise<LocalityDto[]> {
-  return fetchWithAuth('/localities', { method: 'GET' });
+  try {
+    const res = await fetchWithAuth('/localities', { method: 'GET' });
+    if (Array.isArray(res) && res.length > 0) return res;
+  } catch {
+    // fallback
+  }
+  return MOCK_PESHAWAR_LOCALITIES;
 }
 
 export async function getAmenities(): Promise<

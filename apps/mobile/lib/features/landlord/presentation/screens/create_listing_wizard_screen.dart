@@ -40,7 +40,11 @@ class _CreateListingWizardScreenState
   int _bathrooms = 1;
   double _areaSqFt = 250.0;
   String _furnishing = 'FURNISHED';
-  final Set<String> _selectedAmenities = {'Water', 'Electricity', 'Internet / Wi-Fi'};
+  final Set<String> _selectedAmenities = {
+    'Water',
+    'Electricity',
+    'Internet / Wi-Fi'
+  };
 
   final List<String> _imageUrls = [];
   int _primaryImageIndex = 0;
@@ -53,7 +57,13 @@ class _CreateListingWizardScreenState
 
   List<String> get _availablePropertyTypes {
     if (_eligibility == 'STUDENTS_ONLY') {
-      return ['SINGLE_ROOM', 'SHARED_ROOM', 'HOSTEL_BED', 'PORTION', 'APARTMENT'];
+      return [
+        'SINGLE_ROOM',
+        'SHARED_ROOM',
+        'HOSTEL_BED',
+        'PORTION',
+        'APARTMENT'
+      ];
     } else {
       return ['FULL_HOUSE', 'UPPER_PORTION', 'LOWER_PORTION', 'APARTMENT'];
     }
@@ -86,7 +96,8 @@ class _CreateListingWizardScreenState
       if (!PeshawarConstants.isWithinPeshawarBoundary(_latitude, _longitude)) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Coordinates are outside the Peshawar municipal boundary.'),
+            content: Text(
+                'Coordinates are outside the Peshawar municipal boundary.'),
             backgroundColor: Colors.red,
           ),
         );
@@ -137,7 +148,8 @@ class _CreateListingWizardScreenState
       if (data != null && data['isDuplicate'] == true) {
         setState(() {
           _duplicateWarning = true;
-          _duplicateDetails = data['existingProperty']?['title'] ?? 'Similar listing in same locality';
+          _duplicateDetails = data['existingProperty']?['title'] ??
+              'Similar listing in same locality';
         });
       }
     } catch (_) {
@@ -173,7 +185,8 @@ class _CreateListingWizardScreenState
         'propertyType': _propertyType,
         'monthlyRentPkr': _monthlyRentPkr,
         'securityDepositPkr': _securityDepositPkr,
-        'availableFromDate': _availableFromDate.toIso8601String().split('T').first,
+        'availableFromDate':
+            _availableFromDate.toIso8601String().split('T').first,
         'bedrooms': _bedrooms,
         'bathrooms': _bathrooms,
         'areaSqFt': _areaSqFt,
@@ -195,7 +208,8 @@ class _CreateListingWizardScreenState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Listing submitted successfully! Awaiting moderation review.'),
+            content: Text(
+                'Listing submitted successfully! Awaiting moderation review.'),
             backgroundColor: AppTheme.primaryEmeraldDark,
           ),
         );
@@ -203,7 +217,8 @@ class _CreateListingWizardScreenState
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to submit listing. Please ensure all fields are valid.';
+        _errorMessage =
+            'Failed to submit listing. Please ensure all fields are valid.';
       });
     } finally {
       setState(() {
@@ -230,7 +245,8 @@ class _CreateListingWizardScreenState
               width: double.infinity,
               padding: const EdgeInsets.all(12),
               color: Colors.red.shade50,
-              child: Text(_errorMessage!, style: const TextStyle(color: Colors.red, fontSize: 13)),
+              child: Text(_errorMessage!,
+                  style: const TextStyle(color: Colors.red, fontSize: 13)),
             ),
           Expanded(
             child: SingleChildScrollView(
@@ -282,14 +298,16 @@ class _CreateListingWizardScreenState
         const SizedBox(height: 20),
         _buildEligibilityCard(
           title: 'Students Only',
-          description: 'Hostels, shared rooms, single rooms, or portions near University of Peshawar, UET, Islamia College, etc.',
+          description:
+              'Hostels, shared rooms, single rooms, or portions near University of Peshawar, UET, Islamia College, etc.',
           emoji: '🎓',
           value: 'STUDENTS_ONLY',
         ),
         const SizedBox(height: 14),
         _buildEligibilityCard(
           title: 'Families Only',
-          description: 'Independent family portions, houses, or family apartments in residential sectors like Hayatabad, Town, etc.',
+          description:
+              'Independent family portions, houses, or family apartments in residential sectors like Hayatabad, Town, etc.',
           emoji: '👨‍👩‍👧',
           value: 'FAMILIES_ONLY',
         ),
@@ -315,7 +333,9 @@ class _CreateListingWizardScreenState
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryEmerald.withOpacity(0.08) : Colors.white,
+          color: isSelected
+              ? AppTheme.primaryEmerald.withValues(alpha: 0.08)
+              : Colors.white,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: isSelected ? AppTheme.primaryEmerald : Colors.grey.shade300,
@@ -331,9 +351,13 @@ class _CreateListingWizardScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  Text(title,
+                      style: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 4),
-                  Text(description, style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                  Text(description,
+                      style:
+                          TextStyle(fontSize: 12, color: Colors.grey.shade600)),
                 ],
               ),
             ),
@@ -367,11 +391,17 @@ class _CreateListingWizardScreenState
             child: RadioListTile<String>(
               value: type,
               groupValue: _propertyType,
-              title: Text(type.replaceAll('_', ' '), style: const TextStyle(fontWeight: FontWeight.w600)),
-              tileColor: isSelected ? AppTheme.primaryEmerald.withOpacity(0.06) : Colors.white,
+              title: Text(type.replaceAll('_', ' '),
+                  style: const TextStyle(fontWeight: FontWeight.w600)),
+              tileColor: isSelected
+                  ? AppTheme.primaryEmerald.withValues(alpha: 0.06)
+                  : Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
-                side: BorderSide(color: isSelected ? AppTheme.primaryEmerald : Colors.grey.shade200),
+                side: BorderSide(
+                    color: isSelected
+                        ? AppTheme.primaryEmerald
+                        : Colors.grey.shade200),
               ),
               activeColor: AppTheme.primaryEmerald,
               onChanged: (val) {
@@ -390,19 +420,22 @@ class _CreateListingWizardScreenState
 
   // --- STEP 3: LOCATION ---
   Widget _buildStep3Location() {
-    final isInsideBoundary = PeshawarConstants.isWithinPeshawarBoundary(_latitude, _longitude);
+    final isInsideBoundary =
+        PeshawarConstants.isWithinPeshawarBoundary(_latitude, _longitude);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Property Location', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text('Property Location',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         const Text(
           'All properties must be located within verified Peshawar localities.',
           style: TextStyle(fontSize: 13, color: Colors.grey),
         ),
         const SizedBox(height: 16),
-        const Text('Title / Headline', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const Text('Title / Headline',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         const SizedBox(height: 6),
         TextFormField(
           initialValue: _title,
@@ -413,10 +446,11 @@ class _CreateListingWizardScreenState
           onChanged: (v) => _title = v,
         ),
         const SizedBox(height: 16),
-        const Text('Locality', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const Text('Locality',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
-          value: _localityName,
+          initialValue: _localityName,
           items: PeshawarConstants.localities
               .map((loc) => DropdownMenuItem(value: loc, child: Text(loc)))
               .toList(),
@@ -426,7 +460,8 @@ class _CreateListingWizardScreenState
           },
         ),
         const SizedBox(height: 16),
-        const Text('Street Address / Sector / Landmark', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const Text('Street Address / Sector / Landmark',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         const SizedBox(height: 6),
         TextFormField(
           initialValue: _addressNote,
@@ -443,12 +478,16 @@ class _CreateListingWizardScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Latitude', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  const Text('Latitude',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                   const SizedBox(height: 6),
                   TextFormField(
                     initialValue: _latitude.toString(),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(border: OutlineInputBorder()),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
                     onChanged: (v) {
                       final n = double.tryParse(v);
                       if (n != null) setState(() => _latitude = n);
@@ -462,12 +501,16 @@ class _CreateListingWizardScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Longitude', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  const Text('Longitude',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                   const SizedBox(height: 6),
                   TextFormField(
                     initialValue: _longitude.toString(),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                    decoration: const InputDecoration(border: OutlineInputBorder()),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
                     onChanged: (v) {
                       final n = double.tryParse(v);
                       if (n != null) setState(() => _longitude = n);
@@ -482,17 +525,22 @@ class _CreateListingWizardScreenState
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: isInsideBoundary ? const Color(0xFFECFDF5) : Colors.red.shade50,
+            color:
+                isInsideBoundary ? const Color(0xFFECFDF5) : Colors.red.shade50,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: isInsideBoundary ? const Color(0xFF10B981) : Colors.red.shade300,
+              color: isInsideBoundary
+                  ? const Color(0xFF10B981)
+                  : Colors.red.shade300,
             ),
           ),
           child: Row(
             children: [
               Icon(
                 isInsideBoundary ? Icons.check_circle : Icons.error_outline,
-                color: isInsideBoundary ? const Color(0xFF047857) : Colors.red.shade800,
+                color: isInsideBoundary
+                    ? const Color(0xFF047857)
+                    : Colors.red.shade800,
                 size: 20,
               ),
               const SizedBox(width: 8),
@@ -504,7 +552,9 @@ class _CreateListingWizardScreenState
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: isInsideBoundary ? const Color(0xFF047857) : Colors.red.shade800,
+                    color: isInsideBoundary
+                        ? const Color(0xFF047857)
+                        : Colors.red.shade800,
                   ),
                 ),
               ),
@@ -520,11 +570,14 @@ class _CreateListingWizardScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Pricing & Availability', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text('Pricing & Availability',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
-        const Text('Enter transparent PKR rental terms.', style: TextStyle(fontSize: 13, color: Colors.grey)),
+        const Text('Enter transparent PKR rental terms.',
+            style: TextStyle(fontSize: 13, color: Colors.grey)),
         const SizedBox(height: 16),
-        const Text('Monthly Rent (PKR)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const Text('Monthly Rent (PKR)',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         const SizedBox(height: 6),
         TextFormField(
           initialValue: _monthlyRentPkr.toString(),
@@ -539,7 +592,8 @@ class _CreateListingWizardScreenState
           },
         ),
         const SizedBox(height: 16),
-        const Text('Security Deposit (PKR)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const Text('Security Deposit (PKR)',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         const SizedBox(height: 6),
         TextFormField(
           initialValue: _securityDepositPkr.toString(),
@@ -554,7 +608,8 @@ class _CreateListingWizardScreenState
           },
         ),
         const SizedBox(height: 16),
-        const Text('Available From Date', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const Text('Available From Date',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         const SizedBox(height: 6),
         InkWell(
           onTap: () async {
@@ -590,7 +645,8 @@ class _CreateListingWizardScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Property Details & Amenities', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text('Property Details & Amenities',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 16),
         Row(
           children: [
@@ -598,12 +654,15 @@ class _CreateListingWizardScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Bedrooms', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  const Text('Bedrooms',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                   const SizedBox(height: 6),
                   TextFormField(
                     initialValue: _bedrooms.toString(),
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(border: OutlineInputBorder()),
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
                     onChanged: (v) => _bedrooms = int.tryParse(v) ?? 1,
                   ),
                 ],
@@ -614,12 +673,15 @@ class _CreateListingWizardScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Bathrooms', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  const Text('Bathrooms',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                   const SizedBox(height: 6),
                   TextFormField(
                     initialValue: _bathrooms.toString(),
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(border: OutlineInputBorder()),
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
                     onChanged: (v) => _bathrooms = int.tryParse(v) ?? 1,
                   ),
                 ],
@@ -630,12 +692,15 @@ class _CreateListingWizardScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Area (sqft)', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+                  const Text('Area (sqft)',
+                      style:
+                          TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
                   const SizedBox(height: 6),
                   TextFormField(
                     initialValue: _areaSqFt.toString(),
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(border: OutlineInputBorder()),
+                    decoration:
+                        const InputDecoration(border: OutlineInputBorder()),
                     onChanged: (v) => _areaSqFt = double.tryParse(v) ?? 250,
                   ),
                 ],
@@ -644,14 +709,17 @@ class _CreateListingWizardScreenState
           ],
         ),
         const SizedBox(height: 16),
-        const Text('Furnishing Status', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const Text('Furnishing Status',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
-          value: _furnishing,
+          initialValue: _furnishing,
           items: const [
             DropdownMenuItem(value: 'UNFURNISHED', child: Text('Unfurnished')),
-            DropdownMenuItem(value: 'SEMI_FURNISHED', child: Text('Semi Furnished')),
-            DropdownMenuItem(value: 'FURNISHED', child: Text('Fully Furnished')),
+            DropdownMenuItem(
+                value: 'SEMI_FURNISHED', child: Text('Semi Furnished')),
+            DropdownMenuItem(
+                value: 'FURNISHED', child: Text('Fully Furnished')),
           ],
           decoration: const InputDecoration(border: OutlineInputBorder()),
           onChanged: (v) {
@@ -659,19 +727,22 @@ class _CreateListingWizardScreenState
           },
         ),
         const SizedBox(height: 16),
-        const Text('Description', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const Text('Description',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         const SizedBox(height: 6),
         TextFormField(
           initialValue: _description,
           maxLines: 3,
           decoration: const InputDecoration(
-            hintText: 'Detailed description of premises, utilities, rules, etc.',
+            hintText:
+                'Detailed description of premises, utilities, rules, etc.',
             border: OutlineInputBorder(),
           ),
           onChanged: (v) => _description = v,
         ),
         const SizedBox(height: 16),
-        const Text('Select Amenities', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+        const Text('Select Amenities',
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
@@ -681,7 +752,7 @@ class _CreateListingWizardScreenState
             return FilterChip(
               label: Text(amenity),
               selected: isChecked,
-              selectedColor: AppTheme.primaryEmerald.withOpacity(0.2),
+              selectedColor: AppTheme.primaryEmerald.withValues(alpha: 0.2),
               onSelected: (val) {
                 setState(() {
                   if (val) {
@@ -703,7 +774,8 @@ class _CreateListingWizardScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Listing Media (Up to 12 Images)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text('Listing Media (Up to 12 Images)',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         const Text(
           'Add high-quality image URLs. Designate a cover photo that appears first in search results.',
@@ -718,7 +790,8 @@ class _CreateListingWizardScreenState
                 decoration: const InputDecoration(
                   hintText: 'Paste image URL (https://...)',
                   border: OutlineInputBorder(),
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 ),
               ),
             ),
@@ -736,7 +809,8 @@ class _CreateListingWizardScreenState
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryEmerald,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
               child: const Text('Add'),
             ),
@@ -791,14 +865,20 @@ class _CreateListingWizardScreenState
                         setState(() => _primaryImageIndex = idx);
                       },
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 3),
                         decoration: BoxDecoration(
-                          color: isCover ? AppTheme.primaryEmerald : Colors.black54,
+                          color: isCover
+                              ? AppTheme.primaryEmerald
+                              : Colors.black54,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           isCover ? 'Cover' : 'Set Cover',
-                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ),
@@ -837,7 +917,8 @@ class _CreateListingWizardScreenState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Review & Submit for Moderation', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const Text('Review & Submit for Moderation',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         const SizedBox(height: 6),
         const Text(
           'Please verify all listing information before submitting for admin review.',
@@ -858,17 +939,20 @@ class _CreateListingWizardScreenState
               children: [
                 Row(
                   children: [
-                    Icon(Icons.warning_amber_rounded, color: Colors.amber.shade900),
+                    Icon(Icons.warning_amber_rounded,
+                        color: Colors.amber.shade900),
                     const SizedBox(width: 8),
                     Text(
                       'Potential Duplicate Listing Detected',
-                      style: TextStyle(fontWeight: FontWeight.bold, color: Colors.amber.shade900),
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.amber.shade900),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'A similar listing was detected in ${_localityName} (${_duplicateDetails ?? ''}). If this is a separate listing, check below to confirm.',
+                  'A similar listing was detected in $_localityName (${_duplicateDetails ?? ''}). If this is a separate listing, check below to confirm.',
                   style: const TextStyle(fontSize: 12),
                 ),
                 const SizedBox(height: 8),
@@ -876,7 +960,10 @@ class _CreateListingWizardScreenState
                   contentPadding: EdgeInsets.zero,
                   value: _allowDuplicateBypass,
                   activeColor: AppTheme.primaryEmerald,
-                  title: const Text('Confirm this is an independent unit / portion and submit anyway', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                  title: const Text(
+                      'Confirm this is an independent unit / portion and submit anyway',
+                      style:
+                          TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                   onChanged: (val) {
                     setState(() {
                       _allowDuplicateBypass = val ?? false;
@@ -900,15 +987,28 @@ class _CreateListingWizardScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_title.isNotEmpty ? _title : 'Untitled Listing', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Text(_title.isNotEmpty ? _title : 'Untitled Listing',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 8),
-              Text('PKR ${formatter.format(_monthlyRentPkr)} / month', style: const TextStyle(color: AppTheme.primaryEmeraldDark, fontWeight: FontWeight.bold, fontSize: 15)),
+              Text('PKR ${formatter.format(_monthlyRentPkr)} / month',
+                  style: const TextStyle(
+                      color: AppTheme.primaryEmeraldDark,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15)),
               const Divider(height: 20),
-              _buildSummaryRow('Eligibility', _eligibility == 'STUDENTS_ONLY' ? 'Students Only' : 'Families Only'),
-              _buildSummaryRow('Property Type', _propertyType.replaceAll('_', ' ')),
+              _buildSummaryRow(
+                  'Eligibility',
+                  _eligibility == 'STUDENTS_ONLY'
+                      ? 'Students Only'
+                      : 'Families Only'),
+              _buildSummaryRow(
+                  'Property Type', _propertyType.replaceAll('_', ' ')),
               _buildSummaryRow('Locality', _localityName),
-              _buildSummaryRow('Security Deposit', 'PKR ${formatter.format(_securityDepositPkr)}'),
-              _buildSummaryRow('Bedrooms / Baths', '$_bedrooms Bed / $_bathrooms Bath'),
+              _buildSummaryRow('Security Deposit',
+                  'PKR ${formatter.format(_securityDepositPkr)}'),
+              _buildSummaryRow(
+                  'Bedrooms / Baths', '$_bedrooms Bed / $_bathrooms Bath'),
               _buildSummaryRow('Area', '$_areaSqFt sqft'),
               _buildSummaryRow('Furnishing', _furnishing),
               _buildSummaryRow('Images Count', '${_imageUrls.length} images'),
@@ -925,8 +1025,11 @@ class _CreateListingWizardScreenState
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
-          Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+          Text(label,
+              style: TextStyle(fontSize: 13, color: Colors.grey.shade600)),
+          Text(value,
+              style:
+                  const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -934,7 +1037,8 @@ class _CreateListingWizardScreenState
 
   Widget _buildNavigationFooter() {
     final isLastStep = _currentStep == 7;
-    final isSubmitDisabled = _isLoading || (_duplicateWarning && !_allowDuplicateBypass);
+    final isSubmitDisabled =
+        _isLoading || (_duplicateWarning && !_allowDuplicateBypass);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -956,7 +1060,8 @@ class _CreateListingWizardScreenState
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryEmerald,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
               child: const Text('Next Step →'),
             )
@@ -966,13 +1071,15 @@ class _CreateListingWizardScreenState
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryEmerald,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               ),
               child: _isLoading
                   ? const SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      child: CircularProgressIndicator(
+                          color: Colors.white, strokeWidth: 2),
                     )
                   : const Text('Submit Listing'),
             ),

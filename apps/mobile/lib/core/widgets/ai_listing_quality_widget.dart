@@ -47,7 +47,7 @@ class AiListingQualityWidget extends StatelessWidget {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -89,7 +89,6 @@ class AiListingQualityWidget extends StatelessWidget {
             style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
           ),
           const SizedBox(height: 12),
-
           if (suggestions.isEmpty && !isLoading)
             Container(
               padding: const EdgeInsets.all(12),
@@ -115,7 +114,6 @@ class AiListingQualityWidget extends StatelessWidget {
                 ],
               ),
             ),
-
           if (pending.isNotEmpty)
             ListView.separated(
               shrinkWrap: true,
@@ -160,7 +158,8 @@ class AiListingQualityWidget extends StatelessWidget {
                       const SizedBox(height: 4),
                       Text(
                         item.message,
-                        style: const TextStyle(fontSize: 11, color: Color(0xFF475569)),
+                        style: const TextStyle(
+                            fontSize: 11, color: Color(0xFF475569)),
                       ),
                       if (item.actionableStep != null) ...[
                         const SizedBox(height: 6),
@@ -179,24 +178,31 @@ class AiListingQualityWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             OutlinedButton(
-                              onPressed: () => onUpdateStatus!(item.id, 'DISMISSED'),
+                              onPressed: () =>
+                                  onUpdateStatus!(item.id, 'DISMISSED'),
                               style: OutlinedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 4),
                                 minimumSize: Size.zero,
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
-                              child: const Text('Dismiss', style: TextStyle(fontSize: 10)),
+                              child: const Text('Dismiss',
+                                  style: TextStyle(fontSize: 10)),
                             ),
                             const SizedBox(width: 8),
                             ElevatedButton(
-                              onPressed: () => onUpdateStatus!(item.id, 'ACCEPTED'),
+                              onPressed: () =>
+                                  onUpdateStatus!(item.id, 'ACCEPTED'),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF0284C7),
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10, vertical: 4),
                                 minimumSize: Size.zero,
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
-                              child: const Text('Apply', style: TextStyle(fontSize: 10, color: Colors.white)),
+                              child: const Text('Apply',
+                                  style: TextStyle(
+                                      fontSize: 10, color: Colors.white)),
                             ),
                           ],
                         ),
@@ -268,7 +274,7 @@ class PricingInsightCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
-                  color: badgeColor.withOpacity(0.15),
+                  color: badgeColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
@@ -285,17 +291,23 @@ class PricingInsightCard extends StatelessWidget {
           const SizedBox(height: 10),
           Row(
             children: [
-              _buildPriceCell('Locality Median', 'PKR ${medianRentPkr.toString()}'),
+              _buildPriceCell(
+                  'Locality Median', 'PKR ${medianRentPkr.toString()}'),
               const SizedBox(width: 8),
-              _buildPriceCell('Competitive Min', 'PKR ${minRecommendedPkr.toString()}'),
+              _buildPriceCell(
+                  'Competitive Min', 'PKR ${minRecommendedPkr.toString()}'),
               const SizedBox(width: 8),
-              _buildPriceCell('Competitive Max', 'PKR ${maxRecommendedPkr.toString()}'),
+              _buildPriceCell(
+                  'Competitive Max', 'PKR ${maxRecommendedPkr.toString()}'),
             ],
           ),
           const SizedBox(height: 8),
           const Text(
             '⚠️ Estimates derived from active approved listings in Peshawar. Not a guaranteed price.',
-            style: TextStyle(fontSize: 9, fontStyle: FontStyle.italic, color: Color(0xFF64748B)),
+            style: TextStyle(
+                fontSize: 9,
+                fontStyle: FontStyle.italic,
+                color: Color(0xFF64748B)),
           ),
         ],
       ),
@@ -313,7 +325,8 @@ class PricingInsightCard extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(label, style: const TextStyle(fontSize: 8, color: Color(0xFF64748B))),
+            Text(label,
+                style: const TextStyle(fontSize: 8, color: Color(0xFF64748B))),
             const SizedBox(height: 2),
             Text(
               value,
@@ -363,7 +376,8 @@ class SafetyTipsCard extends StatelessWidget {
           SizedBox(height: 6),
           Text(
             '• Never send advance rent via JazzCash/EasyPaisa before viewing.\n• Verify physical property within active Peshawar boundary.\n• Review verified landlord CNIC badge before signing.',
-            style: TextStyle(fontSize: 11, color: Color(0xFFCBD5E1), height: 1.4),
+            style:
+                TextStyle(fontSize: 11, color: Color(0xFFCBD5E1), height: 1.4),
           ),
         ],
       ),

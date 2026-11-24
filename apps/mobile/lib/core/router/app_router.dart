@@ -175,7 +175,7 @@ class MainShellScaffold extends StatelessWidget {
       bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
         onDestinationSelected: (idx) => _onItemTapped(idx, context),
-        indicatorColor: AppTheme.primaryEmerald.withOpacity(0.15),
+        indicatorColor: AppTheme.primaryEmerald.withValues(alpha: 0.15),
         destinations: const [
           NavigationDestination(
             icon: Icon(Icons.explore_outlined),
@@ -207,4 +207,3 @@ class MainShellScaffold extends StatelessWidget {
     );
   }
 }
-

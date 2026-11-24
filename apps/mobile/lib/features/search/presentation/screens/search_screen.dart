@@ -63,7 +63,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               controller: _searchController,
               decoration: InputDecoration(
                 hintText: 'Search by keyword or address...',
-                prefixIcon: const Icon(Icons.search, color: AppTheme.primaryEmerald),
+                prefixIcon:
+                    const Icon(Icons.search, color: AppTheme.primaryEmerald),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
@@ -75,7 +76,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     : null,
                 filled: true,
                 fillColor: Colors.grey.shade100,
-                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                contentPadding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -88,7 +90,8 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           ),
 
           // Active filter indicator if any
-          if (searchState.filters.localityName != null || searchState.filters.minRent != null)
+          if (searchState.filters.localityName != null ||
+              searchState.filters.minRent != null)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
               child: Row(
@@ -120,11 +123,17 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
               children: [
                 Text(
                   '${searchState.results.length} Properties Found',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: AppTheme.textDark),
                 ),
                 Text(
                   authState.currentTenantType.name.toUpperCase(),
-                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey.shade500),
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey.shade500),
                 ),
               ],
             ),
@@ -138,11 +147,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     ? EmptyView(
                         icon: Icons.search_off,
                         title: 'No Matching Rentals',
-                        description: 'Try adjusting your filters or search keywords.',
+                        description:
+                            'Try adjusting your filters or search keywords.',
                         actionText: 'Reset Filters',
                         onAction: () {
                           _searchController.clear();
-                          ref.read(searchProvider.notifier).updateFilters(SearchFilterState());
+                          ref
+                              .read(searchProvider.notifier)
+                              .updateFilters(SearchFilterState());
                         },
                       )
                     : ListView.builder(
@@ -156,7 +168,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                             onTap: () => context.push('/property/${prop.slug}'),
                             onFavoriteToggle: () {
                               if (authState.isAuthenticated) {
-                                ref.read(favoritesProvider.notifier).toggleFavorite(prop);
+                                ref
+                                    .read(favoritesProvider.notifier)
+                                    .toggleFavorite(prop);
                               }
                             },
                           );
@@ -204,25 +218,32 @@ class _FilterBottomSheetState extends ConsumerState<_FilterBottomSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Filter Rentals', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
+              const Text('Filter Rentals',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context)),
             ],
           ),
           const SizedBox(height: 12),
 
           // Locality Dropdown
-          const Text('Locality', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
+          const Text('Locality',
+              style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
           const SizedBox(height: 6),
           DropdownButtonFormField<String>(
-            value: _selectedLocality,
+            initialValue: _selectedLocality,
             hint: const Text('All 15 Localities'),
             isExpanded: true,
             decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
             ),
             items: [
-              const DropdownMenuItem(value: null, child: Text('All Localities')),
+              const DropdownMenuItem(
+                  value: null, child: Text('All Localities')),
               ...PeshawarConstants.localities.map(
                 (loc) => DropdownMenuItem(value: loc, child: Text(loc)),
               ),
@@ -262,13 +283,14 @@ class _FilterBottomSheetState extends ConsumerState<_FilterBottomSheet> {
               backgroundColor: AppTheme.primaryEmerald,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
-            child: const Text('Apply Filters', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('Apply Filters',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
     );
   }
 }
-

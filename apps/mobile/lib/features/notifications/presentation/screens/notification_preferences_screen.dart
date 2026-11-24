@@ -12,10 +12,12 @@ class NotificationPreferencesScreen extends StatefulWidget {
   });
 
   @override
-  State<NotificationPreferencesScreen> createState() => _NotificationPreferencesScreenState();
+  State<NotificationPreferencesScreen> createState() =>
+      _NotificationPreferencesScreenState();
 }
 
-class _NotificationPreferencesScreenState extends State<NotificationPreferencesScreen> {
+class _NotificationPreferencesScreenState
+    extends State<NotificationPreferencesScreen> {
   late bool _inAppAlerts;
   late bool _pushAlerts;
   late bool _emailAlerts;
@@ -67,7 +69,11 @@ class _NotificationPreferencesScreenState extends State<NotificationPreferencesS
         children: [
           const Text(
             'DELIVERY CHANNELS',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black54, letterSpacing: 1),
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: Colors.black54,
+                letterSpacing: 1),
           ),
           const SizedBox(height: 8),
           _buildSwitchTile(
@@ -91,12 +97,17 @@ class _NotificationPreferencesScreenState extends State<NotificationPreferencesS
           const SizedBox(height: 24),
           const Text(
             'FREQUENCY & DISCOVERY',
-            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black54, letterSpacing: 1),
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: Colors.black54,
+                letterSpacing: 1),
           ),
           const SizedBox(height: 8),
           _buildSwitchTile(
             title: 'Instant Alerts',
-            subtitle: 'Notify immediately when matching properties are verified',
+            subtitle:
+                'Notify immediately when matching properties are verified',
             value: _instantAlerts,
             onChanged: (val) => setState(() => _instantAlerts = val),
           ),
@@ -108,7 +119,8 @@ class _NotificationPreferencesScreenState extends State<NotificationPreferencesS
           ),
           _buildSwitchTile(
             title: 'AI Recommendations',
-            subtitle: 'Allow personalized property suggestions based on views and favorites',
+            subtitle:
+                'Allow personalized property suggestions based on views and favorites',
             value: _recommendations,
             onChanged: (val) => setState(() => _recommendations = val),
           ),
@@ -119,9 +131,11 @@ class _NotificationPreferencesScreenState extends State<NotificationPreferencesS
               backgroundColor: const Color(0xFF0284C7),
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
-            child: const Text('Save Preferences', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('Save Preferences',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -136,10 +150,12 @@ class _NotificationPreferencesScreenState extends State<NotificationPreferencesS
   }) {
     return SwitchListTile(
       contentPadding: EdgeInsets.zero,
-      title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-      subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+      title: Text(title,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+      subtitle: Text(subtitle,
+          style: const TextStyle(fontSize: 12, color: Colors.black54)),
       value: value,
-      activeColor: const Color(0xFF0284C7),
+      activeThumbColor: const Color(0xFF0284C7),
       onChanged: onChanged,
     );
   }

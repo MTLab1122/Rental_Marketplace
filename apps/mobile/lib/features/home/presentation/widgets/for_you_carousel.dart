@@ -25,7 +25,10 @@ class ForYouCarousel extends StatelessWidget {
             children: [
               Text(
                 '✨ Recommended For You',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF0F172A)),
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF0F172A)),
               ),
             ],
           ),
@@ -53,7 +56,7 @@ class ForYouCarousel extends StatelessWidget {
                     border: Border.all(color: const Color(0xFFE2E8F0)),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 6,
                         offset: const Offset(0, 2),
                       ),
@@ -66,7 +69,8 @@ class ForYouCarousel extends StatelessWidget {
                       Stack(
                         children: [
                           ClipRRect(
-                            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                            borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(12)),
                             child: Container(
                               height: 110,
                               width: double.infinity,
@@ -75,12 +79,15 @@ class ForYouCarousel extends StatelessWidget {
                                   ? Image.network(
                                       prop.images.first.url,
                                       fit: BoxFit.cover,
-                                      errorBuilder: (_, __, ___) => const Center(
-                                        child: Icon(Icons.home, color: Colors.black26),
+                                      errorBuilder: (_, __, ___) =>
+                                          const Center(
+                                        child: Icon(Icons.home,
+                                            color: Colors.black26),
                                       ),
                                     )
                                   : const Center(
-                                      child: Icon(Icons.home, color: Colors.black26),
+                                      child: Icon(Icons.home,
+                                          color: Colors.black26),
                                     ),
                             ),
                           ),
@@ -88,9 +95,10 @@ class ForYouCarousel extends StatelessWidget {
                             top: 6,
                             left: 6,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 3),
                               decoration: BoxDecoration(
-                                color: Colors.black.withOpacity(0.75),
+                                color: Colors.black.withValues(alpha: 0.75),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
@@ -107,7 +115,8 @@ class ForYouCarousel extends StatelessWidget {
                             bottom: 6,
                             right: 6,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: const Color(0xFF0284C7),
                                 borderRadius: BorderRadius.circular(10),
@@ -142,7 +151,8 @@ class ForYouCarousel extends StatelessWidget {
                             const SizedBox(height: 4),
                             Text(
                               '📍 ${prop.localityName}',
-                              style: const TextStyle(fontSize: 11, color: Colors.black54),
+                              style: const TextStyle(
+                                  fontSize: 11, color: Colors.black54),
                             ),
                             const SizedBox(height: 6),
                             Text(

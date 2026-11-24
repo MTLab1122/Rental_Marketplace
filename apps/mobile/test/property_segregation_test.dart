@@ -36,8 +36,9 @@ void main() {
 
     final mixedInventory = [studentListing, familyListing];
 
-    test('Student mode filter rejects all family listings with zero crossover', () {
-      final currentMode = TenantType.student;
+    test('Student mode filter rejects all family listings with zero crossover',
+        () {
+      const currentMode = TenantType.student;
       final expectedEligibility = currentMode == TenantType.student
           ? PropertyEligibility.studentsOnly
           : PropertyEligibility.familiesOnly;
@@ -49,11 +50,15 @@ void main() {
       expect(studentFeed.length, 1);
       expect(studentFeed.first.id, 'p-student-1');
       expect(studentFeed.first.eligibility, PropertyEligibility.studentsOnly);
-      expect(studentFeed.any((p) => p.eligibility == PropertyEligibility.familiesOnly), isFalse);
+      expect(
+          studentFeed
+              .any((p) => p.eligibility == PropertyEligibility.familiesOnly),
+          isFalse);
     });
 
-    test('Family mode filter rejects all student listings with zero crossover', () {
-      final currentMode = TenantType.family;
+    test('Family mode filter rejects all student listings with zero crossover',
+        () {
+      const currentMode = TenantType.family;
       final expectedEligibility = currentMode == TenantType.student
           ? PropertyEligibility.studentsOnly
           : PropertyEligibility.familiesOnly;
@@ -65,7 +70,10 @@ void main() {
       expect(familyFeed.length, 1);
       expect(familyFeed.first.id, 'p-family-1');
       expect(familyFeed.first.eligibility, PropertyEligibility.familiesOnly);
-      expect(familyFeed.any((p) => p.eligibility == PropertyEligibility.studentsOnly), isFalse);
+      expect(
+          familyFeed
+              .any((p) => p.eligibility == PropertyEligibility.studentsOnly),
+          isFalse);
     });
 
     test('Property label returns expected text for students and families', () {
@@ -74,4 +82,3 @@ void main() {
     });
   });
 }
-

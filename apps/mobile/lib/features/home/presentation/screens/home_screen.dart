@@ -33,7 +33,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 300) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
       ref.read(homeFeedProvider.notifier).loadMore();
     }
   }
@@ -53,7 +54,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           children: [
             Row(
               children: [
-                const Icon(Icons.location_city, color: AppTheme.primaryEmerald, size: 20),
+                const Icon(Icons.location_city,
+                    color: AppTheme.primaryEmerald, size: 20),
                 const SizedBox(width: 6),
                 const Text(
                   PeshawarConstants.appName,
@@ -63,16 +65,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 // Mode Toggle Pill
                 GestureDetector(
                   onTap: () {
-                    final nextType = isStudent ? TenantType.family : TenantType.student;
+                    final nextType =
+                        isStudent ? TenantType.family : TenantType.student;
                     ref.read(authProvider.notifier).switchTenantType(nextType);
                   },
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: isStudent ? AppTheme.studentsOnlyBg : AppTheme.familiesOnlyBg,
+                      color: isStudent
+                          ? AppTheme.studentsOnlyBg
+                          : AppTheme.familiesOnlyBg,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
-                        color: isStudent ? AppTheme.studentsOnlyText : AppTheme.familiesOnlyText,
+                        color: isStudent
+                            ? AppTheme.studentsOnlyText
+                            : AppTheme.familiesOnlyText,
                       ),
                     ),
                     child: Row(
@@ -81,7 +89,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         Icon(
                           isStudent ? Icons.school : Icons.family_restroom,
                           size: 14,
-                          color: isStudent ? AppTheme.studentsOnlyText : AppTheme.familiesOnlyText,
+                          color: isStudent
+                              ? AppTheme.studentsOnlyText
+                              : AppTheme.familiesOnlyText,
                         ),
                         const SizedBox(width: 4),
                         Text(
@@ -89,14 +99,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
-                            color: isStudent ? AppTheme.studentsOnlyText : AppTheme.familiesOnlyText,
+                            color: isStudent
+                                ? AppTheme.studentsOnlyText
+                                : AppTheme.familiesOnlyText,
                           ),
                         ),
                         const SizedBox(width: 2),
                         Icon(
                           Icons.swap_horiz,
                           size: 14,
-                          color: isStudent ? AppTheme.studentsOnlyText : AppTheme.familiesOnlyText,
+                          color: isStudent
+                              ? AppTheme.studentsOnlyText
+                              : AppTheme.familiesOnlyText,
                         ),
                       ],
                     ),
@@ -125,7 +139,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     scrollDirection: Axis.horizontal,
                     itemCount: PeshawarConstants.localities.length + 1,
-                    separatorBuilder: (context, index) => const SizedBox(width: 8),
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 8),
                     itemBuilder: (context, index) {
                       if (index == 0) {
                         final isSelected = feedState.selectedLocality == null;
@@ -133,13 +148,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           label: const Text('All Localities'),
                           selected: isSelected,
                           onSelected: (_) {
-                            ref.read(homeFeedProvider.notifier).selectLocality(null);
+                            ref
+                                .read(homeFeedProvider.notifier)
+                                .selectLocality(null);
                           },
                           selectedColor: AppTheme.primaryEmerald,
                           labelStyle: TextStyle(
-                            color: isSelected ? Colors.white : AppTheme.textDark,
+                            color:
+                                isSelected ? Colors.white : AppTheme.textDark,
                             fontSize: 12,
-                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            fontWeight: isSelected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         );
                       }
@@ -150,13 +170,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         label: Text(locality),
                         selected: isSelected,
                         onSelected: (_) {
-                          ref.read(homeFeedProvider.notifier).selectLocality(locality);
+                          ref
+                              .read(homeFeedProvider.notifier)
+                              .selectLocality(locality);
                         },
                         selectedColor: AppTheme.primaryEmerald,
                         labelStyle: TextStyle(
                           color: isSelected ? Colors.white : AppTheme.textDark,
                           fontSize: 12,
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
                         ),
                       );
                     },
@@ -169,9 +192,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             SliverToBoxAdapter(
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: isStudent ? AppTheme.studentsOnlyBg.withOpacity(0.5) : AppTheme.familiesOnlyBg.withOpacity(0.5),
+                  color: isStudent
+                      ? AppTheme.studentsOnlyBg.withValues(alpha: 0.5)
+                      : AppTheme.familiesOnlyBg.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -179,7 +205,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Icon(
                       isStudent ? Icons.info_outline : Icons.family_restroom,
                       size: 16,
-                      color: isStudent ? AppTheme.studentsOnlyText : AppTheme.familiesOnlyText,
+                      color: isStudent
+                          ? AppTheme.studentsOnlyText
+                          : AppTheme.familiesOnlyText,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -189,7 +217,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             : 'Showing family-only portions, full houses & residential apartments.',
                         style: TextStyle(
                           fontSize: 12,
-                          color: isStudent ? AppTheme.studentsOnlyText : AppTheme.familiesOnlyText,
+                          color: isStudent
+                              ? AppTheme.studentsOnlyText
+                              : AppTheme.familiesOnlyText,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -202,13 +232,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             // Feed Content
             if (feedState.isLoading && feedState.properties.isEmpty)
               const SliverFillRemaining(
-                child: LoadingIndicator(message: 'Loading verified Peshawar rentals...'),
+                child: LoadingIndicator(
+                    message: 'Loading verified Peshawar rentals...'),
               )
             else if (feedState.error != null && feedState.properties.isEmpty)
               SliverFillRemaining(
                 child: ErrorView(
                   message: feedState.error!,
-                  onRetry: () => ref.read(homeFeedProvider.notifier).fetchFeed(),
+                  onRetry: () =>
+                      ref.read(homeFeedProvider.notifier).fetchFeed(),
                 ),
               )
             else if (feedState.properties.isEmpty)
@@ -220,7 +252,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ? 'No active ${isStudent ? 'student' : 'family'} properties currently in ${feedState.selectedLocality}.'
                       : 'No properties available right now.',
                   actionText: 'View All Localities',
-                  onAction: () => ref.read(homeFeedProvider.notifier).selectLocality(null),
+                  onAction: () =>
+                      ref.read(homeFeedProvider.notifier).selectLocality(null),
                 ),
               )
             else
@@ -231,13 +264,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       return feedState.hasMore
                           ? const Padding(
                               padding: EdgeInsets.all(16.0),
-                              child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                              child: Center(
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2)),
                             )
                           : const SizedBox.shrink();
                     }
 
                     final property = feedState.properties[index];
-                    final isFav = favoritesState.favoriteIds.contains(property.id);
+                    final isFav =
+                        favoritesState.favoriteIds.contains(property.id);
 
                     return PropertyCard(
                       property: property,
@@ -249,7 +285,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         if (!authState.isAuthenticated) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: const Text('Please sign in to save favorites'),
+                              content: const Text(
+                                  'Please sign in to save favorites'),
                               action: SnackBarAction(
                                 label: 'Sign In',
                                 onPressed: () => context.push('/login'),
@@ -258,11 +295,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           );
                           return;
                         }
-                        ref.read(favoritesProvider.notifier).toggleFavorite(property);
+                        ref
+                            .read(favoritesProvider.notifier)
+                            .toggleFavorite(property);
                       },
                     );
                   },
-                  childCount: feedState.properties.length + (feedState.hasMore ? 1 : 0),
+                  childCount:
+                      feedState.properties.length + (feedState.hasMore ? 1 : 0),
                 ),
               ),
           ],
@@ -271,4 +311,3 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
-

@@ -17,30 +17,35 @@ class LandlordDashboardScreen extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => ref.read(landlordDashboardProvider.notifier).loadDashboard(),
+            onPressed: () =>
+                ref.read(landlordDashboardProvider.notifier).loadDashboard(),
           ),
         ],
       ),
       body: state.isLoading
-          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryEmerald))
+          ? const Center(
+              child: CircularProgressIndicator(color: AppTheme.primaryEmerald))
           : state.error != null
               ? Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(state.error!, style: const TextStyle(color: Colors.red)),
+                      Text(state.error!,
+                          style: const TextStyle(color: Colors.red)),
                       const SizedBox(height: 12),
                       ElevatedButton(
-                        onPressed: () =>
-                            ref.read(landlordDashboardProvider.notifier).loadDashboard(),
+                        onPressed: () => ref
+                            .read(landlordDashboardProvider.notifier)
+                            .loadDashboard(),
                         child: const Text('Retry'),
                       ),
                     ],
                   ),
                 )
               : RefreshIndicator(
-                  onRefresh: () =>
-                      ref.read(landlordDashboardProvider.notifier).loadDashboard(),
+                  onRefresh: () => ref
+                      .read(landlordDashboardProvider.notifier)
+                      .loadDashboard(),
                   child: ListView(
                     padding: const EdgeInsets.all(16),
                     children: [
@@ -57,7 +62,8 @@ class LandlordDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildVerificationBanner(BuildContext context, LandlordDashboardData? data) {
+  Widget _buildVerificationBanner(
+      BuildContext context, LandlordDashboardData? data) {
     final isVerified = data?.isIdentityVerified ?? false;
     final status = data?.verificationStatus ?? 'UNVERIFIED';
 
@@ -65,9 +71,10 @@ class LandlordDashboardScreen extends ConsumerWidget {
       return Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: AppTheme.primaryEmerald.withOpacity(0.1),
+          color: AppTheme.primaryEmerald.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: AppTheme.primaryEmerald.withOpacity(0.3)),
+          border:
+              Border.all(color: AppTheme.primaryEmerald.withValues(alpha: 0.3)),
         ),
         child: const Row(
           children: [
@@ -79,7 +86,10 @@ class LandlordDashboardScreen extends ConsumerWidget {
                 children: [
                   Text(
                     'Identity Verified (CNIC)',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppTheme.primaryEmeraldDark),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: AppTheme.primaryEmeraldDark),
                   ),
                   Text(
                     'Your account is cleared to publish rental listings in Peshawar.',
@@ -102,7 +112,8 @@ class LandlordDashboardScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.warning_amber_rounded, color: Colors.amber.shade800, size: 30),
+          Icon(Icons.warning_amber_rounded,
+              color: Colors.amber.shade800, size: 30),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -133,7 +144,8 @@ class LandlordDashboardScreen extends ConsumerWidget {
               backgroundColor: Colors.amber.shade800,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+              textStyle:
+                  const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
             child: Text(status == 'PENDING' ? 'Status' : 'Verify'),
           ),
@@ -221,7 +233,7 @@ class LandlordDashboardScreen extends ConsumerWidget {
           border: Border.all(color: Colors.grey.shade200),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: Colors.black.withValues(alpha: 0.02),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -233,14 +245,21 @@ class LandlordDashboardScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(label, style: TextStyle(fontSize: 12, color: Colors.grey.shade600, fontWeight: FontWeight.w500)),
+                Text(label,
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500)),
                 Icon(icon, color: color, size: 20),
               ],
             ),
             const SizedBox(height: 8),
-            Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text(value,
+                style:
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             const SizedBox(height: 2),
-            Text(subtitle, style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
+            Text(subtitle,
+                style: TextStyle(fontSize: 11, color: Colors.grey.shade500)),
           ],
         ),
       ),
@@ -259,7 +278,8 @@ class LandlordDashboardScreen extends ConsumerWidget {
               backgroundColor: AppTheme.primaryEmerald,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
           ),
         ),
@@ -273,7 +293,8 @@ class LandlordDashboardScreen extends ConsumerWidget {
               foregroundColor: AppTheme.textDark,
               side: BorderSide(color: Colors.grey.shade300),
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
           ),
         ),
@@ -281,7 +302,8 @@ class LandlordDashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildRecentInquiries(BuildContext context, LandlordDashboardData? data) {
+  Widget _buildRecentInquiries(
+      BuildContext context, LandlordDashboardData? data) {
     final list = data?.recentInquiries ?? [];
 
     return Column(
@@ -290,10 +312,12 @@ class LandlordDashboardScreen extends ConsumerWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Recent Inquiries', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const Text('Recent Inquiries',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             TextButton(
               onPressed: () => context.push('/landlord/inquiries'),
-              child: const Text('View All', style: TextStyle(color: AppTheme.primaryEmerald)),
+              child: const Text('View All',
+                  style: TextStyle(color: AppTheme.primaryEmerald)),
             ),
           ],
         ),
@@ -315,7 +339,8 @@ class LandlordDashboardScreen extends ConsumerWidget {
           )
         else
           ...list.take(4).map((inq) {
-            final tenantName = inq['tenant']?['fullName'] ?? 'Prospective Tenant';
+            final tenantName =
+                inq['tenant']?['fullName'] ?? 'Prospective Tenant';
             final propTitle = inq['property']?['title'] ?? 'Listing';
             final status = inq['status'] as String? ?? 'PENDING';
             final message = inq['message'] as String? ?? '';
@@ -330,20 +355,28 @@ class LandlordDashboardScreen extends ConsumerWidget {
               child: ListTile(
                 onTap: () => context.push('/landlord/inquiries'),
                 leading: CircleAvatar(
-                  backgroundColor: AppTheme.primaryEmerald.withOpacity(0.1),
-                  child: const Icon(Icons.person, color: AppTheme.primaryEmerald),
+                  backgroundColor:
+                      AppTheme.primaryEmerald.withValues(alpha: 0.1),
+                  child:
+                      const Icon(Icons.person, color: AppTheme.primaryEmerald),
                 ),
-                title: Text(tenantName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                title: Text(tenantName,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14)),
                 subtitle: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(propTitle, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12)),
+                    Text(propTitle,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12)),
                     if (message.isNotEmpty)
                       Text(
                         message,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                        style: TextStyle(
+                            fontSize: 11, color: Colors.grey.shade600),
                       ),
                   ],
                 ),
@@ -375,4 +408,3 @@ class LandlordDashboardScreen extends ConsumerWidget {
     );
   }
 }
-

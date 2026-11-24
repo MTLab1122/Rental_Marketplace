@@ -119,20 +119,90 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="pt-4 border-t border-navy-100 flex flex-wrap gap-3 text-xs font-bold text-navy-700">
-            <Link
-              href="/favorites"
-              className="px-3 py-2 bg-navy-50 rounded-m3-sm border border-navy-200 hover:bg-navy-100"
-            >
-              Saved Favorites
-            </Link>
-            <Link
-              href="/inquiries"
-              className="px-3 py-2 bg-navy-50 rounded-m3-sm border border-navy-200 hover:bg-navy-100"
-            >
-              Submitted Inquiries
-            </Link>
+          {/* Quick Links & System Modules */}
+          <div className="pt-4 border-t border-navy-100 space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-navy-800">
+              Active Rental Management Modules
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Link
+                href="/inquiries"
+                className="p-3 bg-navy-50 hover:bg-peshawar-50 rounded-lg border border-navy-200 hover:border-peshawar-400 transition block text-left"
+              >
+                <div className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
+                  <span>📨</span>
+                  <span>My Inquiries</span>
+                </div>
+                <div className="text-[11px] text-navy-500 mt-1">
+                  Track landlord replies & unlock WhatsApp contacts upon approval
+                </div>
+              </Link>
+
+              <Link
+                href="/messages"
+                className="p-3 bg-navy-50 hover:bg-peshawar-50 rounded-lg border border-navy-200 hover:border-peshawar-400 transition block text-left"
+              >
+                <div className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
+                  <span>💬</span>
+                  <span>Direct Messages</span>
+                </div>
+                <div className="text-[11px] text-navy-500 mt-1">
+                  Chat directly with landlords and hostel wardens
+                </div>
+              </Link>
+
+              <Link
+                href="/favorites"
+                className="p-3 bg-navy-50 hover:bg-peshawar-50 rounded-lg border border-navy-200 hover:border-peshawar-400 transition block text-left"
+              >
+                <div className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
+                  <span>❤️</span>
+                  <span>Saved Properties</span>
+                </div>
+                <div className="text-[11px] text-navy-500 mt-1">
+                  Review and compare your bookmarked Peshawar listings
+                </div>
+              </Link>
+
+              <Link
+                href="/agreements"
+                className="p-3 bg-navy-50 hover:bg-peshawar-50 rounded-lg border border-navy-200 hover:border-peshawar-400 transition block text-left"
+              >
+                <div className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
+                  <span>📝</span>
+                  <span>Lease Agreements</span>
+                </div>
+                <div className="text-[11px] text-navy-500 mt-1">
+                  Sign & download enforceable KP Tenancy Act contracts
+                </div>
+              </Link>
+
+              <Link
+                href="/bookings"
+                className="p-3 bg-navy-50 hover:bg-peshawar-50 rounded-lg border border-navy-200 hover:border-peshawar-400 transition block text-left"
+              >
+                <div className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
+                  <span>📅</span>
+                  <span>Bookings & Escrow</span>
+                </div>
+                <div className="text-[11px] text-navy-500 mt-1">
+                  Track security deposit holds and official rent receipts
+                </div>
+              </Link>
+
+              <Link
+                href="/for-landlords"
+                className="p-3 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition block text-left"
+              >
+                <div className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+                  <span>🏢</span>
+                  <span>Landlord Center</span>
+                </div>
+                <div className="text-[11px] text-emerald-700 mt-1">
+                  List a property for free & get verified NADRA badge
+                </div>
+              </Link>
+            </div>
           </div>
         </div>
       </div>

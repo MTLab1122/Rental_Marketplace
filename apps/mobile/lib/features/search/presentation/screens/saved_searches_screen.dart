@@ -4,7 +4,8 @@ import 'package:rental_peshawar_mobile/core/models/saved_search_model.dart';
 class SavedSearchesScreen extends StatefulWidget {
   final List<SavedSearchModel> initialSearches;
   final Function(String id)? onDelete;
-  final Function(String id, bool alertsEnabled, AlertFrequency frequency)? onToggleAlerts;
+  final Function(String id, bool alertsEnabled, AlertFrequency frequency)?
+      onToggleAlerts;
   final Function(SavedSearchModel search)? onRunSearch;
 
   const SavedSearchesScreen({
@@ -45,20 +46,21 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
         elevation: 0.5,
       ),
       body: _searches.isEmpty
-          ? Center(
+          ? const Center(
               child: Padding(
-                padding: const EdgeInsets.all(32),
+                padding: EdgeInsets.all(32),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.search_off, size: 64, color: Colors.black26),
-                    const SizedBox(height: 16),
-                    const Text(
+                    Icon(Icons.search_off, size: 64, color: Colors.black26),
+                    SizedBox(height: 16),
+                    Text(
                       'No Saved Searches',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 8),
-                    const Text(
+                    SizedBox(height: 8),
+                    Text(
                       'Save searches when browsing properties in Peshawar to receive automatic match alerts.',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 13, color: Colors.black54),
@@ -75,7 +77,8 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
                 final search = _searches[index];
                 return Card(
                   elevation: 1,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -94,7 +97,8 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete_outline, color: Colors.redAccent, size: 20),
+                              icon: const Icon(Icons.delete_outline,
+                                  color: Colors.redAccent, size: 20),
                               onPressed: () => _handleDelete(search.id),
                             ),
                           ],
@@ -107,11 +111,14 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
                             if (search.filters['localityId'] != null)
                               _buildPill('📍 Locality'),
                             if (search.filters['propertyType'] != null)
-                              _buildPill('🏢 ${search.filters['propertyType']}'),
+                              _buildPill(
+                                  '🏢 ${search.filters['propertyType']}'),
                             if (search.filters['bedrooms'] != null)
-                              _buildPill('🛏️ ${search.filters['bedrooms']}+ Bed'),
+                              _buildPill(
+                                  '🛏️ ${search.filters['bedrooms']}+ Bed'),
                             if (search.filters['maxPrice'] != null)
-                              _buildPill('💰 ≤ PKR ${search.filters['maxPrice']}'),
+                              _buildPill(
+                                  '💰 ≤ PKR ${search.filters['maxPrice']}'),
                           ],
                         ),
                         const Divider(height: 24),
@@ -122,7 +129,7 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
                               children: [
                                 Switch(
                                   value: search.alertsEnabled,
-                                  activeColor: const Color(0xFF0284C7),
+                                  activeThumbColor: const Color(0xFF0284C7),
                                   onChanged: (val) {
                                     setState(() {
                                       _searches[index] = SavedSearchModel(
@@ -136,15 +143,20 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
                                         createdAt: search.createdAt,
                                       );
                                     });
-                                    widget.onToggleAlerts?.call(search.id, val, search.frequency);
+                                    widget.onToggleAlerts?.call(
+                                        search.id, val, search.frequency);
                                   },
                                 ),
                                 Text(
-                                  search.alertsEnabled ? search.frequency.label : 'Alerts Paused',
+                                  search.alertsEnabled
+                                      ? search.frequency.label
+                                      : 'Alerts Paused',
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color: search.alertsEnabled ? const Color(0xFF0284C7) : Colors.black45,
+                                    color: search.alertsEnabled
+                                        ? const Color(0xFF0284C7)
+                                        : Colors.black45,
                                   ),
                                 ),
                               ],
@@ -156,9 +168,12 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: const Color(0xFF0284C7),
                                 foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 8),
+                                textStyle: const TextStyle(
+                                    fontSize: 12, fontWeight: FontWeight.bold),
                               ),
                             ),
                           ],
@@ -182,7 +197,10 @@ class _SavedSearchesScreenState extends State<SavedSearchesScreen> {
       ),
       child: Text(
         label,
-        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF334155)),
+        style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF334155)),
       ),
     );
   }

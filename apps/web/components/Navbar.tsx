@@ -13,33 +13,42 @@ export default function Navbar() {
   return (
     <nav className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-navy-100 shadow-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Brand Logo & Peshawar Verification Badge */}
-          <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-10 h-10 rounded-md bg-peshawar-600 flex items-center justify-center text-white font-bold text-xl shadow-xs group-hover:bg-peshawar-700 transition">
-                PR
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center gap-3 group">
+              <div className="w-11 h-11 rounded-lg bg-gradient-to-br from-peshawar-600 to-navy-900 flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
+                <svg
+                  className="w-6 h-6 text-emerald-300"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+                >
+                  <path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2zm0 2.84L18.5 11H17v7h-2v-6H9v6H7v-7H5.5L12 4.84z" />
+                </svg>
               </div>
               <div>
-                <span className="font-extrabold text-navy-900 text-lg tracking-tight block leading-tight">
+                <span className="font-black text-navy-950 text-xl tracking-tight block leading-tight">
                   Peshawar<span className="text-peshawar-600">Rentals</span>
                 </span>
-                <span className="text-[10px] text-navy-500 font-semibold uppercase tracking-wider block">
-                  KP Verified Municipal Portal
+                <span className="text-[10px] text-peshawar-700 font-extrabold uppercase tracking-wider flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                  KP Municipal Verified Portal
                 </span>
               </div>
             </Link>
 
             {/* Tenant Category Switcher */}
-            <div className="hidden md:flex items-center bg-navy-100 p-1 rounded-md border border-navy-200 ml-4">
+            <div className="hidden lg:flex items-center bg-navy-100/80 p-1 rounded-lg border border-navy-200 ml-2">
               <button
                 type="button"
                 onClick={() => setTenantType(TenantType.STUDENT)}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-md transition flex items-center gap-1.5 ${
                   tenantType === TenantType.STUDENT
                     ? 'bg-student-bg text-student-text border border-student-border shadow-xs'
                     : 'text-navy-600 hover:text-navy-900'
                 }`}
+                title="View Student Hostels & Bachelor Accommodations"
               >
                 <StudentIcon className="w-3.5 h-3.5" />
                 <span>Student Mode</span>
@@ -47,11 +56,12 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setTenantType(TenantType.FAMILY)}
-                className={`px-3 py-1 text-xs font-bold rounded-md transition flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 text-xs font-bold rounded-md transition flex items-center gap-1.5 ${
                   tenantType === TenantType.FAMILY
                     ? 'bg-family-bg text-family-text border border-family-border shadow-xs'
                     : 'text-navy-600 hover:text-navy-900'
                 }`}
+                title="View Family Houses, Portions & Residential Apartments"
               >
                 <FamilyIcon className="w-3.5 h-3.5" />
                 <span>Family Mode</span>
@@ -60,16 +70,28 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-5">
+            <Link
+              href="/"
+              className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
+            >
+              Home
+            </Link>
             <Link
               href="/properties"
               className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
             >
-              Explore Listings
+              Properties
+            </Link>
+            <Link
+              href="/services"
+              className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
+            >
+              Services
             </Link>
             <Link
               href="/for-landlords"
-              className="text-sm font-semibold text-peshawar-700 hover:text-peshawar-800 transition"
+              className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
             >
               For Landlords
             </Link>
@@ -80,66 +102,66 @@ export default function Navbar() {
               Pricing
             </Link>
             <Link
-              href="/favorites"
+              href="/about"
               className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
             >
-              Saved
+              About Us
             </Link>
             <Link
-              href="/inquiries"
+              href="/contact"
               className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
             >
-              Inquiries
-            </Link>
-            <Link
-              href="/messages"
-              className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
-            >
-              Messages
-            </Link>
-            <Link
-              href="/notifications"
-              className="text-sm font-semibold text-navy-700 hover:text-peshawar-600 transition"
-            >
-              Alerts
+              Contact
             </Link>
 
             {isAuthenticated ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 pl-2 border-l border-navy-200">
                 <Link
                   href="/profile"
-                  className="text-sm font-semibold text-navy-800 bg-navy-50 px-3 py-1.5 rounded-md border border-navy-200 hover:bg-navy-100 transition"
+                  className="flex items-center gap-2 text-sm font-bold text-navy-900 bg-navy-50 px-3 py-1.5 rounded-lg border border-navy-200 hover:bg-navy-100 transition shadow-2xs"
                 >
-                  {user?.fullName || 'Profile'}
+                  <span className="w-6 h-6 rounded-full bg-peshawar-600 text-white text-xs flex items-center justify-center font-black">
+                    {user?.fullName ? user.fullName[0]?.toUpperCase() : 'U'}
+                  </span>
+                  <span className="truncate max-w-[120px]">{user?.fullName || 'Profile'}</span>
                 </Link>
                 <button
                   type="button"
                   onClick={logout}
-                  className="text-xs font-medium text-red-600 hover:text-red-700 px-2 py-1"
+                  className="text-xs font-semibold text-red-600 hover:text-red-700 px-2 py-1"
                 >
                   Sign Out
                 </button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 pl-2 border-l border-navy-200">
                 <Link
                   href="/login"
-                  className="text-sm font-semibold text-navy-700 hover:text-navy-900 px-3 py-1.5"
+                  className="text-sm font-bold text-navy-800 hover:text-navy-950 px-3 py-2 transition"
                 >
                   Sign In
                 </Link>
                 <Link
                   href="/register"
-                  className="text-sm font-bold bg-peshawar-600 text-white px-4 py-2 rounded-md shadow-xs hover:bg-peshawar-700 transition"
+                  className="text-sm font-bold bg-navy-900 hover:bg-navy-950 text-white px-3.5 py-2 rounded-lg transition shadow-2xs"
                 >
-                  Get Started
+                  Register
+                </Link>
+                <Link
+                  href="/for-landlords"
+                  className="text-sm font-bold bg-peshawar-600 hover:bg-peshawar-700 text-white px-3.5 py-2 rounded-lg transition shadow-xs flex items-center gap-1.5"
+                >
+                  <span>Post Property</span>
+                  <span className="text-[11px] bg-peshawar-800 px-1.5 py-0.2 rounded font-extrabold text-emerald-200">
+                    Free
+                  </span>
                 </Link>
               </div>
             )}
           </div>
 
           {/* Mobile hamburger menu toggle */}
-          <div className="flex md:hidden items-center">
+          <div className="flex md:hidden items-center gap-2">
             <button
               type="button"
               onClick={() => setMenuOpen(!menuOpen)}
@@ -166,9 +188,9 @@ export default function Navbar() {
 
       {/* Mobile Drawer */}
       {menuOpen && (
-        <div className="md:hidden bg-white border-b border-navy-200 px-4 pt-3 pb-5 space-y-3 shadow-lg">
-          <div className="flex items-center justify-between bg-navy-50 p-2.5 rounded-md border border-navy-200">
-            <span className="text-xs font-bold text-navy-700">Active Tenant View:</span>
+        <div className="md:hidden bg-white border-b border-navy-200 px-4 pt-3 pb-6 space-y-3 shadow-xl">
+          <div className="flex items-center justify-between bg-navy-50 p-2.5 rounded-lg border border-navy-200">
+            <span className="text-xs font-bold text-navy-700">Active Tenant Mode:</span>
             <div className="flex gap-1.5">
               <button
                 type="button"
@@ -197,63 +219,74 @@ export default function Navbar() {
             </div>
           </div>
 
-          <Link
-            href="/properties"
-            onClick={() => setMenuOpen(false)}
-            className="block text-navy-800 font-semibold py-2.5 text-sm border-b border-navy-50"
-          >
-            Explore Properties
-          </Link>
-          <Link
-            href="/for-landlords"
-            onClick={() => setMenuOpen(false)}
-            className="block text-peshawar-700 font-semibold py-2.5 text-sm border-b border-navy-50"
-          >
-            For Landlords
-          </Link>
-          <Link
-            href="/pricing"
-            onClick={() => setMenuOpen(false)}
-            className="block text-navy-800 font-semibold py-2.5 text-sm border-b border-navy-50"
-          >
-            Pricing & Boosts
-          </Link>
-          <Link
-            href="/favorites"
-            onClick={() => setMenuOpen(false)}
-            className="block text-navy-800 font-semibold py-2.5 text-sm border-b border-navy-50"
-          >
-            Saved Favorites
-          </Link>
-          <Link
-            href="/inquiries"
-            onClick={() => setMenuOpen(false)}
-            className="block text-navy-800 font-semibold py-2.5 text-sm border-b border-navy-50"
-          >
-            My Inquiries
-          </Link>
-          <Link
-            href="/messages"
-            onClick={() => setMenuOpen(false)}
-            className="block text-navy-800 font-semibold py-2.5 text-sm border-b border-navy-50"
-          >
-            Direct Messages
-          </Link>
-          <Link
-            href="/notifications"
-            onClick={() => setMenuOpen(false)}
-            className="block text-navy-800 font-semibold py-2.5 text-sm"
-          >
-            Alerts & Notifications
-          </Link>
+          <div className="grid grid-cols-2 gap-2 text-sm font-semibold pt-1">
+            <Link
+              href="/"
+              onClick={() => setMenuOpen(false)}
+              className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
+            >
+              🏠 Home
+            </Link>
+            <Link
+              href="/properties"
+              onClick={() => setMenuOpen(false)}
+              className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
+            >
+              🔍 Properties
+            </Link>
+            <Link
+              href="/services"
+              onClick={() => setMenuOpen(false)}
+              className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
+            >
+              🛠️ Services
+            </Link>
+            <Link
+              href="/for-landlords"
+              onClick={() => setMenuOpen(false)}
+              className="p-2.5 rounded-md hover:bg-navy-50 text-peshawar-700 font-bold"
+            >
+              🏢 For Landlords
+            </Link>
+            <Link
+              href="/pricing"
+              onClick={() => setMenuOpen(false)}
+              className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
+            >
+              🏷️ Pricing
+            </Link>
+            <Link
+              href="/about"
+              onClick={() => setMenuOpen(false)}
+              className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
+            >
+              📖 About Us
+            </Link>
+            <Link
+              href="/contact"
+              onClick={() => setMenuOpen(false)}
+              className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
+            >
+              📞 Contact Us
+            </Link>
+            <Link
+              href="/inquiries"
+              onClick={() => setMenuOpen(false)}
+              className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
+            >
+              📨 Inquiries
+            </Link>
+          </div>
+
           {isAuthenticated ? (
-            <div className="pt-2 border-t border-navy-100 flex items-center justify-between">
+            <div className="pt-3 border-t border-navy-100 flex items-center justify-between">
               <Link
                 href="/profile"
                 onClick={() => setMenuOpen(false)}
-                className="text-sm font-semibold text-peshawar-700"
+                className="text-sm font-bold text-peshawar-700 flex items-center gap-1.5"
               >
-                {user?.fullName} (Account)
+                <span>👤</span>
+                <span>{user?.fullName} (My Profile)</span>
               </Link>
               <button
                 type="button"
@@ -261,26 +294,35 @@ export default function Navbar() {
                   logout();
                   setMenuOpen(false);
                 }}
-                className="text-xs text-red-600 font-bold px-2 py-1"
+                className="text-xs text-red-600 font-bold px-3 py-1.5 rounded-md bg-red-50"
               >
                 Sign Out
               </button>
             </div>
           ) : (
-            <div className="pt-2 border-t border-navy-100 flex gap-2">
+            <div className="pt-3 border-t border-navy-100 space-y-2">
+              <div className="flex gap-2">
+                <Link
+                  href="/login"
+                  onClick={() => setMenuOpen(false)}
+                  className="w-1/2 text-center text-sm font-bold border border-navy-300 py-2.5 rounded-lg text-navy-800 bg-white"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  href="/register"
+                  onClick={() => setMenuOpen(false)}
+                  className="w-1/2 text-center text-sm font-bold bg-navy-900 text-white py-2.5 rounded-lg"
+                >
+                  Register
+                </Link>
+              </div>
               <Link
-                href="/login"
+                href="/for-landlords"
                 onClick={() => setMenuOpen(false)}
-                className="w-1/2 text-center text-sm font-bold border border-navy-300 py-2.5 rounded-md text-navy-800"
+                className="block w-full text-center text-sm font-bold bg-peshawar-600 text-white py-2.5 rounded-lg shadow-xs"
               >
-                Sign In
-              </Link>
-              <Link
-                href="/register"
-                onClick={() => setMenuOpen(false)}
-                className="w-1/2 text-center text-sm font-bold bg-peshawar-600 text-white py-2.5 rounded-md"
-              >
-                Register
+                Post Property Free
               </Link>
             </div>
           )}

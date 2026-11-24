@@ -20,7 +20,8 @@ class PropertyCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isStudent = property.eligibility == PropertyEligibility.studentsOnly;
-    final primaryImageUrl = property.images.isNotEmpty ? property.images.first.url : null;
+    final primaryImageUrl =
+        property.images.isNotEmpty ? property.images.first.url : null;
 
     return Card(
       elevation: 2,
@@ -50,12 +51,14 @@ class PropertyCard extends StatelessWidget {
                           ),
                           errorWidget: (context, url, error) => Container(
                             color: Colors.grey.shade200,
-                            child: const Icon(Icons.broken_image, size: 40, color: Colors.grey),
+                            child: const Icon(Icons.broken_image,
+                                size: 40, color: Colors.grey),
                           ),
                         )
                       : Container(
                           color: Colors.grey.shade200,
-                          child: const Icon(Icons.apartment, size: 48, color: Colors.grey),
+                          child: const Icon(Icons.apartment,
+                              size: 48, color: Colors.grey),
                         ),
                 ),
 
@@ -64,17 +67,23 @@ class PropertyCard extends StatelessWidget {
                   top: 12,
                   left: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: isStudent ? AppTheme.studentsOnlyBg : AppTheme.familiesOnlyBg,
+                      color: isStudent
+                          ? AppTheme.studentsOnlyBg
+                          : AppTheme.familiesOnlyBg,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: isStudent
-                            ? AppTheme.studentsOnlyText.withOpacity(0.3)
-                            : AppTheme.familiesOnlyText.withOpacity(0.3),
+                            ? AppTheme.studentsOnlyText.withValues(alpha: 0.3)
+                            : AppTheme.familiesOnlyText.withValues(alpha: 0.3),
                       ),
                       boxShadow: const [
-                        BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))
+                        BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2))
                       ],
                     ),
                     child: Text(
@@ -82,7 +91,9 @@ class PropertyCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
-                        color: isStudent ? AppTheme.studentsOnlyText : AppTheme.familiesOnlyText,
+                        color: isStudent
+                            ? AppTheme.studentsOnlyText
+                            : AppTheme.familiesOnlyText,
                       ),
                     ),
                   ),
@@ -104,7 +115,8 @@ class PropertyCard extends StatelessWidget {
                         child: Icon(
                           isFavorited ? Icons.favorite : Icons.favorite_border,
                           size: 20,
-                          color: isFavorited ? Colors.red : Colors.grey.shade700,
+                          color:
+                              isFavorited ? Colors.red : Colors.grey.shade700,
                         ),
                       ),
                     ),
@@ -117,7 +129,8 @@ class PropertyCard extends StatelessWidget {
                     bottom: 12,
                     left: 12,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: AppTheme.primaryEmerald,
                         borderRadius: BorderRadius.circular(6),
@@ -155,7 +168,8 @@ class PropertyCard extends StatelessWidget {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: Colors.grey.shade100,
                           borderRadius: BorderRadius.circular(6),
@@ -189,7 +203,8 @@ class PropertyCard extends StatelessWidget {
                   // Locality
                   Row(
                     children: [
-                      const Icon(Icons.location_on, size: 14, color: AppTheme.primaryEmerald),
+                      const Icon(Icons.location_on,
+                          size: 14, color: AppTheme.primaryEmerald),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
@@ -213,10 +228,12 @@ class PropertyCard extends StatelessWidget {
                     children: [
                       _buildSpec(Icons.bed, '${property.bedrooms} Beds'),
                       const SizedBox(width: 16),
-                      _buildSpec(Icons.bathtub_outlined, '${property.bathrooms} Baths'),
+                      _buildSpec(Icons.bathtub_outlined,
+                          '${property.bathrooms} Baths'),
                       if (property.areaSqFt != null) ...[
                         const SizedBox(width: 16),
-                        _buildSpec(Icons.square_foot, '${property.areaSqFt!.toInt()} sqft'),
+                        _buildSpec(Icons.square_foot,
+                            '${property.areaSqFt!.toInt()} sqft'),
                       ],
                     ],
                   ),
@@ -246,4 +263,3 @@ class PropertyCard extends StatelessWidget {
     );
   }
 }
-
