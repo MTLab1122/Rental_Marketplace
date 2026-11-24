@@ -94,18 +94,56 @@ export default function PrivacyPolicyPage() {
 
       <section className="space-y-4 text-sm leading-relaxed text-navy-800">
         <h2 className="text-lg font-bold text-navy-950 border-l-4 border-emerald-600 pl-3">
-          5. Tenant Rights & Data Portability
+          5. Tenant & Landlord Rights: Data Access & Permanent Deletion
         </h2>
         <p>
-          Under Khyber Pakhtunkhwa consumer safety guidelines, users maintain the right to inspect,
-          correct, export, or request permanent deletion of their profile records, active saved
-          searches, and communication histories by contacting our verified support registry at{' '}
-          <a
-            href="mailto:privacy@rentpeshawar.pk"
-            className="text-emerald-700 underline font-semibold"
+          Under Khyber Pakhtunkhwa consumer safety guidelines and personal data protection
+          principles, all registered tenants and landlords maintain the absolute right to inspect,
+          export, or request permanent erasure of their personal identity records, CNIC scans, and
+          inquiry logs.
+        </p>
+        <div className="p-4 bg-navy-50 border border-navy-200 rounded-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <div className="font-bold text-navy-900 text-xs">Want to delete your account data?</div>
+            <div className="text-[11px] text-navy-600">
+              Submit an online request to purge your CNIC, inquiries, and profile.
+            </div>
+          </div>
+          <Link
+            href="/data-deletion"
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-md shadow-xs transition shrink-0"
           >
-            privacy@rentpeshawar.pk
-          </a>
+            Submit Data Deletion Request →
+          </Link>
+        </div>
+      </section>
+
+      <section className="space-y-4 text-sm leading-relaxed text-navy-800">
+        <h2 className="text-lg font-bold text-navy-950 border-l-4 border-emerald-600 pl-3">
+          6. Cookies, Local Storage & Advertising Transparency
+        </h2>
+        <p>
+          We employ strictly necessary cookies for session security, alongside optional functional
+          cookies to preserve locality filters and discovery modes. We never deploy deceptive dark
+          patterns or third-party behavioral ad trackers. Learn more in our dedicated{' '}
+          <Link href="/cookie-policy" className="text-emerald-700 underline font-semibold">
+            Cookie Policy
+          </Link>
+          .
+        </p>
+      </section>
+
+      <section className="space-y-4 text-sm leading-relaxed text-navy-800">
+        <h2 className="text-lg font-bold text-navy-950 border-l-4 border-emerald-600 pl-3">
+          7. Financial Privacy & Escrow Transparency
+        </h2>
+        <p>
+          Security deposit holds and rental transactions are conducted under strict escrow
+          oversight. Refund requests, cancellation settlements, and dispute resolutions are governed
+          by our{' '}
+          <Link href="/refund-policy" className="text-emerald-700 underline font-semibold">
+            Refund & Escrow Cancellation Policy
+          </Link>
           .
         </p>
       </section>

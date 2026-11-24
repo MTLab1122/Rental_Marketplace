@@ -6,6 +6,15 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
 import { TenantType } from '@rental-peshawar/shared-types';
 import EmptyState from '../../components/EmptyState';
+import {
+  MailIcon,
+  ChatIcon,
+  StarIcon,
+  DocumentIcon,
+  CalendarIcon,
+  HouseIcon,
+  ShieldCheckIcon,
+} from '../../components/Icons';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -130,7 +139,7 @@ export default function ProfilePage() {
                 className="p-3 bg-navy-50 hover:bg-peshawar-50 rounded-lg border border-navy-200 hover:border-peshawar-400 transition block text-left"
               >
                 <div className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
-                  <span>📨</span>
+                  <MailIcon className="w-4 h-4 text-peshawar-600" />
                   <span>My Inquiries</span>
                 </div>
                 <div className="text-[11px] text-navy-500 mt-1">
@@ -143,7 +152,7 @@ export default function ProfilePage() {
                 className="p-3 bg-navy-50 hover:bg-peshawar-50 rounded-lg border border-navy-200 hover:border-peshawar-400 transition block text-left"
               >
                 <div className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
-                  <span>💬</span>
+                  <ChatIcon className="w-4 h-4 text-peshawar-600" />
                   <span>Direct Messages</span>
                 </div>
                 <div className="text-[11px] text-navy-500 mt-1">
@@ -156,7 +165,7 @@ export default function ProfilePage() {
                 className="p-3 bg-navy-50 hover:bg-peshawar-50 rounded-lg border border-navy-200 hover:border-peshawar-400 transition block text-left"
               >
                 <div className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
-                  <span>❤️</span>
+                  <StarIcon className="w-4 h-4 text-peshawar-600" />
                   <span>Saved Properties</span>
                 </div>
                 <div className="text-[11px] text-navy-500 mt-1">
@@ -169,7 +178,7 @@ export default function ProfilePage() {
                 className="p-3 bg-navy-50 hover:bg-peshawar-50 rounded-lg border border-navy-200 hover:border-peshawar-400 transition block text-left"
               >
                 <div className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
-                  <span>📝</span>
+                  <DocumentIcon className="w-4 h-4 text-peshawar-600" />
                   <span>Lease Agreements</span>
                 </div>
                 <div className="text-[11px] text-navy-500 mt-1">
@@ -182,7 +191,7 @@ export default function ProfilePage() {
                 className="p-3 bg-navy-50 hover:bg-peshawar-50 rounded-lg border border-navy-200 hover:border-peshawar-400 transition block text-left"
               >
                 <div className="text-xs font-bold text-navy-900 flex items-center gap-1.5">
-                  <span>📅</span>
+                  <CalendarIcon className="w-4 h-4 text-peshawar-600" />
                   <span>Bookings & Escrow</span>
                 </div>
                 <div className="text-[11px] text-navy-500 mt-1">
@@ -195,13 +204,46 @@ export default function ProfilePage() {
                 className="p-3 bg-emerald-50 hover:bg-emerald-100 rounded-lg border border-emerald-200 transition block text-left"
               >
                 <div className="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
-                  <span>🏢</span>
+                  <HouseIcon className="w-4 h-4 text-emerald-700" />
                   <span>Landlord Center</span>
                 </div>
                 <div className="text-[11px] text-emerald-700 mt-1">
                   List a property for free & get verified NADRA badge
                 </div>
               </Link>
+            </div>
+          </div>
+
+          {/* Privacy & Legal Rights Section */}
+          <div className="pt-4 border-t border-navy-100 space-y-3">
+            <h4 className="text-xs font-black uppercase tracking-wider text-navy-800">
+              Privacy & Legal Governance
+            </h4>
+            <div className="p-4 bg-slate-50 border border-navy-200 rounded-lg flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              <div>
+                <div className="font-bold text-navy-950 flex items-center gap-1.5">
+                  <ShieldCheckIcon className="w-4 h-4 text-peshawar-600" />
+                  <span>Data Protection & Deletion Rights</span>
+                </div>
+                <div className="text-[11px] text-navy-600 mt-0.5">
+                  Request permanent deletion of your account, CNIC identity records, and inquiry
+                  logs.
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <Link
+                  href="/data-deletion"
+                  className="px-3.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold border border-red-200 rounded-md transition"
+                >
+                  Delete Account Data
+                </Link>
+                <Link
+                  href="/refund-policy"
+                  className="px-3.5 py-1.5 bg-white hover:bg-navy-50 text-navy-700 font-bold border border-navy-200 rounded-md transition"
+                >
+                  Refund Policy
+                </Link>
+              </div>
             </div>
           </div>
         </div>

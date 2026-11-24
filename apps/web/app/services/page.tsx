@@ -2,7 +2,14 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ShieldCheckIcon, StudentIcon, FamilyIcon, CheckIcon } from '../../components/Icons';
+import {
+  ShieldCheckIcon,
+  StudentIcon,
+  FamilyIcon,
+  CheckIcon,
+  ScaleIcon,
+  HouseIcon,
+} from '../../components/Icons';
 
 export default function ServicesPage() {
   const servicesList = [
@@ -60,7 +67,7 @@ export default function ServicesPage() {
       title: 'KP Tenancy Act Digital Leases',
       description:
         'Legally binding digital tenancy agreements designed according to Khyber Pakhtunkhwa rental regulations, protecting both owner and tenant.',
-      icon: <span className="text-xl">⚖️</span>,
+      icon: <ScaleIcon className="w-6 h-6 text-peshawar-700" />,
       features: [
         'Compliant with KP Tenancy & Urban Rent Laws',
         'Digital signature audit trail with timestamp & IP recording',
@@ -76,7 +83,7 @@ export default function ServicesPage() {
       title: 'Escrow Security Deposit Protection',
       description:
         'Prevent deposit disputes at the end of tenancy. Security deposits and advance rents are tracked in a transparent escrow ledger until mutual handover.',
-      icon: <span className="text-xl">💳</span>,
+      icon: <ShieldCheckIcon className="w-6 h-6 text-emerald-700" />,
       features: [
         'Pakistani payment rails: JazzCash, EasyPaisa, Direct IBAN transfer',
         'Official digital tax receipts & KPRA-compliant invoices',
@@ -92,7 +99,7 @@ export default function ServicesPage() {
       title: 'Private Hostel & Agency Management Suite',
       description:
         'Full property management platform for private hostel operators and multi-unit landlords managing 10 to 50+ rooms in Peshawar.',
-      icon: <span className="text-xl">🏢</span>,
+      icon: <HouseIcon className="w-6 h-6 text-navy-800" />,
       features: [
         'Bulk CSV listing import & multi-room allocation engine',
         'Student occupancy tracking & automated rent reminder SMS',

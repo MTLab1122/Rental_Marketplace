@@ -8,6 +8,7 @@ import {
   FamilyIcon,
   MapPinIcon,
   CheckIcon,
+  ScaleIcon,
 } from '../../components/Icons';
 
 export default function AboutPage() {
@@ -135,7 +136,7 @@ export default function AboutPage() {
           {/* Pillar 3 */}
           <div className="bg-white p-8 rounded-xl border border-navy-100 shadow-sm space-y-4 relative overflow-hidden">
             <div className="w-12 h-12 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-black text-xl">
-              💰
+              <span className="text-sm font-black text-amber-800">0%</span>
             </div>
             <h3 className="text-xl font-bold text-navy-950">
               3. Direct Landlord Connections (0% Brokerage)
@@ -145,15 +146,16 @@ export default function AboutPage() {
               rent from the landlord. On Peshawar Rentals, tenants pay 0 PKR broker fees. Inquiries
               connect directly with verified owners, saving up to 80,000 PKR on a single lease.
             </p>
-            <div className="text-xs font-semibold text-emerald-800 bg-emerald-50/50 p-2 rounded border border-emerald-100">
-              ✓ Verified WhatsApp contact revealed upon inquiry approval
+            <div className="text-xs font-semibold text-emerald-800 bg-emerald-50/50 p-2 rounded border border-emerald-100 flex items-center gap-1.5">
+              <CheckIcon className="w-3.5 h-3.5 text-emerald-700" />
+              <span>Verified WhatsApp contact revealed upon inquiry approval</span>
             </div>
           </div>
 
           {/* Pillar 4 */}
           <div className="bg-white p-8 rounded-xl border border-navy-100 shadow-sm space-y-4 relative overflow-hidden">
             <div className="w-12 h-12 rounded-lg bg-peshawar-50 text-peshawar-700 flex items-center justify-center font-black text-xl">
-              ⚖️
+              <ScaleIcon className="w-6 h-6 text-peshawar-700" />
             </div>
             <h3 className="text-xl font-bold text-navy-950">
               4. KP Tenancy Act Enforceable Leases & Escrow
@@ -164,8 +166,9 @@ export default function AboutPage() {
               police verification paperwork support, and secure escrow holding for security
               deposits.
             </p>
-            <div className="text-xs font-semibold text-navy-700 bg-navy-50/50 p-2 rounded border border-navy-100">
-              ✓ Enforceable digital signature audit log & NADRA CNIC binding
+            <div className="text-xs font-semibold text-navy-700 bg-navy-50/50 p-2 rounded border border-navy-100 flex items-center gap-1.5">
+              <CheckIcon className="w-3.5 h-3.5 text-navy-700" />
+              <span>Enforceable digital signature audit log & NADRA CNIC binding</span>
             </div>
           </div>
         </div>

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '../lib/auth-context';
 import { TenantType } from '@rental-peshawar/shared-types';
-import { StudentIcon, FamilyIcon, CloseIcon } from './Icons';
+import { StudentIcon, FamilyIcon, CloseIcon, UserIcon } from './Icons';
 
 export default function Navbar() {
   const { user, tenantType, setTenantType, logout, isAuthenticated } = useAuth();
@@ -225,56 +225,56 @@ export default function Navbar() {
               onClick={() => setMenuOpen(false)}
               className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
             >
-              🏠 Home
+              Home
             </Link>
             <Link
               href="/properties"
               onClick={() => setMenuOpen(false)}
               className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
             >
-              🔍 Properties
+              Properties
             </Link>
             <Link
               href="/services"
               onClick={() => setMenuOpen(false)}
               className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
             >
-              🛠️ Services
+              Services
             </Link>
             <Link
               href="/for-landlords"
               onClick={() => setMenuOpen(false)}
               className="p-2.5 rounded-md hover:bg-navy-50 text-peshawar-700 font-bold"
             >
-              🏢 For Landlords
+              For Landlords
             </Link>
             <Link
               href="/pricing"
               onClick={() => setMenuOpen(false)}
               className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
             >
-              🏷️ Pricing
+              Pricing
             </Link>
             <Link
               href="/about"
               onClick={() => setMenuOpen(false)}
               className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
             >
-              📖 About Us
+              About Us
             </Link>
             <Link
               href="/contact"
               onClick={() => setMenuOpen(false)}
               className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
             >
-              📞 Contact Us
+              Contact Us
             </Link>
             <Link
               href="/inquiries"
               onClick={() => setMenuOpen(false)}
               className="p-2.5 rounded-md hover:bg-navy-50 text-navy-800"
             >
-              📨 Inquiries
+              Inquiries
             </Link>
           </div>
 
@@ -285,7 +285,7 @@ export default function Navbar() {
                 onClick={() => setMenuOpen(false)}
                 className="text-sm font-bold text-peshawar-700 flex items-center gap-1.5"
               >
-                <span>👤</span>
+                <UserIcon className="w-4 h-4 text-peshawar-700" />
                 <span>{user?.fullName} (My Profile)</span>
               </Link>
               <button

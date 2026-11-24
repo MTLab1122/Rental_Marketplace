@@ -85,7 +85,36 @@ export default function TermsAndConditionsPage() {
 
       <section className="space-y-4 text-sm leading-relaxed text-navy-800">
         <h2 className="text-lg font-bold text-navy-950 border-l-4 border-emerald-600 pl-3">
-          5. Contact Information
+          5. Escrow Holds, Cancellation & Refunds
+        </h2>
+        <p>
+          All advance booking deposits are held in escrow and subject to our official{' '}
+          <Link href="/refund-policy" className="text-emerald-700 underline font-semibold">
+            Refund & Escrow Cancellation Policy
+          </Link>
+          . Tenants receive a 100% full refund if a property fails physical verification or if the
+          landlord cancels prior to handover.
+        </p>
+      </section>
+
+      <section className="space-y-4 text-sm leading-relaxed text-navy-800">
+        <h2 className="text-lg font-bold text-navy-950 border-l-4 border-emerald-600 pl-3">
+          6. Tenancy Disputes & Police Registration
+        </h2>
+        <p>
+          Tenancy contracts must comply with the Khyber Pakhtunkhwa Restriction of Rented Buildings
+          (Security) Act 2014. Disagreements regarding property condition or deposits can be
+          escalated to our arbitration team via the{' '}
+          <Link href="/disputes" className="text-emerald-700 underline font-semibold">
+            Dispute Resolution Center
+          </Link>
+          .
+        </p>
+      </section>
+
+      <section className="space-y-4 text-sm leading-relaxed text-navy-800">
+        <h2 className="text-lg font-bold text-navy-950 border-l-4 border-emerald-600 pl-3">
+          7. Contact Information
         </h2>
         <p>
           Legal inquiries, dispute escalations, or tenancy complaints may be submitted to:

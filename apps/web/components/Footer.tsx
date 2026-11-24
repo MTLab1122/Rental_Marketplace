@@ -165,6 +165,16 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/refund-policy" className="hover:text-white transition">
+                  Refund & Escrow Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/data-deletion" className="hover:text-white transition">
+                  Data Deletion Request
+                </Link>
+              </li>
+              <li>
                 <Link href="/cookie-policy" className="hover:text-white transition">
                   Cookie Policy
                 </Link>
@@ -187,12 +197,18 @@ export default function Footer() {
             © {new Date().getFullYear()} Peshawar Rental Marketplace. All rights reserved.
             Exclusively serving Peshawar, KP, Pakistan.
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-wrap items-center gap-4">
             <Link href="/privacy-policy" className="hover:text-white">
               Privacy
             </Link>
             <Link href="/terms-and-conditions" className="hover:text-white">
               Terms
+            </Link>
+            <Link href="/refund-policy" className="hover:text-white">
+              Refunds
+            </Link>
+            <Link href="/data-deletion" className="hover:text-white">
+              Data Deletion
             </Link>
             <Link href="/cookie-policy" className="hover:text-white">
               Cookies

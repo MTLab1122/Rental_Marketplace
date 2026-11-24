@@ -81,9 +81,23 @@ export default function CookiePolicyPage() {
         </h2>
         <p>
           You have full control over your cookie preferences at all times. You can open our consent
-          manager and adjust your choices by using the link in the site footer, or by clearing your
-          browser&apos;s site storage for rentpeshawar.pk.
+          manager and adjust your choices by using the button below, the link in the site footer, or
+          by clearing your browser&apos;s site storage for rentpeshawar.pk.
         </p>
+        <div className="flex flex-wrap gap-3 pt-2">
+          <Link
+            href="/privacy-policy"
+            className="px-4 py-2 bg-navy-50 hover:bg-navy-100 text-navy-800 border border-navy-200 rounded-md font-bold text-xs transition"
+          >
+            Review Privacy Policy →
+          </Link>
+          <Link
+            href="/data-deletion"
+            className="px-4 py-2 bg-navy-50 hover:bg-navy-100 text-navy-800 border border-navy-200 rounded-md font-bold text-xs transition"
+          >
+            Data Deletion Requests →
+          </Link>
+        </div>
       </section>
     </main>
   );

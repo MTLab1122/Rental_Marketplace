@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { submitInquiry } from '../lib/api';
 import { useAuth } from '../lib/auth-context';
+import { CheckIcon } from './Icons';
 
 interface InquiryModalProps {
   propertyId: string;
@@ -27,14 +29,33 @@ export default function InquiryModal({
   const [preferredContact, setPreferredContact] = useState<'PHONE' | 'WHATSAPP' | 'IN_APP'>(
     'PHONE',
   );
+  const [consent, setConsent] = useState(false);
+  const [hpInqConfirm, setHpInqConfirm] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (hpInqConfirm) return; // Bot protection
+
+    if (!consent) {
+      setError('Please agree to the privacy and inquiry disclosure terms.');
+      return;
+    }
+
     if (!isAuthenticated || !token) {
       window.location.href = '/login';
       return;
@@ -90,15 +111,27 @@ export default function InquiryModal({
         </p>
 
         {success ? (
-          <div className="bg-peshawar-50 border border-peshawar-200 text-peshawar-800 p-4 rounded-m3-md text-sm text-center">
-            <span className="text-xl block mb-1"></span>
-            <strong>Inquiry Submitted!</strong>
-            <p className="text-xs text-peshawar-600 mt-1">
+          <div className="bg-peshawar-50 border border-peshawar-200 text-peshawar-800 p-4 rounded-m3-md text-sm text-center space-y-1">
+            <CheckIcon className="w-8 h-8 text-peshawar-700 mx-auto" />
+            <strong className="block text-base">Inquiry Submitted!</strong>
+            <p className="text-xs text-peshawar-600">
               The verified landlord has been notified and will review your request.
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Honeypot field for bot spam protection */}
+            <input
+              type="text"
+              name="hp_inq_confirm"
+              tabIndex={-1}
+              autoComplete="off"
+              value={hpInqConfirm}
+              onChange={(e) => setHpInqConfirm(e.target.value)}
+              className="hidden"
+              aria-hidden="true"
+            />
+
             {error && (
               <div className="bg-red-50 text-red-700 text-xs p-2.5 rounded-m3-sm border border-red-200">
                 {error}
@@ -148,18 +181,41 @@ export default function InquiryModal({
               </div>
             </div>
 
+            {/* Form Consent Checkbox */}
+            <div className="p-2.5 bg-slate-50 border border-navy-200 rounded-md">
+              <label className="flex items-start gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  required
+                  checked={consent}
+                  onChange={(e) => setConsent(e.target.checked)}
+                  className="mt-0.5 h-3.5 w-3.5 rounded border-navy-300 text-peshawar-600 focus:ring-peshawar-500"
+                />
+                <span className="text-[11px] text-navy-700 leading-tight">
+                  I agree to share my inquiry details with the verified property owner under the{' '}
+                  <Link
+                    href="/privacy-policy"
+                    className="text-peshawar-700 underline font-semibold"
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
+                </span>
+              </label>
+            </div>
+
             <div className="pt-2 flex justify-end gap-2">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-4 py-2 text-xs font-bold text-navy-600 hover:text-navy-900 border border-navy-200 rounded-m3-md"
+                className="px-4 py-2 text-xs font-bold text-navy-600 hover:text-navy-900 border border-navy-200 rounded-m3-md transition"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="px-5 py-2 text-xs font-bold bg-peshawar-600 hover:bg-peshawar-700 text-white rounded-m3-md shadow-sm transition disabled:opacity-50"
+                className="px-5 py-2 text-xs font-bold bg-peshawar-600 hover:bg-peshawar-700 text-white rounded-m3-md shadow-sm transition disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-peshawar-400"
               >
                 {loading ? 'Submitting...' : 'Send Inquiry'}
               </button>

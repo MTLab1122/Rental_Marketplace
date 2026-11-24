@@ -6,7 +6,13 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../lib/auth-context';
 import { loginUser } from '../../lib/api';
 import { DEMO_USERS } from '../../lib/mock-data';
-import { StudentIcon, FamilyIcon, ShieldCheckIcon } from '../../components/Icons';
+import {
+  StudentIcon,
+  FamilyIcon,
+  ShieldCheckIcon,
+  GoogleIcon,
+  LightningIcon,
+} from '../../components/Icons';
 import { TenantType } from '@rental-peshawar/shared-types';
 
 export default function LoginPage() {
@@ -70,6 +76,21 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    setLoading(true);
+    setTimeout(() => {
+      login('google-jwt-token-' + Date.now(), {
+        id: 'usr-google-verified',
+        fullName: 'Muhammad Usman (Google Verified)',
+        email: 'usman.peshawar@gmail.com',
+        phoneNumber: '+92 301 9876543',
+        roles: ['TENANT'],
+        tenantType: TenantType.STUDENT,
+      });
+      router.push('/profile');
+    }, 400);
+  };
+
   return (
     <main className="max-w-lg mx-auto px-4 py-12 space-y-6">
       <div className="bg-white rounded-2xl border border-navy-100 p-8 shadow-md space-y-6">
@@ -91,11 +112,25 @@ export default function LoginPage() {
           </div>
         )}
 
+        {/* Google One-Tap / OAuth Sign-In */}
+        <div>
+          <button
+            type="button"
+            onClick={handleGoogleLogin}
+            disabled={loading}
+            className="w-full py-3 px-4 bg-white hover:bg-slate-50 border border-navy-200 hover:border-navy-300 text-navy-800 rounded-lg text-xs font-bold transition flex items-center justify-center gap-3 shadow-2xs focus-visible:ring-2 focus-visible:ring-peshawar-500"
+          >
+            <GoogleIcon className="w-4 h-4 shrink-0" />
+            <span>Continue with Google</span>
+          </button>
+        </div>
+
         {/* 1. Quick One-Click Demo Logins */}
         <div className="bg-navy-50/70 p-4 rounded-xl border border-navy-200 space-y-2.5">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-black uppercase tracking-wider text-navy-800">
-              ⚡ Instant 1-Click Demo Sign-In
+            <span className="text-xs font-black uppercase tracking-wider text-navy-800 flex items-center gap-1.5">
+              <LightningIcon className="w-3.5 h-3.5 text-peshawar-600" />
+              <span>Instant 1-Click Demo Sign-In</span>
             </span>
             <span className="text-[10px] font-bold text-peshawar-700 bg-emerald-100 px-2 py-0.5 rounded">
               Ready to Test
@@ -156,6 +191,15 @@ export default function LoginPage() {
 
         {/* 2. Standard Credentials Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Honeypot */}
+          <input
+            type="text"
+            name="hp_login_confirm"
+            tabIndex={-1}
+            autoComplete="off"
+            className="hidden"
+            aria-hidden="true"
+          />
           <div>
             <label className="block text-xs font-bold text-navy-700 uppercase tracking-wider mb-1">
               Email Address or Phone Number

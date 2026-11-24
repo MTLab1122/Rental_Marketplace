@@ -21,6 +21,20 @@ export function trackEvent(eventName: AnalyticsEvent, payload: AnalyticsPayload 
   try {
     if (typeof window === 'undefined') return;
 
+    // Strict Cookie Consent Enforcement - Zero Dark Patterns
+    try {
+      const consentRaw = localStorage.getItem('peshawar_rent_cookie_consent');
+      if (consentRaw) {
+        const consent = JSON.parse(consentRaw);
+        if (consent && consent.analytics === false) {
+          // User rejected analytics tracking or opted out; respect decision completely
+          return;
+        }
+      }
+    } catch {
+      // Continue or gracefully proceed
+    }
+
     const eventData = {
       event: eventName,
       timestamp: new Date().toISOString(),

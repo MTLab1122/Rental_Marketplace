@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ShieldCheckIcon, MapPinIcon } from '../../components/Icons';
+import { ShieldCheckIcon, MapPinIcon, PhoneIcon, ChatIcon } from '../../components/Icons';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -11,6 +11,7 @@ export default function ContactPage() {
     phone: '',
     category: 'GENERAL',
     message: '',
+    hp_contact_confirm: '',
   });
 
   const [submitted, setSubmitted] = useState(false);
@@ -18,11 +19,20 @@ export default function ContactPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.hp_contact_confirm) return; // Bot protection
+
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
-      setFormData({ name: '', email: '', phone: '', category: 'GENERAL', message: '' });
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        category: 'GENERAL',
+        message: '',
+        hp_contact_confirm: '',
+      });
     }, 600);
   };
 
@@ -55,7 +65,7 @@ export default function ContactPage() {
             {/* Phone */}
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-lg bg-emerald-50 text-peshawar-700 flex items-center justify-center shrink-0">
-                <span className="text-lg">📞</span>
+                <PhoneIcon className="w-5 h-5 text-peshawar-700" />
               </div>
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-navy-500">
@@ -69,7 +79,7 @@ export default function ContactPage() {
             {/* WhatsApp */}
             <div className="flex items-start gap-4">
               <div className="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
-                <span className="text-lg">💬</span>
+                <ChatIcon className="w-5 h-5 text-emerald-800" />
               </div>
               <div>
                 <div className="text-xs font-bold uppercase tracking-wider text-emerald-800">
@@ -238,10 +248,44 @@ export default function ContactPage() {
               />
             </div>
 
+            {/* Honeypot field for bot spam protection */}
+            <input
+              type="text"
+              name="hp_contact_confirm"
+              tabIndex={-1}
+              autoComplete="off"
+              value={formData.hp_contact_confirm}
+              onChange={(e) => setFormData({ ...formData, hp_contact_confirm: e.target.value })}
+              className="hidden"
+              aria-hidden="true"
+            />
+
+            {/* Consent Checkbox */}
+            <div className="p-3 bg-slate-50 border border-navy-200 rounded-md">
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  required
+                  className="mt-0.5 h-4 w-4 rounded border-navy-300 text-peshawar-600 focus:ring-peshawar-500"
+                />
+                <span className="text-xs text-navy-700 leading-relaxed">
+                  I agree that Peshawar Rentals may contact me via Phone, SMS, or WhatsApp regarding
+                  this inquiry in accordance with the{' '}
+                  <Link
+                    href="/privacy-policy"
+                    className="text-peshawar-700 underline font-semibold"
+                  >
+                    Privacy Policy
+                  </Link>
+                  .
+                </span>
+              </label>
+            </div>
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3.5 bg-peshawar-600 hover:bg-peshawar-700 text-white font-bold text-sm rounded-lg shadow-md transition disabled:opacity-50"
+              className="w-full py-3.5 bg-peshawar-600 hover:bg-peshawar-700 text-white font-bold text-sm rounded-lg shadow-md transition disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-peshawar-400"
             >
               {loading ? 'Submitting Ticket...' : 'Send Message to Peshawar Desk'}
             </button>
